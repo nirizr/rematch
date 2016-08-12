@@ -1,0 +1,6 @@
+django
+numpy
+pygments
+django-registration-redux
+djangorestframework
+django-rest-auth < 0.8.0
