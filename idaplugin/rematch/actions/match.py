@@ -3,17 +3,9 @@ import idc
 from idautils import Functions
 
 from .. import instances
+from ..collectors.dummy import DummyVector
 from .. import network
 from . import base
-
-
-class Vector:
-  def __init__(self, id):
-    self.id = id
-
-  def serialize(self):
-    return {"instance": self.id, "type": "hash", "type_version": 0,
-            "data": "NotEmpty"}
 
 
 class MatchAllAction(base.BoundFileAction):
@@ -25,13 +17,11 @@ class MatchAllAction(base.BoundFileAction):
     file_id = nn.hashstr('bound_file_id')
 
     # this is horribly slow
-    fns = Functions()
-    for f in fns:
-      data = instances.FunctionInstance(file_id, f)
-      r = network.query("POST", "collab/instances/", params=data.serialize(),
-                        json=True)
-      vec = Vector(r['id'])
-      network.query("POST", "collab/vectors/", params=vec.serialize(),
+    for fea in Functions():
+      func = instances.FunctionInstance(file_id, fea)
+      func.vectors.add(DummyVector())
+      func.vectors.add(DummyVector())
+      network.query("POST", "collab/instances/", params=func.serialize(),
                     json=True)
 
 
@@ -49,8 +39,5 @@ class MatchFunctionAction(base.BoundFileAction):
       return
 
     data = instances.FunctionInstance(file_id, function.startEA)
-    r = network.query("POST", "collab/instances/", params=data.serialize(),
-                      json=True)
-    vec = Vector(r['id'])
-    r = network.query("POST", "collab/vectors/", params=[vec.serialize()],
-                      json=True)
+    network.query("POST", "collab/instances/", params=data.serialize(),
+                  json=True)
