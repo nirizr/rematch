@@ -2,18 +2,16 @@ import idaapi
 import idc
 from idautils import Functions
 
+try:
+  from PyQt5 import QtGui, QtCore, QtWidgets
+except:
+  from PySide import QtGui, QtCore
+  QtWidgets = QtGui
+
 from .. import instances
+from ..collectors.dummy import DummyVector
 from .. import network
 from . import base
-
-
-class Vector:
-  def __init__(self, id):
-    self.id = id
-
-  def serialize(self):
-    return {"instance": self.id, "type": "hash", "type_version": 0,
-            "data": "NotEmpty"}
 
 
 class MatchAllAction(base.BoundFileAction):
@@ -22,17 +20,33 @@ class MatchAllAction(base.BoundFileAction):
 
   def activate(self, ctx):
     nn = idaapi.netnode("$rematch")
-    file_id = nn.hashstr('bound_file_id')
+    self.file_id = nn.hashstr('bound_file_id')
 
-    # this is horribly slow
-    fns = Functions()
-    for f in fns:
-      data = instances.FunctionInstance(file_id, f)
-      r = network.query("POST", "collab/instances/", params=data.serialize(),
-                        json=True)
-      vec = Vector(r['id'])
-      network.query("POST", "collab/vectors/", params=vec.serialize(),
-                    json=True)
+    self.function_gen = enumerate(Functions())
+    pd = QtWidgets.QProgressDialog(labelText="Processing functions...",
+                                   minimum=0, maximum=len(list(Functions())))
+    self.progress = pd
+    self.progress.canceled.connect(self.cancel)
+    self.timer = QtCore.QTimer()
+    self.timer.timeout.connect(self.perform)
+    self.timer.start()
+
+  def perform(self):
+    i, fea = self.function_gen.next()
+
+    func = instances.FunctionInstance(self.file_id, fea)
+    func.vectors.add(DummyVector())
+    func.vectors.add(DummyVector())
+    network.query("POST", "collab/instances/", params=func.serialize(),
+                  json=True)
+
+    i = i + 1
+    self.progress.setValue(i)
+    if (i >= self.progress.maximum()):
+      self.timer.stop()
+
+  def cancel(self):
+    self.timer.stop()
 
 
 class MatchFunctionAction(base.BoundFileAction):
@@ -49,8 +63,5 @@ class MatchFunctionAction(base.BoundFileAction):
       return
 
     data = instances.FunctionInstance(file_id, function.startEA)
-    r = network.query("POST", "collab/instances/", params=data.serialize(),
-                      json=True)
-    vec = Vector(r['id'])
-    r = network.query("POST", "collab/vectors/", params=[vec.serialize()],
-                      json=True)
+    network.query("POST", "collab/instances/", params=data.serialize(),
+                  json=True)
