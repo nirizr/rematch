@@ -2,6 +2,12 @@ import idaapi
 import idc
 from idautils import Functions
 
+try:
+  from PyQt5 import QtGui, QtCore, QtWidgets
+except:
+  from PySide import QtGui, QtCore
+  QtWidgets = QtGui
+
 from .. import instances
 from ..collectors.dummy import DummyVector
 from .. import network
@@ -14,15 +20,33 @@ class MatchAllAction(base.BoundFileAction):
 
   def activate(self, ctx):
     nn = idaapi.netnode("$rematch")
-    file_id = nn.hashstr('bound_file_id')
+    self.file_id = nn.hashstr('bound_file_id')
 
-    # this is horribly slow
-    for fea in Functions():
-      func = instances.FunctionInstance(file_id, fea)
-      func.vectors.add(DummyVector())
-      func.vectors.add(DummyVector())
-      network.query("POST", "collab/instances/", params=func.serialize(),
-                    json=True)
+    self.function_gen = enumerate(Functions())
+    pd = QtWidgets.QProgressDialog(labelText="Processing functions...",
+                                   minimum=0, maximum=len(list(Functions())))
+    self.progress = pd
+    self.progress.canceled.connect(self.cancel)
+    self.timer = QtCore.QTimer()
+    self.timer.timeout.connect(self.perform)
+    self.timer.start()
+
+  def perform(self):
+    i, fea = self.function_gen.next()
+
+    func = instances.FunctionInstance(self.file_id, fea)
+    func.vectors.add(DummyVector())
+    func.vectors.add(DummyVector())
+    network.query("POST", "collab/instances/", params=func.serialize(),
+                  json=True)
+
+    i = i + 1
+    self.progress.setValue(i)
+    if (i >= self.progress.maximum()):
+      self.timer.stop()
+
+  def cancel(self):
+    self.timer.stop()
 
 
 class MatchFunctionAction(base.BoundFileAction):
