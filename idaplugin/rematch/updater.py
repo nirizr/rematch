@@ -7,7 +7,11 @@ from . import network
 from . import exceptions
 from .version import __version__
 
+# builtin
 from distutils.version import StrictVersion
+
+# ida
+import idc
 
 
 def update():
@@ -34,10 +38,24 @@ def update():
       return
 
     logger('updater').info("update is available")
+
+    if remote_version in config['settings']['update']['skipped']:
+      logger('updater').info("version update marked skip")
+      return
+
     if config['settings']['update']['autoupdate']:
       pass
     else:
-      pass
+      update = idc.AskYN(1, "An update is available for the rematch IDA "
+                            "plugin.\nVersion {} is available, while you're "
+                            "using {}.\nWould you like to update your version?"
+                            .format(remote_version, local_version))
+      if update == 0:
+        config['settings']['update']['skipped'].append(str(remote_version))
+        logger('updater').info("Version update supressed")
+        return
+      if update == -1:
+        return
 
   except exceptions.NotFoundException:
     logger('updater').info("Couldn't find latest release for plugin")
