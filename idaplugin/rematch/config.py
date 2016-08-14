@@ -38,9 +38,9 @@ class Config(dict):
     elif os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:
         try:
-          file = json.loads(fh.read())
+          _file = json.loads(fh.read())
           default = json.loads(self.DEFAULT)
-          new = self.merge_map(default, file)
+          new = self.merge_map(default, _file)
           self.update(new)
         except Exception as ex:
           logger('config').warn(ex)
