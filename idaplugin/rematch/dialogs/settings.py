@@ -14,6 +14,8 @@ class SettingsDialog(base.BaseDialog):
 
     autoupdate = config['settings']['update']['autoupdate']
     autocheck = config['settings']['update']['autocheck']
+    autologin = config['settings']['login']['autologin']
+    autologout = config['settings']['login']['autologout']
 
     layout = QtWidgets.QVBoxLayout()
 
@@ -27,6 +29,16 @@ class SettingsDialog(base.BaseDialog):
                                           "version on startup")
     self.autoupdate.setChecked(autoupdate)
     layout.addWidget(self.autoupdate)
+
+    self.autologin = QtWidgets.QCheckBox("Automatically login using "
+                                         "user/password on startup")
+    self.autologin.setChecked(autologin)
+    layout.addWidget(self.autologin)
+
+    self.autologout = QtWidgets.QCheckBox("Automatically forget login "
+                                          "token when IDA exits")
+    self.autologout.setChecked(autologout)
+    layout.addWidget(self.autologout)
 
     saveBtn = QtWidgets.QPushButton("&Save")
     saveBtn.setDefault(True)
@@ -48,10 +60,14 @@ class SettingsDialog(base.BaseDialog):
   def data(self):
     autocheck = self.autocheck.isChecked()
     autoupdate = self.autoupdate.isChecked()
+    autologin = self.autologin.isChecked()
+    autologout = self.autologout.isChecked()
 
-    return autocheck, autoupdate
+    return autocheck, autoupdate, autologin, autologout
 
   def submit(self):
     config['settings']['update']['autocheck'] = self.autocheck.isChecked()
     config['settings']['update']['autoupdate'] = self.autoupdate.isChecked()
+    config['settings']['login']['autologin'] = self.autologin.isChecked()
+    config['settings']['login']['autologout'] = self.autologout.isChecked()
     self.accept()

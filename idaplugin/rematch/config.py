@@ -18,6 +18,10 @@ class Config(dict):
         "update": {
             "autocheck": true,
             "autoupdate": true
+        },
+        "login": {
+            "autologin": true,
+            "autologout": false
         }
     },
     "username": ""
