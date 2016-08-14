@@ -24,11 +24,11 @@ class Config(dict):
 }"""
 
   def __init__(self):
+    super(Config, self).__init__()
+
     self.home_dir = os.path.expanduser("~")
     self.user_config_dir = os.path.join(self.home_dir, 'rematch')
     self.user_config_file = os.path.join(self.user_config_dir, 'config.json')
-    # TODO: config should be initialized by components
-    super(Config, self).__init__(json.loads(self.DEFAULT))
 
     if not os.path.exists(self.user_config_dir):
       try:
@@ -38,11 +38,24 @@ class Config(dict):
     elif os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:
         try:
-          self.update(json.loads(fh.read()))
-        except:
-          pass
+          _file = json.loads(fh.read())
+          default = json.loads(self.DEFAULT)
+          new = self.merge_map(default, _file)
+          self.update(new)
+        except Exception as ex:
+          logger('config').warn(ex)
 
     self.save()
+
+  def merge_map(self, a, b):
+    if isinstance(a, list) and isinstance(b, list):
+      return a + b
+    if not isinstance(a, dict) or not isinstance(b, dict):
+      return b
+
+    for key in b.keys():
+      a[key] = self.merge_map(a[key], b[key]) if key in a else b[key]
+    return a
 
   def save(self):
     try:
