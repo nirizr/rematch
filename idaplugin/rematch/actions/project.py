@@ -5,7 +5,7 @@ from ..dialogs.project import AddProjectDialog, AddFileDialog
 
 
 class AddProjectAction(base.AuthAction):
-  name = "&Create project"
+  name = "&Add project"
   group = "Project"
 
   def activate(self, ctx):
