@@ -9,17 +9,24 @@ class User(dict):
                     "is_staff": False, "is_active": False, "id": None}
 
   def __init__(self):
+    super(User, self).__init__(self.LOGGEDOUT_USER)
+
     try:
       if 'token' in config:
         self.refresh()
-      elif 'username' in config and \
-           'password' in config and \
-           'server' in config:
+
+      # refresh was successful
+      if self['is_authenticated']:
+        return
+
+      # only attempt user auto login if configured
+      if not config['settings']['login']['autologin']:
+        return
+
+      if 'username' in config and 'password' in config and 'server' in config:
         self.login(config['username'], config['password'], config['server'])
     except exceptions.RematchException as ex:
       logger('user').debug(ex)
-      data = self.LOGGEDOUT_USER
-      super(User, self).__init__(data)
 
   def login(self, username, password, server):
     # authenticate
