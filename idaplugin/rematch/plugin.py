@@ -80,7 +80,7 @@ class RematchPlugin(idaapi.plugin_t):
     timespent = self.timespent
 
     def update_timespent():
-        timespent.setValue(timespent.value() + 1 % (60 * 60))
+        timespent.setValue((timespent.value() + 1) % (60 * 60 + 1))
     self.timespent_timer.timeout.connect(update_timespent)
     self.timespent_timer.start()
 
