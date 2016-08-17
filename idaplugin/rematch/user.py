@@ -9,7 +9,7 @@ class User(dict):
                     "is_staff": False, "is_active": False, "id": None}
 
   def __init__(self):
-    super(User, self).__init__(self.LOGGEDOUT_USER)
+    super(User, self).__init__()
 
     try:
       if 'token' in config:
@@ -27,6 +27,7 @@ class User(dict):
         self.login(config['username'], config['password'], config['server'])
     except exceptions.RematchException as ex:
       logger('user').debug(ex)
+      self.update(self.LOGGEDOUT_USER)
 
   def login(self, username, password, server):
     # authenticate
