@@ -2,5 +2,5 @@
 
 REmatch, a simple binary diffing utility that just works. 
 
-Note: rematch is still work in progress not fully functional at the moment.
-We're currently working on bringing basic funcionality, check us out again soon!
+Atleast, we hope it will be. Rematch is still a work in progress and is not fully functional at the moment.
+We're currently working on bringing up basic funcionality. Check us out again soon, or watch for updates!
