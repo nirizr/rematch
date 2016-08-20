@@ -13,8 +13,8 @@ class AssemblyHashVector(Vector):
   @property
   def data(self):
     md5 = hashlib.md5()
-    for ea in idautils.FuncItems(self.ea):
-      asm_line = idc.GetDisasmEx(ea, idc.GENDSM_MULTI_LINE)
+    for offset in idautils.FuncItems(self.offset):
+      asm_line = idc.GetDisasmEx(offset, idc.GENDSM_MULTI_LINE)
       if ';' in asm_line:
         asm_line = asm_line[:asm_line.find(';')]
       asm_line = asm_line.strip()

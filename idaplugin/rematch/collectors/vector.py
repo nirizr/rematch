@@ -1,7 +1,7 @@
 class Vector:
-  def __init__(self, ea, instance_id=None):
+  def __init__(self, offset, instance_id=None):
     self.instance_id = instance_id
-    self.ea = ea
+    self.offset = offset
 
   def serialize(self):
     return {"instance": self.instance_id, "type": self.type,
