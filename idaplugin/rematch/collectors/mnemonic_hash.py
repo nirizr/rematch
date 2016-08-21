@@ -15,6 +15,7 @@ class MnemonicHashVector(Vector):
     md5 = hashlib.md5()
     for offset in idautils.FuncItems(self.offset):
       mnem_line = idc.GetMnem(offset)
-      mnem_line = asm_line.strip()
+      mnem_line = mnem_line.strip()
+      mnem_line = mnem_line.lower()
       md5.update(mnem_line)
     return md5.hexdigest()

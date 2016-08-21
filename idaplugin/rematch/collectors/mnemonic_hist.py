@@ -3,19 +3,24 @@ import idc
 
 from .vector import Vector
 
+from collections import defaultdict
 
-class MnemonicHashVector(Vector):
+
+class MnemonicHistVector(Vector):
   type = 'mnemonic_hist'
   type_version = 0
 
   @property
   def data(self):
-    instruction_enum = enumerate(idautils.GetInstructionList())
-    instruction_set = {inst: i for i, inst in instruction_enum}
-    instruction_hist = [0] * len(instruction_set)
+    instruction_set = idautils.GetInstructionList()
+    instruction_hist = defaultdict(int)
 
     for offset in idautils.FuncItems(self.offset):
       mnem_line = idc.GetMnem(offset)
-      instruction_hist[instruction_set[mnem_line]] += 1
+      mnem_line = mnem_line.lower()
+      instruction_hist[mnem_line] += 1
+
+    instruction_hist = {mnem: value
+                          for mnem, value in instruction_hist.items()}
 
     return instruction_hist

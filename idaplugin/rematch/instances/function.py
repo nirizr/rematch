@@ -17,5 +17,6 @@ class FunctionInstance(EmptyFunctionInstance):
     super(FunctionInstance, self).__init__(*args, **kwargs)
     self.vectors.add(collectors.AssemblyHashVector)
     self.vectors.add(collectors.MnemonicHashVector)
+    self.vectors.add(collectors.MnemonicHistVector)
     # self.vectors.add(collectors.data_hash)
     # self.vectors.add(collectors.opcode_hash)

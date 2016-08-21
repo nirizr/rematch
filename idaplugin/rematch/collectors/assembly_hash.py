@@ -19,5 +19,6 @@ class AssemblyHashVector(Vector):
         asm_line = asm_line[:asm_line.find(';')]
       asm_line = asm_line.strip()
       asm_line = " ".join(asm_line.split())
+      asm_line = asm_line.lower()
       md5.update(asm_line)
     return md5.hexdigest()
