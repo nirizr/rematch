@@ -1,0 +1,22 @@
+language: python
+python:
+  - "2.7"
+  - "3.2"
+  - "3.4"
+  - "3.5"
+env:
+  - PROJECT=idaplugin
+  - PROJECT=server
+matrix:
+  # idaplugin is run with python2.7, we'll check against python3 to assert compatibility
+  exclude:
+    - python: "3.2"
+      env: PROJECT=idaplugin
+    - python: "3.4"
+      env: PROJECT=idaplugin
+
+install:
+  - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
+  - pip install flake8
+
+script: flake8 ${PROJECT}
