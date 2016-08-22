@@ -32,18 +32,20 @@ class MatchAllAction(base.BoundFileAction):
     self.timer.start()
 
   def perform(self):
-    i, fea = self.function_gen.next()
+    try:
+      i, offset = self.function_gen.next()
 
-    func = instances.FunctionInstance(self.file_id, fea)
-    func.vectors.add(DummyVector())
-    func.vectors.add(DummyVector())
-    network.query("POST", "collab/instances/", params=func.serialize(),
-                  json=True)
+      func = instances.FunctionInstance(self.file_id, offset)
+      network.query("POST", "collab/instances/", params=func.serialize(),
+                    json=True)
 
-    i = i + 1
-    self.progress.setValue(i)
-    if (i >= self.progress.maximum()):
+      i = i + 1
+      self.progress.setValue(i)
+      if (i >= self.progress.maximum()):
+        self.timer.stop()
+    except:
       self.timer.stop()
+      raise
 
   def cancel(self):
     self.timer.stop()

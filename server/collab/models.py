@@ -58,9 +58,17 @@ class Instance(models.Model):
 
 
 class Vector(models.Model):
+  DUMMY = 'dummy'
   TYPE_HASH = 'hash'
+  TYPE_ASSEMBLY_HASH = 'assembly_hash'
+  TYPE_MNEMONIC_HASH = 'mnemonic_hash'
+  TYPE_MNEMONIC_HIST = 'mnemonic_hist'
   TYPE_OPCODE_HIST = 'opcode_histogram'
-  TYPE_CHOICES = ((TYPE_HASH, "Hash"),
+  TYPE_CHOICES = ((DUMMY, "Dummy"),
+                  (TYPE_HASH, "Hash"),
+                  (TYPE_ASSEMBLY_HASH, "Assembly Hash"),
+                  (TYPE_MNEMONIC_HASH, "Mnemonic Hash"),
+                  (TYPE_MNEMONIC_HIST, "Mnemonic Hist"),
                   (TYPE_OPCODE_HIST, "Opcode Histogram"))
 
   instance = models.ForeignKey(Instance, related_name='vectors')

@@ -1,4 +1,5 @@
 from . import base
+from .. import collectors
 
 
 class EmptyFunctionInstance(base.BaseInstance):
@@ -6,7 +7,7 @@ class EmptyFunctionInstance(base.BaseInstance):
 
   def __init__(self, *args, **kwargs):
     super(EmptyFunctionInstance, self).__init__(*args, **kwargs)
-    # self.vector_collectors.add(collectors.vecotors.name_hash)
+    # self.vectors.add(collectors.name_hash)
 
 
 class FunctionInstance(EmptyFunctionInstance):
@@ -14,5 +15,8 @@ class FunctionInstance(EmptyFunctionInstance):
 
   def __init__(self, *args, **kwargs):
     super(FunctionInstance, self).__init__(*args, **kwargs)
-    # self.vector_collectors.add(collectors.vecotors.data_hash)
-    # self.vector_collectors.add(collectors.vecotors.opcode_hash)
+    self.vectors.add(collectors.AssemblyHashVector)
+    self.vectors.add(collectors.MnemonicHashVector)
+    self.vectors.add(collectors.MnemonicHistVector)
+    # self.vectors.add(collectors.data_hash)
+    # self.vectors.add(collectors.opcode_hash)
