@@ -6,7 +6,7 @@ from . import logger
 
 class Config(dict):
   DEFAULT = """{
-    "debug": true,
+    "debug": false,
     "git": {
         "owner": "nirizr",
         "repository": "rematch",
