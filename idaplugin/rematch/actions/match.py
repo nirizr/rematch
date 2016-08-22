@@ -9,7 +9,6 @@ except:
   QtWidgets = QtGui
 
 from .. import instances
-from ..collectors.dummy import DummyVector
 from .. import network
 from . import base
 
