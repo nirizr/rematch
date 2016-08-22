@@ -15,6 +15,10 @@ matrix:
     - python: "3.4"
       env: PROJECT=idaplugin
 
+branches:
+  only: 
+    - master
+
 install:
   - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
   - pip install flake8
