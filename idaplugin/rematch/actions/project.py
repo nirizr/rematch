@@ -1,5 +1,3 @@
-import idaapi
-
 from . import base
 from ..dialogs.project import AddProjectDialog, AddFileDialog
 

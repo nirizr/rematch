@@ -5,7 +5,6 @@ except:
   QtWidgets = QtGui
 
 import idc
-import idaapi
 
 from . import base
 from .. import network, netnode
@@ -74,8 +73,7 @@ class AddProjectDialog(base.BaseDialog):
             'files': []}
 
     if bind_current:
-      netnode.bound_file_id = file_ids
-      data['files'].append(file_id)
+      data['files'].append(netnode.bound_file_id)
 
     self.response = network.query("POST", "collab/projects/", params=data,
                                   json=True)
