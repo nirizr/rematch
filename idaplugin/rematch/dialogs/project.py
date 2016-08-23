@@ -8,7 +8,7 @@ import idc
 import idaapi
 
 from . import base
-from .. import network
+from .. import network, netnode
 
 
 class AddProjectDialog(base.BaseDialog):
@@ -33,8 +33,7 @@ class AddProjectDialog(base.BaseDialog):
     layout.addWidget(self.privateCkb)
     self.bindCurrentCkb = QtWidgets.QCheckBox("Bind current file to project")
     layout.addWidget(self.bindCurrentCkb)
-    if not (idaapi.netnode("$rematch") and
-            idaapi.netnode("$rematch").hashstr('bound_file_id')):
+    if not netnode.bound_file_id:
       self.bindCurrentCkb.setEnabled(False)
 
     self.statusLbl = QtWidgets.QLabel()
@@ -75,8 +74,7 @@ class AddProjectDialog(base.BaseDialog):
             'files': []}
 
     if bind_current:
-      nn = idaapi.netnode("$rematch", 0, True)
-      file_id = int(nn.hashstr('bound_file_id'))
+      netnode.bound_file_id = file_ids
       data['files'].append(file_id)
 
     self.response = network.query("POST", "collab/projects/", params=data,

@@ -3,6 +3,8 @@ import idaapi
 from . import base
 from ..dialogs.project import AddProjectDialog, AddFileDialog
 
+from .. import netnode
+
 
 class AddProjectAction(base.AuthAction):
   name = "&Add project"
@@ -16,8 +18,7 @@ class AddProjectAction(base.AuthAction):
 
     name, description, private, bind_current = data
     if bind_current:
-      nn = idaapi.netnode("$rematch", 0, True)
-      nn.hashset('bound_project_id', str(response['id']))
+      netnode.bound_file_id = response['id']
 
 
 class AddFileAction(base.UnboundFileAction):
@@ -29,6 +30,5 @@ class AddFileAction(base.UnboundFileAction):
     if not response:
       return
 
-    nn = idaapi.netnode("$rematch", 0, True)
-    nn.hashset('bound_file_id', str(response['id']))
+    netnode.bound_file_id = response['id']
     # search for files with the same hash

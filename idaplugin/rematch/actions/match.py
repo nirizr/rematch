@@ -9,7 +9,7 @@ except:
   QtWidgets = QtGui
 
 from .. import instances
-from .. import network
+from .. import network, netnode
 from . import base
 
 
@@ -18,8 +18,7 @@ class MatchAllAction(base.BoundFileAction):
   group = "Match"
 
   def activate(self, ctx):
-    nn = idaapi.netnode("$rematch")
-    self.file_id = nn.hashstr('bound_file_id')
+    self.file_id = netnode.bound_file_id
 
     self.function_gen = enumerate(Functions())
     pd = QtWidgets.QProgressDialog(labelText="Processing functions...",
@@ -55,8 +54,7 @@ class MatchFunctionAction(base.BoundFileAction):
   group = "Match"
 
   def activate(self, ctx):
-    nn = idaapi.netnode("$rematch")
-    file_id = nn.hashstr('bound_file_id')
+    file_id = netnode.bound_file_id
 
     function = idaapi.choose_func("Choose function to match with database",
                                   idc.ScreenEA())

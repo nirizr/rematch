@@ -1,6 +1,6 @@
 import os
 
-from .. import user, logger
+from .. import user, logger, netnode
 
 import idaapi
 import idc
@@ -139,12 +139,7 @@ class BoundFileAction(AuthIdbAction):
     if not AuthIdbAction.enabled(self, ctx):
       return False
 
-    nn = idaapi.netnode("$rematch")
-    if not nn:
-      return False
-
-    file_id = nn.hashstr('bound_file_id')
-    if file_id and file_id.isdigit():
+    if netnode.bound_file_id:
       return True
     else:
       return False
@@ -157,12 +152,7 @@ class UnboundFileAction(AuthIdbAction):
     if not AuthIdbAction.enabled(self, ctx):
       return False
 
-    nn = idaapi.netnode("$rematch")
-    if not nn:
-      return False
-
-    file_id = nn.hashstr('bound_file_id')
-    if file_id and file_id.isdigit():
+    if netnode.bound_file_id:
       return False
     else:
       return True
