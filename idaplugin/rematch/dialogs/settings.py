@@ -24,9 +24,9 @@ class SettingsDialog(base.BaseDialog):
     self.autocheck.setChecked(autocheck)
     layout.addWidget(self.autocheck)
 
-    # TODO: only enabled when autocheck is checked
     self.autoupdate = QtWidgets.QCheckBox("Automatically update to new "
                                           "version on startup")
+    self.autocheck.stateChanged.connect(self.autoupdate.setEnabled)
     self.autoupdate.setChecked(autoupdate)
     layout.addWidget(self.autoupdate)
 
