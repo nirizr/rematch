@@ -23,4 +23,4 @@ install:
   - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
   - pip install flake8
 
-script: flake8 ${PROJECT}
+script: flake8 ${PROJECT} --show-source --statistics
