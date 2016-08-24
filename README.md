@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nirizr/rematch.svg?branch=master)](https://travis-ci.org/nirizr/rematch)
+
 # rematch
 
 REmatch, a simple binary diffing utility that just works. 
