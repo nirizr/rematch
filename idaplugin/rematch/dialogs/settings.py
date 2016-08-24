@@ -16,6 +16,7 @@ class SettingsDialog(base.BaseDialog):
     autocheck = config['settings']['update']['autocheck']
     autologin = config['settings']['login']['autologin']
     autologout = config['settings']['login']['autologout']
+    debug = config['debug']
 
     layout = QtWidgets.QVBoxLayout()
 
@@ -40,6 +41,10 @@ class SettingsDialog(base.BaseDialog):
     self.autologout.setChecked(autologout)
     layout.addWidget(self.autologout)
 
+    self.debug = QtWidgets.QCheckBox("Print debug logs to console output")
+    self.debug.setChecked(debug)
+    layout.addWidget(self.debug)
+
     saveBtn = QtWidgets.QPushButton("&Save")
     saveBtn.setDefault(True)
     cancelBtn = QtWidgets.QPushButton("&Cancel")
@@ -62,12 +67,14 @@ class SettingsDialog(base.BaseDialog):
     autoupdate = self.autoupdate.isChecked()
     autologin = self.autologin.isChecked()
     autologout = self.autologout.isChecked()
+    debug = self.debug.isChecked()
 
-    return autocheck, autoupdate, autologin, autologout
+    return autocheck, autoupdate, autologin, autologout, debug
 
   def submit(self):
     config['settings']['update']['autocheck'] = self.autocheck.isChecked()
     config['settings']['update']['autoupdate'] = self.autoupdate.isChecked()
     config['settings']['login']['autologin'] = self.autologin.isChecked()
     config['settings']['login']['autologout'] = self.autologout.isChecked()
+    config['debug'] = self.debug.isChecked()
     self.accept()
