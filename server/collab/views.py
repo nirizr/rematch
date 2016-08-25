@@ -4,20 +4,6 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 InstanceSerializer, VectorSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
-
-
-@api_view(['GET'])
-def api_root(request, format=None):
-  return Response({
-    'projects': reverse('project-list', request=request, format=format),
-    'files': reverse('file-list', request=request, format=format),
-    'instances': reverse('instance-list', request=request, format=format),
-    'vectors': reverse('vector-list', request=request, format=format)
-  })
-
 
 class ProjectViewSet(viewsets.ModelViewSet):
   queryset = Project.objects.all()
