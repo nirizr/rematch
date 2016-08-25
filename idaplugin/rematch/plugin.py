@@ -25,6 +25,8 @@ class RematchPlugin(idaapi.plugin_t):
     self.mainwindow = None
     self.toolbar = None
     self.menu = None
+    self.statusbar_timer = None
+    self.timespent_timer = None
 
   def init(self):
     QtCore.QTimer.singleShot(100, lambda: updater.update())
