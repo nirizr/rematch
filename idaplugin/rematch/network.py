@@ -11,45 +11,26 @@ cookiejar = CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
 
 
-def query(method, url, server=None, token=None, params={}, json=False):
+def query(method, url, server=None, token=None, params=None, json=False):
   if method not in ("GET", "POST"):
     raise exceptions.QueryException()
 
-  if method == "GET":
-    params = "?" + urllib.urlencode(params)
-  elif method == "POST" and json:
-    params = dumps(params)
+  full_url = get_server(server) + url
+  headers = get_headers(token, json)
 
-  # getting and finalzing server address
-  if not server:
-    if 'server' not in config or not config['server']:
-      raise exceptions.QueryException()
-    server = config['server']
-  if not (server.startswith("http://") or server.startswith("http://")):
-    server = "http://" + server
-  if not server.endswith("/"):
-    server = server + "/"
-
-  # Setting up headers
-  headers = {}
-  headers['Accept'] = 'application/json, text/html, */*'
-  headers['Content-Type'] = 'application/json'
-  if token is None and 'token' in config and config['token']:
-    token = config['token']
-  if token:
-    headers['Authorization'] = 'Token {}'.format(token)
-
-  full_url = server + url
-
-  logger('network').info("[query] params {full_url}{headers}{params}"
+  logger('network').info("[query] {full_url}{headers}{params}"
                          "".format(full_url=full_url, headers=headers,
                                    params=params))
 
   # issue request
   try:
     if method == "GET":
-      request = urllib2.Request(full_url + params, headers=headers)
+      if params:
+        full_url += "?" + urllib.urlencode(params)
+      request = urllib2.Request(full_url, headers=headers)
     elif method == "POST":
+      if params and json:
+        params = dumps(params)
       request = urllib2.Request(full_url, data=params, headers=headers)
 
     response = opener.open(request)
@@ -71,3 +52,33 @@ def query(method, url, server=None, token=None, params={}, json=False):
     raise
   except urllib2.URLError as ex:
     raise exceptions.ConnectionException()
+
+
+def get_server(server):
+  """getting and finalzing server address"""
+
+  if not server:
+    if 'server' not in config or not config['server']:
+      raise exceptions.QueryException()
+    server = config['server']
+  if not (server.startswith("http://") or server.startswith("http://")):
+    server = "http://" + server
+  if not server.endswith("/"):
+    server = server + "/"
+
+  return server
+
+
+def get_headers(token, json):
+  """Setting up headers"""
+
+  headers = {}
+  if json:
+    headers['Accept'] = 'application/json, text/html, */*'
+    headers['Content-Type'] = 'application/json'
+  if token is None and 'token' in config and config['token']:
+    token = config['token']
+  if token:
+    headers['Authorization'] = 'Token {}'.format(token)
+
+  return headers
