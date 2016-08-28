@@ -127,7 +127,8 @@ class RematchPlugin(idaapi.plugin_t):
 
     return self.mainwindow
 
-  def search_mainwindow(self, widget):
+  @staticmethod
+  def search_mainwindow(widget):
     while widget is not None:
       if isinstance(widget, QtWidgets.QMainWindow):
         return widget

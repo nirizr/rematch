@@ -8,8 +8,10 @@ from ..dialogs.settings import SettingsDialog
 class SettingsAction(base.Action):
   name = "&Settings"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     SettingsDialog().get()
 
-  def update(self, ctx):
+  @staticmethod
+  def update(ctx):
     return idaapi.AST_ENABLE_ALWAYS

@@ -53,7 +53,8 @@ class MatchFunctionAction(base.BoundFileAction):
   name = "Match &Function"
   group = "Match"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     file_id = netnode.bound_file_id
 
     function = idaapi.choose_func("Choose function to match with database",

@@ -109,50 +109,43 @@ class Action(idaapi.action_handler_t):
 
 class IdbAction(Action):
   """This action is only available when an idb file is loaded"""
-  def enabled(self, ctx):
-    if idc.GetIdbPath():
-      return True
-    else:
-      return False
+  @staticmethod
+  def enabled(ctx):
+    return bool(idc.GetIdbPath())
 
 
 class AuthAction(Action):
   """This action is only available when a user is logged in"""
-  def enabled(self, ctx):
-    if user['is_authenticated']:
-      return True
-    else:
-      return False
+  @staticmethod
+  def enabled(ctx):
+    return bool(user['is_authenticated'])
 
 
 class AuthIdbAction(AuthAction, IdbAction):
   """This action is only available when an idb file is loaded and a user is
   logged in"""
-  def enabled(self, ctx):
-    return AuthAction.enabled(self, ctx) and IdbAction.enabled(self, ctx)
+  @staticmethod
+  def enabled(ctx):
+    return AuthAction.enabled(ctx) and IdbAction.enabled(ctx)
 
 
 class BoundFileAction(AuthIdbAction):
   """This action is only available when a file bound to the remote server is
   loaded"""
-  def enabled(self, ctx):
-    if not AuthIdbAction.enabled(self, ctx):
+  @staticmethod
+  def enabled(ctx):
+    if not AuthIdbAction.enabled(ctx):
       return False
 
-    if netnode.bound_file_id:
-      return True
-    else:
-      return False
+    return bool(netnode.bound_file_id)
 
 
 class UnboundFileAction(AuthIdbAction):
   """This action is only available when no file is bound to the remote
   server"""
-  def enabled(self, ctx):
-    if not AuthIdbAction.enabled(self, ctx):
+  @staticmethod
+  def enabled(ctx):
+    if not AuthIdbAction.enabled(ctx):
       return False
 
-    if netnode.bound_file_id:
-      return False
-    else:
-      return True
+    return not bool(netnode.bound_file_id)

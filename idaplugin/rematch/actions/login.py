@@ -10,10 +10,12 @@ class LoginAction(base.Action):
   name = "&Login"
   group = "User"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     LoginDialog().get()
 
-  def update(self, ctx):
+  @staticmethod
+  def update(ctx):
     if 'is_authenticated' in user and user['is_authenticated']:
       return idaapi.AST_DISABLE
     else:
@@ -24,10 +26,12 @@ class LogoutAction(base.Action):
   name = "Log&out"
   group = "User"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     user.logout()
 
-  def update(self, ctx):
+  @staticmethod
+  def update(ctx):
     if 'is_authenticated' in user and user['is_authenticated']:
       return idaapi.AST_ENABLE
     else:

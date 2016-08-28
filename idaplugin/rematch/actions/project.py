@@ -8,7 +8,8 @@ class AddProjectAction(base.AuthAction):
   name = "&Add project"
   group = "Project"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     data, response, accepted = AddProjectDialog().get()
 
     if not accepted:
@@ -23,10 +24,11 @@ class AddFileAction(base.UnboundFileAction):
   name = "&Add file"
   group = "Project"
 
-  def activate(self, ctx):
+  @staticmethod
+  def activate(ctx):
     response = AddFileDialog().get_response()
     if not response:
       return
 
     netnode.bound_file_id = response['id']
-    # search for files with the same hash
+    # TODO: search for files with the same hash
