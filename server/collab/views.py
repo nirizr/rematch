@@ -24,23 +24,23 @@ class ViewSetManyAllowedMixin(object):
     return super(ViewSetManyAllowedMixin, self).get_serializer(*args, **kwargs)
 
 
-class ProjectViewSet(viewsets.ModelViewSet, ViewSetOwnerMixin):
+class ProjectViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Project.objects.all()
   serializer_class = ProjectSerializer
 
 
-class FileViewSet(viewsets.ModelViewSet, ViewSetOwnerMixin):
+class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = File.objects.all()
   serializer_class = FileSerializer
 
 
-class InstanceViewSet(viewsets.ModelViewSet, ViewSetOwnerMixin,
-                      ViewSetManyAllowedMixin):
+class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
+                      viewsets.ModelViewSet):
   queryset = Instance.objects.all()
   serializer_class = InstanceSerializer
 
 
-class VectorViewSet(viewsets.ModelViewSet, ViewSetManyAllowedMixin):
+class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Vector.objects.all()
   serializer_class = VectorSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
