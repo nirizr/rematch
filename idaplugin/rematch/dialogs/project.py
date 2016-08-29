@@ -15,7 +15,6 @@ class AddProjectDialog(base.BaseDialog):
     super(AddProjectDialog, self).__init__(title="Add Project", **kwargs)
 
     gridLyt = QtWidgets.QGridLayout()
-    layout = QtWidgets.QVBoxLayout()
 
     gridLyt.addWidget(QtWidgets.QLabel("Project name:"), 0, 0)
     gridLyt.addWidget(QtWidgets.QLabel("Description:"), 1, 0)
@@ -26,34 +25,16 @@ class AddProjectDialog(base.BaseDialog):
     self.descriptionTxt = QtWidgets.QTextEdit()
     gridLyt.addWidget(self.descriptionTxt, 1, 1)
 
-    layout.addLayout(gridLyt)
+    self.layout.addLayout(gridLyt)
 
     self.privateCkb = QtWidgets.QCheckBox("Make project private")
-    layout.addWidget(self.privateCkb)
+    self.layout.addWidget(self.privateCkb)
     self.bindCurrentCkb = QtWidgets.QCheckBox("Bind current file to project")
-    layout.addWidget(self.bindCurrentCkb)
+    self.layout.addWidget(self.bindCurrentCkb)
     if not netnode.bound_file_id:
       self.bindCurrentCkb.setEnabled(False)
 
-    self.statusLbl = QtWidgets.QLabel()
-    layout.addWidget(self.statusLbl)
-
-    addBtn = QtWidgets.QPushButton("&Add")
-    addBtn.setDefault(True)
-    cancelBtn = QtWidgets.QPushButton("&Cancel")
-    SizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                       QtWidgets.QSizePolicy.Fixed)
-    addBtn.setSizePolicy(SizePolicy)
-    cancelBtn.setSizePolicy(SizePolicy)
-    buttonLyt = QtWidgets.QHBoxLayout()
-    buttonLyt.addWidget(addBtn)
-    buttonLyt.addWidget(cancelBtn)
-    layout.addLayout(buttonLyt)
-
-    self.setLayout(layout)
-
-    addBtn.clicked.connect(self.submit)
-    cancelBtn.clicked.connect(self.reject)
+    self.bottom_layout(self.submit, ok_text="&Add")
 
   def data(self):
     name = self.nameTxt.text()
@@ -88,7 +69,6 @@ class AddFileDialog(base.BaseDialog):
     md5hash = idc.GetInputMD5()
 
     gridLyt = QtWidgets.QGridLayout()
-    layout = QtWidgets.QVBoxLayout()
 
     gridLyt.addWidget(QtWidgets.QLabel("File name:"), 0, 0)
     gridLyt.addWidget(QtWidgets.QLabel("Description:"), 1, 0)
@@ -102,32 +82,13 @@ class AddFileDialog(base.BaseDialog):
     gridLyt.addWidget(self.descriptionTxt, 1, 1)
 
     gridLyt.addWidget(QtWidgets.QLabel(md5hash), 2, 1)
-
-    layout.addLayout(gridLyt)
+    self.layout.addLayout(gridLyt)
 
     self.shareidbCkb = QtWidgets.QCheckBox("Share IDB (let others without "
                                            "the idb to participate)")
-    layout.addWidget(self.shareidbCkb)
+    self.layout.addWidget(self.shareidbCkb)
 
-    self.statusLbl = QtWidgets.QLabel()
-    layout.addWidget(self.statusLbl)
-
-    addBtn = QtWidgets.QPushButton("&Add")
-    addBtn.setDefault(True)
-    cancelBtn = QtWidgets.QPushButton("&Cancel")
-    SizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                       QtWidgets.QSizePolicy.Fixed)
-    addBtn.setSizePolicy(SizePolicy)
-    cancelBtn.setSizePolicy(SizePolicy)
-    buttonLyt = QtWidgets.QHBoxLayout()
-    buttonLyt.addWidget(addBtn)
-    buttonLyt.addWidget(cancelBtn)
-    layout.addLayout(buttonLyt)
-
-    self.setLayout(layout)
-
-    addBtn.clicked.connect(self.submit)
-    cancelBtn.clicked.connect(self.reject)
+    self.bottom_layout(self.submit, ok_text="&Add")
 
   def data(self):
     name = self.nameTxt.text()

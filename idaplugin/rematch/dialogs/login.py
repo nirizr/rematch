@@ -17,7 +17,6 @@ class LoginDialog(base.BaseDialog):
     password = config['password']
     server = config['server']
 
-    layout = QtWidgets.QVBoxLayout()
     formLyt = QtWidgets.QHBoxLayout()
     LabelLyt = QtWidgets.QVBoxLayout()
     InputLyt = QtWidgets.QVBoxLayout()
@@ -41,31 +40,13 @@ class LoginDialog(base.BaseDialog):
     InputLyt.addWidget(self.serverTxt)
 
     formLyt.addLayout(InputLyt)
-    layout.addLayout(formLyt)
+    self.layout.addLayout(formLyt)
 
     self.rememberPwd = QtWidgets.QCheckBox("Remember password (plaintext)")
     self.rememberPwd.setChecked(True)
-    layout.addWidget(self.rememberPwd)
+    self.layout.addWidget(self.rememberPwd)
 
-    self.statusLbl = QtWidgets.QLabel()
-    layout.addWidget(self.statusLbl)
-
-    applyBtn = QtWidgets.QPushButton("&Login")
-    applyBtn.setDefault(True)
-    cancelBtn = QtWidgets.QPushButton("&Cancel")
-    SizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                       QtWidgets.QSizePolicy.Fixed)
-    applyBtn.setSizePolicy(SizePolicy)
-    cancelBtn.setSizePolicy(SizePolicy)
-    buttonLyt = QtWidgets.QHBoxLayout()
-    buttonLyt.addWidget(applyBtn)
-    buttonLyt.addWidget(cancelBtn)
-    layout.addLayout(buttonLyt)
-
-    self.setLayout(layout)
-
-    applyBtn.clicked.connect(self.submit)
-    cancelBtn.clicked.connect(self.reject)
+    self.bottom_layout(self.submit, ok_text="&Login")
 
   def data(self):
     username = self.usernameTxt.text()

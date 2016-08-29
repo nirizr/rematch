@@ -18,49 +18,33 @@ class SettingsDialog(base.BaseDialog):
     autologout = config['settings']['login']['autologout']
     debug = config['debug']
 
-    layout = QtWidgets.QVBoxLayout()
-
     self.autocheck = QtWidgets.QCheckBox("Automatically check for updates on "
                                          "startup")
     self.autocheck.setChecked(autocheck)
-    layout.addWidget(self.autocheck)
+    self.layout.addWidget(self.autocheck)
 
     self.autoupdate = QtWidgets.QCheckBox("Automatically update to new "
                                           "version on startup")
     self.autocheck.stateChanged.connect(self.autoupdate.setEnabled)
+    self.autoupdate.setEnabled(self.autocheck.isChecked())
     self.autoupdate.setChecked(autoupdate)
-    layout.addWidget(self.autoupdate)
+    self.layout.addWidget(self.autoupdate)
 
     self.autologin = QtWidgets.QCheckBox("Automatically login using "
                                          "user/password on startup")
     self.autologin.setChecked(autologin)
-    layout.addWidget(self.autologin)
+    self.layout.addWidget(self.autologin)
 
     self.autologout = QtWidgets.QCheckBox("Automatically forget login "
                                           "token when IDA exits")
     self.autologout.setChecked(autologout)
-    layout.addWidget(self.autologout)
+    self.layout.addWidget(self.autologout)
 
     self.debug = QtWidgets.QCheckBox("Print debug logs to console output")
     self.debug.setChecked(debug)
-    layout.addWidget(self.debug)
+    self.layout.addWidget(self.debug)
 
-    saveBtn = QtWidgets.QPushButton("&Save")
-    saveBtn.setDefault(True)
-    cancelBtn = QtWidgets.QPushButton("&Cancel")
-    SizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                       QtWidgets.QSizePolicy.Fixed)
-    saveBtn.setSizePolicy(SizePolicy)
-    cancelBtn.setSizePolicy(SizePolicy)
-    buttonLyt = QtWidgets.QHBoxLayout()
-    buttonLyt.addWidget(saveBtn)
-    buttonLyt.addWidget(cancelBtn)
-    layout.addLayout(buttonLyt)
-
-    self.setLayout(layout)
-
-    saveBtn.clicked.connect(self.submit)
-    cancelBtn.clicked.connect(self.reject)
+    self.bottom_layout(self.submit, ok_text="&Save")
 
   def data(self):
     autocheck = self.autocheck.isChecked()
@@ -77,4 +61,5 @@ class SettingsDialog(base.BaseDialog):
     config['settings']['login']['autologin'] = self.autologin.isChecked()
     config['settings']['login']['autologout'] = self.autologout.isChecked()
     config['debug'] = self.debug.isChecked()
+    config.save()
     self.accept()
