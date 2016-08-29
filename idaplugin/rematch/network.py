@@ -29,7 +29,9 @@ def query(method, url, server=None, token=None, params=None, json=False):
         full_url += "?" + urllib.urlencode(params)
       request = urllib2.Request(full_url, headers=headers)
     elif method == "POST":
-      if params and json:
+      if not params:
+        params = ""
+      elif json:
         params = dumps(params)
       request = urllib2.Request(full_url, data=params, headers=headers)
 
