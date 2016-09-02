@@ -63,7 +63,7 @@ class User(dict):
       self.update(network.query("GET", "accounts/profile/", json=True))
     except exceptions.AuthenticationException:
       del config['token']
-      self.update(network.query("GET", "accounts/profile/", json=True))
+      self.update(self.LOGGEDOUT_USER)
 
   def __setitem__(self, key, value):
     raise RuntimeError("User is a read only dict")
