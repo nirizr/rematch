@@ -17,34 +17,30 @@ class LoginDialog(base.BaseDialog):
     password = config['password']
     server = config['server']
 
-    formLyt = QtWidgets.QHBoxLayout()
-    LabelLyt = QtWidgets.QVBoxLayout()
-    InputLyt = QtWidgets.QVBoxLayout()
+    gridLyt = QtWidgets.QGridLayout()
 
-    LabelLyt.addWidget(QtWidgets.QLabel("Username:"))
-    LabelLyt.addWidget(QtWidgets.QLabel("Password:"))
-    LabelLyt.addWidget(QtWidgets.QLabel("Server:"))
-    formLyt.addLayout(LabelLyt)
+    gridLyt.addWidget(QtWidgets.QLabel("Username:"), 0, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("Password:"), 1, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("Server:"), 2, 0)
 
     self.usernameTxt = QtWidgets.QLineEdit()
     self.usernameTxt.setText(username)
-    InputLyt.addWidget(self.usernameTxt)
+    gridLyt.addWidget(self.usernameTxt, 0, 1)
 
     self.passwordTxt = QtWidgets.QLineEdit()
     self.passwordTxt.setEchoMode(QtWidgets.QLineEdit.Password)
     self.passwordTxt.setText(password)
-    InputLyt.addWidget(self.passwordTxt)
+    gridLyt.addWidget(self.passwordTxt, 1, 1)
 
     self.serverTxt = QtWidgets.QLineEdit()
     self.serverTxt.setText(server)
-    InputLyt.addWidget(self.serverTxt)
+    gridLyt.addWidget(self.serverTxt, 2, 1)
 
-    formLyt.addLayout(InputLyt)
-    self.layout.addLayout(formLyt)
+    self.base_layout.addLayout(gridLyt)
 
     self.rememberPwd = QtWidgets.QCheckBox("Remember password (plaintext)")
     self.rememberPwd.setChecked(True)
-    self.layout.addWidget(self.rememberPwd)
+    self.base_layout.addWidget(self.rememberPwd)
 
     self.bottom_layout(self.submit, ok_text="&Login")
 

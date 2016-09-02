@@ -10,12 +10,14 @@ class BaseDialog(QtWidgets.QDialog):
     super(BaseDialog, self).__init__(**kwargs)
     self.setWindowTitle(title)
     self.response = None
+    self.statusLbl = None
 
-    self.layout = QtWidgets.QVBoxLayout()
-    self.statusLbl = QtWidgets.QLabel()
+    self.base_layout = QtWidgets.QVBoxLayout()
+    self.setLayout(self.base_layout)
 
   def bottom_layout(self, submit, ok_text="&Ok", cencel_text="&Cancel"):
-    self.layout.addWidget(self.statusLbl)
+    self.statusLbl = QtWidgets.QLabel()
+    self.base_layout.addWidget(self.statusLbl)
 
     okBtn = QtWidgets.QPushButton(ok_text)
     okBtn.setDefault(True)
@@ -27,9 +29,7 @@ class BaseDialog(QtWidgets.QDialog):
     buttonLyt = QtWidgets.QHBoxLayout()
     buttonLyt.addWidget(okBtn)
     buttonLyt.addWidget(cancelBtn)
-    self.layout.addLayout(buttonLyt)
-
-    self.setLayout(self.layout)
+    self.base_layout.addLayout(buttonLyt)
 
     okBtn.clicked.connect(submit)
     cancelBtn.clicked.connect(self.reject)

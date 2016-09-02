@@ -25,12 +25,12 @@ class AddProjectDialog(base.BaseDialog):
     self.descriptionTxt = QtWidgets.QTextEdit()
     gridLyt.addWidget(self.descriptionTxt, 1, 1)
 
-    self.layout.addLayout(gridLyt)
+    self.base_layout.addLayout(gridLyt)
 
     self.privateCkb = QtWidgets.QCheckBox("Make project private")
-    self.layout.addWidget(self.privateCkb)
+    self.base_layout.addWidget(self.privateCkb)
     self.bindCurrentCkb = QtWidgets.QCheckBox("Bind current file to project")
-    self.layout.addWidget(self.bindCurrentCkb)
+    self.base_layout.addWidget(self.bindCurrentCkb)
     if not netnode.bound_file_id:
       self.bindCurrentCkb.setEnabled(False)
 
@@ -82,11 +82,11 @@ class AddFileDialog(base.BaseDialog):
     gridLyt.addWidget(self.descriptionTxt, 1, 1)
 
     gridLyt.addWidget(QtWidgets.QLabel(md5hash), 2, 1)
-    self.layout.addLayout(gridLyt)
+    self.base_layout.addLayout(gridLyt)
 
     self.shareidbCkb = QtWidgets.QCheckBox("Share IDB (let others without "
                                            "the idb to participate)")
-    self.layout.addWidget(self.shareidbCkb)
+    self.base_layout.addWidget(self.shareidbCkb)
 
     self.bottom_layout(self.submit, ok_text="&Add")
 

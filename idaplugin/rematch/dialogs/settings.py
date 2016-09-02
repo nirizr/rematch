@@ -21,28 +21,28 @@ class SettingsDialog(base.BaseDialog):
     self.autocheck = QtWidgets.QCheckBox("Automatically check for updates on "
                                          "startup")
     self.autocheck.setChecked(autocheck)
-    self.layout.addWidget(self.autocheck)
+    self.base_layout.addWidget(self.autocheck)
 
     self.autoupdate = QtWidgets.QCheckBox("Automatically update to new "
                                           "version on startup")
     self.autocheck.stateChanged.connect(self.autoupdate.setEnabled)
     self.autoupdate.setEnabled(self.autocheck.isChecked())
     self.autoupdate.setChecked(autoupdate)
-    self.layout.addWidget(self.autoupdate)
+    self.base_layout.addWidget(self.autoupdate)
 
     self.autologin = QtWidgets.QCheckBox("Automatically login using "
                                          "user/password on startup")
     self.autologin.setChecked(autologin)
-    self.layout.addWidget(self.autologin)
+    self.base_layout.addWidget(self.autologin)
 
     self.autologout = QtWidgets.QCheckBox("Automatically forget login "
                                           "token when IDA exits")
     self.autologout.setChecked(autologout)
-    self.layout.addWidget(self.autologout)
+    self.base_layout.addWidget(self.autologout)
 
     self.debug = QtWidgets.QCheckBox("Print debug logs to console output")
     self.debug.setChecked(debug)
-    self.layout.addWidget(self.debug)
+    self.base_layout.addWidget(self.debug)
 
     self.bottom_layout(self.submit, ok_text="&Save")
 
