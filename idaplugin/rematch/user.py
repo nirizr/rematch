@@ -12,8 +12,7 @@ class User(dict):
     super(User, self).__init__()
 
     try:
-      if 'token' in config:
-        self.refresh()
+      self.refresh()
 
       # refresh was successful
       if self['is_authenticated']:
@@ -59,11 +58,14 @@ class User(dict):
 
   def refresh(self):
     self.clear()
+    self.update(self.LOGGEDOUT_USER)
+
     try:
       self.update(network.query("GET", "accounts/profile/", json=True))
     except exceptions.AuthenticationException:
       del config['token']
-      self.update(self.LOGGEDOUT_USER)
+    except exceptions.NotFoundException:
+      pass
 
   def __setitem__(self, key, value):
     raise RuntimeError("User is a read only dict")
