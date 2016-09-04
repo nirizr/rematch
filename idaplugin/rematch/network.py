@@ -1,3 +1,8 @@
+try:
+  from PyQt5 import QtCore
+except ImportError:
+  from PySide import QtCore
+
 import urllib
 import urllib2
 from cookielib import CookieJar
@@ -9,6 +14,52 @@ from . import config, logger
 # building opener
 cookiejar = CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+
+_threadpool = QtCore.QThreadPool()
+
+
+class WorkerSignals(QtCore.QObject):
+  result_json = QtCore.pyqtSignal(dict)
+  result_text = QtCore.pyqtSignal(str)
+  result_exception = QtCore.pyqtSignal(Exception)
+
+
+class QueryWorker(QtCore.QRunnable):
+  def __init__(self, method, url, server, token, params, json):
+    super(QueryWorker, self).__init__()
+
+    self.method = method
+    self.url = url
+    self.server = server
+    self.token = token
+    self.params = params
+    self.json = json
+
+    self.signals = WorkerSignals()
+
+  def run(self):
+    try:
+      response = query(self.method, self.url, self.server, self.token,
+                       self.params, self.json)
+      if self.json:
+        self.signals.result_json.emit(response)
+      else:
+        self.signals.result_text.emit(response)
+    except Exception as ex:
+      self.signals.result_exception.emit(ex)
+
+
+def delayed_query(method, url, server=None, token=None, params=None,
+                  json=False, callback=None, exception_callback=None):
+  query_worker = QueryWorker(method, url, server, token, params, json)
+  if callback:
+    if json:
+      query_worker.signals.result_json.connect(callback)
+    else:
+      query_worker.signals.result_text.connect(callback)
+  if exception_callback:
+    query_worker.signals.result_exception.connect(exception_callback)
+  _threadpool.start(query_worker)
 
 
 def query(method, url, server=None, token=None, params=None, json=False):
