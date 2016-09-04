@@ -13,14 +13,10 @@ class MnemonicHistVector(Vector):
   @property
   def data(self):
     instruction_hist = defaultdict(int)
-    instruction_hist['instruction_set'] = idautils.GetInstructionList()
 
     for offset in idautils.FuncItems(self.offset):
       mnem_line = idc.GetMnem(offset)
       mnem_line = mnem_line.lower()
       instruction_hist[mnem_line] += 1
-
-    instruction_hist = {mnem: value
-                        for mnem, value in instruction_hist.items()}
 
     return instruction_hist
