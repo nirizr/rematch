@@ -24,6 +24,9 @@ class Config(dict):
             "autologout": false
         }
     },
+    "network": {
+        "threadcount": 10
+    },
     "username": ""
 }"""
 

@@ -16,11 +16,13 @@ cookiejar = CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
 
 _threadpool = QtCore.QThreadPool()
+_threadpool.setMaxThreadCount(config['network']['threadcount'])
 
 
 class WorkerSignals(QtCore.QObject):
-  result_json = QtCore.pyqtSignal(dict)
-  result_text = QtCore.pyqtSignal(str)
+  result_dict = QtCore.pyqtSignal(dict)
+  result_list = QtCore.pyqtSignal(list)
+  result_str = QtCore.pyqtSignal(str)
   result_exception = QtCore.pyqtSignal(Exception)
 
 
@@ -41,24 +43,30 @@ class QueryWorker(QtCore.QRunnable):
     try:
       response = query(self.method, self.url, self.server, self.token,
                        self.params, self.json)
-      if self.json:
-        self.signals.result_json.emit(response)
-      else:
-        self.signals.result_text.emit(response)
+      if isinstance(response, dict):
+        self.signals.result_dict.emit(response)
+      elif isinstance(response, list):
+        self.signals.result_list.emit(response)
+      elif isinstance(response, str):
+        self.signals.result_str.emit(response)
     except Exception as ex:
       self.signals.result_exception.emit(ex)
+
+
+def default_exception_callback(exception):
+  raise exception
 
 
 def delayed_query(method, url, server=None, token=None, params=None,
                   json=False, callback=None, exception_callback=None):
   query_worker = QueryWorker(method, url, server, token, params, json)
   if callback:
-    if json:
-      query_worker.signals.result_json.connect(callback)
-    else:
-      query_worker.signals.result_text.connect(callback)
-  if exception_callback:
-    query_worker.signals.result_exception.connect(exception_callback)
+    query_worker.signals.result_dict.connect(callback)
+    query_worker.signals.result_list.connect(callback)
+    query_worker.signals.result_str.connect(callback)
+  if not exception_callback:
+    exception_callback = default_exception_callback
+  query_worker.signals.result_exception.connect(exception_callback)
   _threadpool.start(query_worker)
 
 
