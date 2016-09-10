@@ -102,16 +102,18 @@ def query(method, url, server=None, token=None, params=None, json=False):
     return return_obj
   except urllib2.HTTPError as ex:
     logger('network').debug(ex)
-    logger('network').debug(ex.read())
+    return_obj = loads(ex.read()) if json else ex.read()
+    logger('network').debug(return_obj)
     logger('network').debug(ex.__dict__)
     if ex.code in (500,):
-      raise exceptions.ServerException()
+      raise exceptions.ServerException(response=return_obj)
     if ex.code in (401,):
-      raise exceptions.AuthenticationException()
+      raise exceptions.AuthenticationException(response=return_obj)
     if ex.code in (404,):
-      raise exceptions.NotFoundException()
+      raise exceptions.NotFoundException(response=return_obj)
     raise
   except urllib2.URLError as ex:
+    logger('network').debug(ex)
     raise exceptions.ConnectionException()
 
 

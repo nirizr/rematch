@@ -1,8 +1,12 @@
 class RematchException(Exception):
   message = ""
 
+  def __init__(self, response=None, **kwargs):
+    super(RematchException, self).__init__(**kwargs)
+    self.response = response
+
   def __str__(self):
-    return "<{}: {}>".format(self.__class__, self.message)
+    return "<{}: {}, {}>".format(self.__class__, self.response, self.message)
 
 
 class UnsavedIdb(RematchException):
