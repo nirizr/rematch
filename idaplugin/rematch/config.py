@@ -9,14 +9,15 @@ class Config(dict):
              "git": {"owner": "nirizr",
                      "repository": "rematch",
                      "server": "http://api.github.com"},
-             "password": "",
-             "server": "",
+             "login": {"username": "",
+                       "password": "",
+                       "server": "",
+                       "token": None},
              "settings": {"update": {"autocheck": True,
                                      "autoupdate": True},
                           "login": {"autologin": True,
                                     "autologout": False}},
-             "network": {"threadcount": 10},
-             "username": ""}
+             "network": {"threadcount": 10}}
 
   def __init__(self):
     super(Config, self).__init__()
