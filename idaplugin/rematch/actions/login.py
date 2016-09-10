@@ -1,5 +1,3 @@
-import idaapi
-
 from . import base
 from .. import user
 
@@ -15,11 +13,11 @@ class LoginAction(base.Action):
     LoginDialog().get()
 
   @staticmethod
-  def update(ctx):
+  def enabled(ctx):
     if 'is_authenticated' in user and user['is_authenticated']:
-      return idaapi.AST_DISABLE
+      return False
     else:
-      return idaapi.AST_ENABLE
+      return True
 
 
 class LogoutAction(base.Action):
@@ -31,8 +29,8 @@ class LogoutAction(base.Action):
     user.logout()
 
   @staticmethod
-  def update(ctx):
+  def enabled(ctx):
     if 'is_authenticated' in user and user['is_authenticated']:
-      return idaapi.AST_ENABLE
+      return True
     else:
-      return idaapi.AST_DISABLE
+      return False
