@@ -5,30 +5,18 @@ from . import logger
 
 
 class Config(dict):
-  DEFAULT = """{
-    "debug": false,
-    "git": {
-        "owner": "nirizr",
-        "repository": "rematch",
-        "server": "http://api.github.com"
-    },
-    "password": "",
-    "server": "",
-    "settings": {
-        "update": {
-            "autocheck": true,
-            "autoupdate": true
-        },
-        "login": {
-            "autologin": true,
-            "autologout": false
-        }
-    },
-    "network": {
-        "threadcount": 10
-    },
-    "username": ""
-}"""
+  DEFAULT = {"debug": False,
+             "git": {"owner": "nirizr",
+                     "repository": "rematch",
+                     "server": "http://api.github.com"},
+             "password": "",
+             "server": "",
+             "settings": {"update": {"autocheck": True,
+                                     "autoupdate": True},
+                          "login": {"autologin": True,
+                                    "autologout": False}},
+             "network": {"threadcount": 10},
+             "username": ""}
 
   def __init__(self):
     super(Config, self).__init__()
@@ -46,8 +34,7 @@ class Config(dict):
       with open(self.user_config_file, 'r') as fh:
         try:
           _file = json.loads(fh.read())
-          default = json.loads(self.DEFAULT)
-          new = self.merge_map(default, _file)
+          new = self.merge_map(self.DEFAULT, _file)
           self.update(new)
         except Exception as ex:
           logger('config').warn(ex)
