@@ -70,18 +70,27 @@ class AddFileDialog(base.BaseDialog):
 
     gridLyt = QtWidgets.QGridLayout()
 
-    gridLyt.addWidget(QtWidgets.QLabel("File name:"), 0, 0)
-    gridLyt.addWidget(QtWidgets.QLabel("Description:"), 1, 0)
-    gridLyt.addWidget(QtWidgets.QLabel("MD5 hash:"), 2, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("Project:"), 0, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("File name:"), 1, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("Description:"), 2, 0)
+    gridLyt.addWidget(QtWidgets.QLabel("MD5 hash:"), 3, 0)
+
+    response = network.query("GET", "collab/projects/", json=True)
+    self.projectCbb = QtWidgets.QComboBox()
+    for idx, project in enumerate(response):
+      text = "{} ({})".format(project['name'], project['id'])
+      self.projectCbb.insertItem(idx, text, int(project['id']))
+    self.projectCbb.insertItem(0, "None", None)
+    gridLyt.addWidget(self.projectCbb, 0, 1)
 
     self.nameTxt = QtWidgets.QLineEdit()
     self.nameTxt.setText(name)
-    gridLyt.addWidget(self.nameTxt, 0, 1)
+    gridLyt.addWidget(self.nameTxt, 1, 1)
 
     self.descriptionTxt = QtWidgets.QTextEdit()
-    gridLyt.addWidget(self.descriptionTxt, 1, 1)
+    gridLyt.addWidget(self.descriptionTxt, 2, 1)
 
-    gridLyt.addWidget(QtWidgets.QLabel(md5hash), 2, 1)
+    gridLyt.addWidget(QtWidgets.QLabel(md5hash), 3, 1)
     self.base_layout.addLayout(gridLyt)
 
     self.shareidbCkb = QtWidgets.QCheckBox("Share IDB (let others without "
@@ -91,20 +100,22 @@ class AddFileDialog(base.BaseDialog):
     self.bottom_layout(self.submit, ok_text="&Add")
 
   def data(self):
+    project = self.projectCbb.currentData()
     name = self.nameTxt.text()
     description = self.descriptionTxt.toPlainText()
     shareidb = self.shareidbCkb.isChecked()
 
-    return name, description, shareidb
+    return project, name, description, shareidb
 
   def submit(self):
+    project = self.projectCbb.currentData()
     name = self.nameTxt.text()
     md5hash = idc.GetInputMD5()
     description = self.descriptionTxt.toPlainText()
     shareidb = self.shareidbCkb.isChecked()
 
-    data = {'name': name, 'md5hash': md5hash, 'description': description,
-            'instances': []}
+    data = {'project': project, 'name': name, 'md5hash': md5hash,
+            'description': description, 'instances': []}
 
     if shareidb:
       # TODO: uploadfile
