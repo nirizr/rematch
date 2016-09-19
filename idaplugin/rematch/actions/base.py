@@ -10,7 +10,7 @@ def plugin_path(*path):
   return os.path.join(idc.GetIdaDirectory(), "plugins", "rematch", *path)
 
 
-class Action(object, idaapi.action_handler_t):
+class Action(idaapi.action_handler_t):
   """Actions are objects registered to IDA's interface and added to the
   rematch menu and toolbar"""
 

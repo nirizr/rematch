@@ -1,0 +1,3 @@
+[submodule "idaplugin/rematch/idasix"]
+	path = idaplugin/rematch/idasix
+	url = git@github.com:nirizr/idasix.git

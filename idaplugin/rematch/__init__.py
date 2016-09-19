@@ -1,3 +1,5 @@
+import idasix
+
 from .version import __version__
 
 # utilities
