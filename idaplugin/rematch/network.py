@@ -27,7 +27,8 @@ class WorkerSignals(QtCore.QObject):
 
 
 class QueryWorker(QtCore.QRunnable):
-  def __init__(self, method, url, server, token, params, json):
+  def __init__(self, method, url, server=None, token=None, params=None,
+               json=False):
     super(QueryWorker, self).__init__()
 
     self.method = method
@@ -60,6 +61,10 @@ def default_exception_callback(exception):
 def delayed_query(method, url, server=None, token=None, params=None,
                   json=False, callback=None, exception_callback=None):
   query_worker = QueryWorker(method, url, server, token, params, json)
+  return delayed_worker(query_worker, callable, exception_callback)
+
+
+def delayed_worker(query_worker, callback=None, exception_callback=None):
   if callback:
     query_worker.signals.result_dict.connect(callback)
     query_worker.signals.result_list.connect(callback)
@@ -105,12 +110,12 @@ def query(method, url, server=None, token=None, params=None, json=False):
     return_obj = loads(ex.read()) if json else ex.read()
     logger('network').debug(return_obj)
     logger('network').debug(ex.__dict__)
-    if ex.code in (500,):
-      raise exceptions.ServerException(response=return_obj)
-    if ex.code in (401,):
-      raise exceptions.AuthenticationException(response=return_obj)
-    if ex.code in (404,):
-      raise exceptions.NotFoundException(response=return_obj)
+    err_codes = {500: exceptions.ServerException,
+                 400: exceptions.QueryException,
+                 401: exceptions.AuthenticationException,
+                 404: exceptions.NotFoundException}
+    if ex.code in err_codes:
+      raise err_codes[ex.code](response=return_obj)
     raise
   except urllib2.URLError as ex:
     logger('network').debug(ex)

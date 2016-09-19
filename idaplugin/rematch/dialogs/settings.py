@@ -44,22 +44,11 @@ class SettingsDialog(base.BaseDialog):
     self.debug.setChecked(debug)
     self.base_layout.addWidget(self.debug)
 
-    self.bottom_layout(self.submit, ok_text="&Save")
+    self.bottom_layout(ok_text="&Save")
 
   def data(self):
-    autocheck = self.autocheck.isChecked()
-    autoupdate = self.autoupdate.isChecked()
-    autologin = self.autologin.isChecked()
-    autologout = self.autologout.isChecked()
-    debug = self.debug.isChecked()
-
-    return autocheck, autoupdate, autologin, autologout, debug
-
-  def submit(self):
-    config['settings']['update']['autocheck'] = self.autocheck.isChecked()
-    config['settings']['update']['autoupdate'] = self.autoupdate.isChecked()
-    config['settings']['login']['autologin'] = self.autologin.isChecked()
-    config['settings']['login']['autologout'] = self.autologout.isChecked()
-    config['debug'] = self.debug.isChecked()
-    config.save()
-    self.accept()
+    return {'autocheck': self.autocheck.isChecked(),
+            'autoupdate': self.autoupdate.isChecked(),
+            'autologin': self.autologin.isChecked(),
+            'autologout': self.autologout.isChecked(),
+            'debug': self.debug.isChecked()}

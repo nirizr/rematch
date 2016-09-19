@@ -13,9 +13,16 @@ def plugin_path(*path):
 class Action(idaapi.action_handler_t):
   """Actions are objects registered to IDA's interface and added to the
   rematch menu and toolbar"""
+  dialog = None
+
+  reject_handler = None
+  submit_handler = None
+  response_handler = None
+  exception_handler = None
 
   def __init__(self):
     self._icon = None
+    self.dlg = None
 
   def __repr__(self):
     return "<Action: {}>".format(self.get_id())
@@ -101,10 +108,25 @@ class Action(idaapi.action_handler_t):
     return idaapi.AST_ENABLE if self.enabled(ctx) else idaapi.AST_DISABLE
 
   def activate(self, ctx):
-    logger('actions').warn("{}: no activation".format(self.__class__))
-    logger('actions').debug(map(str, (ctx.form, ctx.form_type, ctx.form_title,
-                                      ctx.chooser_selection, ctx.action,
-                                      ctx.cur_flags)))
+    if self.dialog:
+      self.dlg = self.dialog(reject_handler=self.reject_handler,
+                             submit_handler=self.submit_handler,
+                             response_handler=self.response_handler,
+                             exception_handler=self.exception_handler)
+      self.dlg.show()
+    else:
+      logger('actions').warn("{}: no activation".format(self.__class__))
+      logger('actions').debug(map(str, (ctx.form, ctx.form_type,
+                                        ctx.form_title, ctx.chooser_selection,
+                                        ctx.action, ctx.cur_flags)))
+
+  @staticmethod
+  def force_update():
+    """Forcefuly requests IDA kernel to update all widgets and views. Useful
+    for when delayed actions modify the program and/or plugin state without
+    IDA's awareness"""
+    IWID_ALL = 0xFFFFFFFF
+    idaapi.request_refresh(IWID_ALL)
 
 
 class IdbAction(Action):

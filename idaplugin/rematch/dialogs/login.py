@@ -5,8 +5,7 @@ except ImportError:
   QtWidgets = QtGui
 
 from . import base
-from .. import config, user
-from .. import exceptions
+from .. import config
 
 
 class LoginDialog(base.BaseDialog):
@@ -42,40 +41,15 @@ class LoginDialog(base.BaseDialog):
     self.rememberPwd.setChecked(True)
     self.base_layout.addWidget(self.rememberPwd)
 
-    self.bottom_layout(self.submit, ok_text="&Login")
+    self.bottom_layout(ok_text="&Login")
 
   def data(self):
-    username = self.usernameTxt.text()
-    password = self.passwordTxt.text()
-    server = self.serverTxt.text()
+    return {'username': self.usernameTxt.text(),
+            'password': self.passwordTxt.text(),
+            'server': self.serverTxt.text(),
+            'remember': self.rememberPwd.isChecked()}
 
-    return username, password, server
-
-  def submit(self):
+  def submit_base(self):
     self.statusLbl.setText("Connecting...")
     self.statusLbl.setStyleSheet("color: black;")
-    username = self.usernameTxt.text()
-    password = self.passwordTxt.text()
-    server = self.serverTxt.text()
-
-    # TODO: This could be async
-    try:
-      if user.login(username, password, server=server):
-        self.statusLbl.setText("Connected!")
-        self.statusLbl.setStyleSheet("color: green;")
-
-        config['username'] = username
-        config['server'] = server
-        if self.rememberPwd.isChecked():
-          config['password'] = password
-        else:
-          config['password'] = ""
-        config.save()
-
-        self.accept()
-    except (exceptions.ConnectionException, exceptions.ServerException):
-      self.statusLbl.setText("Connection to server failed.")
-      self.statusLbl.setStyleSheet("color: blue;")
-    except exceptions.AuthenticationException:
-      self.statusLbl.setText("Invalid user name or password.")
-      self.statusLbl.setStyleSheet("color: red;")
+    super(LoginDialog, self).submit_base()

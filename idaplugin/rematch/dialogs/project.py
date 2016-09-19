@@ -7,7 +7,8 @@ except ImportError:
 import idc
 
 from . import base
-from .. import network, netnode
+from .. import netnode
+from .. import network
 
 
 class AddProjectDialog(base.BaseDialog):
@@ -34,31 +35,13 @@ class AddProjectDialog(base.BaseDialog):
     if not netnode.bound_file_id:
       self.bindCurrentCkb.setEnabled(False)
 
-    self.bottom_layout(self.submit, ok_text="&Add")
+    self.bottom_layout(ok_text="&Add")
 
   def data(self):
-    name = self.nameTxt.text()
-    description = self.descriptionTxt.toPlainText()
-    private = self.privateCkb.isChecked()
-    bind_current = self.bindCurrentCkb.isChecked()
-
-    return name, description, private, bind_current
-
-  def submit(self):
-    name = self.nameTxt.text()
-    description = self.descriptionTxt.toPlainText()
-    private = self.privateCkb.isChecked()
-    bind_current = self.bindCurrentCkb.isChecked()
-
-    data = {'name': name, 'description': description, 'private': private,
-            'files': []}
-
-    if bind_current:
-      data['files'].append(netnode.bound_file_id)
-
-    self.response = network.query("POST", "collab/projects/", params=data,
-                                  json=True)
-    self.accept()
+    return {'name': self.nameTxt.text(),
+            'description': self.descriptionTxt.toPlainText(),
+            'private': self.privateCkb.isChecked(),
+            'bind_current': self.bindCurrentCkb.isChecked()}
 
 
 class AddFileDialog(base.BaseDialog):
@@ -97,30 +80,11 @@ class AddFileDialog(base.BaseDialog):
                                            "the idb to participate)")
     self.base_layout.addWidget(self.shareidbCkb)
 
-    self.bottom_layout(self.submit, ok_text="&Add")
+    self.bottom_layout(ok_text="&Add")
 
   def data(self):
-    project = self.projectCbb.currentData()
-    name = self.nameTxt.text()
-    description = self.descriptionTxt.toPlainText()
-    shareidb = self.shareidbCkb.isChecked()
-
-    return project, name, description, shareidb
-
-  def submit(self):
-    project = self.projectCbb.currentData()
-    name = self.nameTxt.text()
-    md5hash = idc.GetInputMD5()
-    description = self.descriptionTxt.toPlainText()
-    shareidb = self.shareidbCkb.isChecked()
-
-    data = {'project': project, 'name': name, 'md5hash': md5hash,
-            'description': description, 'instances': []}
-
-    if shareidb:
-      # TODO: uploadfile
-      pass
-
-    self.response = network.query("POST", "collab/files/", params=data,
-                                  json=True)
-    self.accept()
+    return {'project': self.projectCbb.currentData(),
+            'name': self.nameTxt.text(),
+            'md5hash': idc.GetInputMD5(),
+            'description': self.descriptionTxt.toPlainText(),
+            'shareidb': self.shareidbCkb.isChecked()}
