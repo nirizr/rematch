@@ -61,7 +61,7 @@ def default_exception_callback(exception):
 def delayed_query(method, url, server=None, token=None, params=None,
                   json=False, callback=None, exception_callback=None):
   query_worker = QueryWorker(method, url, server, token, params, json)
-  return delayed_worker(query_worker, callable, exception_callback)
+  return delayed_worker(query_worker, callback, exception_callback)
 
 
 def delayed_worker(query_worker, callback=None, exception_callback=None):
