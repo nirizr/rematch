@@ -21,6 +21,12 @@ class AddProjectAction(base.AuthAction):
     return network.QueryWorker("POST", "collab/projects/", params=data,
                                json=True)
 
+  @classmethod
+  def response_handler(cls, response):
+    del response
+    cls.force_update()
+    return True
+
 
 class AddFileAction(base.UnboundFileAction):
   name = "&Add file"
@@ -40,7 +46,8 @@ class AddFileAction(base.UnboundFileAction):
     return network.QueryWorker("POST", "collab/files/", params=data,
                                json=True)
 
-  @staticmethod
-  def response_handler(response):
+  @classmethod
+  def response_handler(cls, response):
     netnode.bound_file_id = response['id']
+    cls.force_update()
     return True
