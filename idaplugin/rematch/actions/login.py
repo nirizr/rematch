@@ -37,10 +37,7 @@ class LoginAction(base.Action):
   @staticmethod
   def enabled(ctx):
     del ctx
-    if 'is_authenticated' in user and user['is_authenticated']:
-      return False
-    else:
-      return True
+    return not bool('is_authenticated' in user and user['is_authenticated'])
 
 
 class LogoutAction(base.Action):

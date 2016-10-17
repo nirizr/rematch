@@ -1,13 +1,7 @@
-import os
-
-from .. import user, logger, netnode
+from .. import user, logger, netnode, utils
 
 import idaapi
 import idc
-
-
-def plugin_path(*path):
-  return os.path.join(idc.GetIdaDirectory(), "plugins", "rematch", *path)
 
 
 class Action(idaapi.action_handler_t):
@@ -57,7 +51,7 @@ class Action(idaapi.action_handler_t):
 
   def get_icon(self):
     if not self._icon:
-      image_path = plugin_path('images', self.get_id() + ".png")
+      image_path = utils.getPluginPath('images', self.get_id() + ".png")
       self._icon = idaapi.py_load_custom_icon_fn(image_path)
     return self._icon
 
@@ -125,8 +119,8 @@ class Action(idaapi.action_handler_t):
     """Forcefuly requests IDA kernel to update all widgets and views. Useful
     for when delayed actions modify the program and/or plugin state without
     IDA's awareness"""
-    IWID_ALL = 0xFFFFFFFF
-    idaapi.request_refresh(IWID_ALL)
+    iwid_all = 0xFFFFFFFF
+    idaapi.request_refresh(iwid_all)
 
 
 class IdbAction(Action):

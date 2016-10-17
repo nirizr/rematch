@@ -2,11 +2,7 @@ import idaapi
 import idc
 from idautils import Functions
 
-try:
-  from PyQt5 import QtGui, QtCore, QtWidgets
-except ImportError:
-  from PySide import QtGui, QtCore
-  QtWidgets = QtGui
+from ..idasix import QtCore, QtWidgets
 
 from .. import instances
 from .. import network, netnode

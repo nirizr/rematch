@@ -1,7 +1,4 @@
-try:
-  from PyQt5 import QtCore
-except ImportError:
-  from PySide import QtCore
+from idasix import QtCore
 
 import urllib
 import urllib2
