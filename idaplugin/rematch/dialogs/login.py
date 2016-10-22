@@ -1,8 +1,4 @@
-try:
-  from PyQt5 import QtWidgets
-except ImportError:
-  from PySide import QtGui
-  QtWidgets = QtGui
+from ..idasix import QtWidgets
 
 from . import base
 from .. import config
