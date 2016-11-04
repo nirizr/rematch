@@ -1,6 +1,5 @@
 django
 numpy
-pygments
 django-registration-redux
 djangorestframework
 django-rest-auth
