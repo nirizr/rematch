@@ -16,4 +16,4 @@ def profile(request):
                  "last_name": request.user.last_name,
                  "email": request.user.email,
                  })
-  return Response(user)
+  return Response(user, template_name='profile.html')

@@ -25,7 +25,6 @@ SECRET_KEY = 'qvc7t@rd5#1l-n_%%&+_fu+-lu#sp2oonf9mto%bn-1#i7$(tu'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 # As of django 1.10, allowed hosts are validated in debug as well,
 # this disables that and makes sure all hosts are acceptible when
 # running in debug mode. for more details see
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_auth',
     'djcelery',
+    'registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +72,9 @@ ROOT_URLCONF = 'rematch.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'template')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -168,6 +170,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "template/static")]
 
 # Celery configuration
 
@@ -175,3 +178,6 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Django Registration Redux configuration
+ACCOUNT_ACTIVATION_DAYS = 1
