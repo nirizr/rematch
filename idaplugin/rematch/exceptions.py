@@ -1,12 +1,20 @@
+import json
+
+from urllib2 import HTTPError, URLError
+from traceback import format_exc
+
+
 class RematchException(Exception):
   message = ""
 
-  def __init__(self, response=None, **kwargs):
-    super(RematchException, self).__init__(**kwargs)
-    self.response = response
+  def __init__(self, **kwargs):
+    super(RematchException, self).__init__()
+    self._kwargs = kwargs
 
   def __str__(self):
-    return "<{}: {}, {}>".format(self.__class__, self.response, self.message)
+    kwarg_str = ", ".join("{} = {}".format(k, v)
+                          for k, v in self._kwargs.items())
+    return "<{}: {}. args: {}>".format(self.__class__, self.message, kwarg_str)
 
 
 class UnsavedIdb(RematchException):
@@ -17,6 +25,13 @@ class UnsavedIdb(RematchException):
 class QueryException(RematchException):
   message = ("Local error has occured! please report a reproducable bug if "
              "this issue persists")
+
+
+class UnknownObjectReferenceException(QueryException):
+  message = ("An object unknown to the server was referenced in a request. "
+             "Please make sure you're logged in to the correct server, and "
+             "that the object wasn't deliberately removed. Please report a "
+             "reproducable bug if this issue persists")
 
 
 class ConnectionException(QueryException):
@@ -37,3 +52,36 @@ class AuthenticationException(RematchException):
 class NotFoundException(QueryException):
   message = ("Asset not found. This could be either a plugin error or a "
              "server error.")
+
+
+def factory(ex):
+  if isinstance(ex, HTTPError):
+    response_text = ex.read()
+    try:
+      response = json.loads(response_text)
+    except Exception:
+      response = response_text
+    ex_cls = None
+    if ex.code == 500:
+      ex_cls = ServerException
+    elif ex.code == 401:
+      ex_cls = AuthenticationException
+    elif ex.code == 404:
+      ex_cls = NotFoundException
+    elif ex.code == 400:
+      ex_cls = handle_400(response)
+
+    if ex_cls is not None:
+      raise ex_cls(response=response, code=ex.code)
+  elif isinstance(ex, URLError):
+    raise ConnectionException(reason=ex.reason)
+
+  tb = format_exc()
+  raise Exception("Couldn't factor an exception: {}".format(tb))
+
+
+def handle_400(resp):
+  if isinstance(resp, dict) and "Invalid pk" in resp['file'][0]:
+    return UnknownObjectReferenceException
+  else:
+    return QueryException

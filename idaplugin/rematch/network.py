@@ -102,21 +102,10 @@ def query(method, url, server=None, token=None, params=None, json=False):
     return_obj = loads(response.read()) if json else response.read()
     logger('network').info("[response] {}".format(return_obj))
     return return_obj
-  except urllib2.HTTPError as ex:
-    logger('network').debug(ex)
-    return_obj = loads(ex.read()) if json else ex.read()
-    logger('network').debug(return_obj)
-    logger('network').debug(ex.__dict__)
-    err_codes = {500: exceptions.ServerException,
-                 400: exceptions.QueryException,
-                 401: exceptions.AuthenticationException,
-                 404: exceptions.NotFoundException}
-    if ex.code in err_codes:
-      raise err_codes[ex.code](response=return_obj)
-    raise
-  except urllib2.URLError as ex:
-    logger('network').debug(ex)
-    raise exceptions.ConnectionException()
+  except Exception as ex:
+    rematch_ex = exceptions.factory(ex)
+    logger('network').debug(rematch_ex)
+    raise rematch_ex
 
 
 def get_server(server):
