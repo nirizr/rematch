@@ -4,7 +4,6 @@ import idc
 
 from . import base
 from .. import netnode
-from .. import network
 
 
 class AddProjectDialog(base.BaseDialog):
@@ -54,12 +53,7 @@ class AddFileDialog(base.BaseDialog):
     gridLyt.addWidget(QtWidgets.QLabel("Description:"), 2, 0)
     gridLyt.addWidget(QtWidgets.QLabel("MD5 hash:"), 3, 0)
 
-    response = network.query("GET", "collab/projects/", json=True)
-    self.projectCbb = QtWidgets.QComboBox()
-    for idx, project in enumerate(response):
-      text = "{} ({})".format(project['name'], project['id'])
-      self.projectCbb.insertItem(idx, text, int(project['id']))
-    self.projectCbb.insertItem(0, "None", None)
+    self.projectCbb = base.QItemSelect('projects')
     gridLyt.addWidget(self.projectCbb, 0, 1)
 
     self.nameTxt = QtWidgets.QLineEdit()

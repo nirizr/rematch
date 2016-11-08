@@ -52,8 +52,7 @@ class RematchPlugin(idaapi.plugin_t):
     actions.project.AddProjectAction.register()
     actions.project.AddFileAction.register()
 
-    actions.match.MatchAllAction.register()
-    actions.match.MatchFunctionAction.register()
+    actions.match.MatchAction.register()
 
     actions.settings.SettingsAction.register()
 
