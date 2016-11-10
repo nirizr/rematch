@@ -18,7 +18,7 @@ The goal of REmatch is to act as a maintained, extendable, open source tool for 
 We've noticed that although there are more than several existing binary matching tools, there's no one tool that provides all of the following:
 
 1. Open source and community driven.
-2. Supports advanced matching algorithms (ML included ™).
+2. Supports advanced matching algorithms (ML included ™).
 3. Fully integrated into IDA.
 4. Allows managing multiple projects in a single location.
 5. Enables out of the box one vs. many matches.
