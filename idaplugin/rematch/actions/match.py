@@ -14,7 +14,7 @@ class MatchAction(base.BoundFileAction):
 
   def __init__(self, *args, **kwargs):
     super(MatchAction, self).__init__(*args, **kwargs)
-    self.function_gen = None
+    self.functions = None
     self.pbar = None
     self.timer = None
     self.task_id = None
@@ -35,7 +35,7 @@ class MatchAction(base.BoundFileAction):
       raise NotImplementedError("All user functions are not currently "
                                 "supported as source value.")
     elif self.source == 'single':
-      return [self.source_single]
+      return set([self.source_single])
     elif self.source == 'range':
       return set(idautils.Functions(self.source_range[0],
                                     self.source_range[1]))
@@ -53,15 +53,14 @@ class MatchAction(base.BoundFileAction):
     self.target_file = target_file if target == 'file' else None
     self.methods = methods
 
-    functions = self.get_functions()
-    if not functions:
+    self.functions = self.get_functions()
+    if not self.functions:
       return False
 
-    self.function_gen = enumerate(functions)
     self.pbar = QtWidgets.QProgressDialog()
     self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
                            "please avoid making any ground-breaking changes.")
-    self.pbar.setRange(0, len(functions))
+    self.pbar.setRange(0, len(self.functions))
     self.pbar.setValue(0)
     self.pbar.canceled.connect(self.cancel_upload)
     self.pbar.rejected.connect(self.reject_upload)
@@ -75,8 +74,8 @@ class MatchAction(base.BoundFileAction):
 
   def perform_upload(self):
     try:
-      i, offset = self.function_gen.next()
-    except StopIteration:
+      offset = self.functions.pop()
+    except KeyError:
       self.timer.stop()
       return
 

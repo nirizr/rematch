@@ -29,7 +29,7 @@ class Config(dict):
     if not os.path.exists(self.user_config_dir):
       try:
         os.mkdir(self.user_config_dir)
-      except:
+      except OSError:
         logger('config').warn("Could not create user configuration directory")
     elif os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:

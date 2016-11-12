@@ -103,7 +103,7 @@ class Action(idaapi.action_handler_t):
     return idaapi.AST_ENABLE if self.enabled(ctx) else idaapi.AST_DISABLE
 
   def activate(self, ctx):
-    if self.dialog:
+    if callable(self.dialog):
       self.dlg = self.dialog(reject_handler=self.reject_handler,
                              submit_handler=self.submit_handler,
                              response_handler=self.response_handler,
@@ -131,6 +131,7 @@ class IdbAction(Action):
   """This action is only available when an idb file is loaded"""
   @staticmethod
   def enabled(ctx):
+    del ctx
     return bool(idc.GetIdbPath())
 
 
