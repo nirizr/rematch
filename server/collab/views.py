@@ -1,8 +1,9 @@
 from rest_framework import viewsets, permissions, mixins
-from collab.models import Project, File, Task, Instance, Vector
+from collab.models import Project, File, Task, Instance, Vector, Match
 from collab.serializers import (ProjectSerializer, FileSerializer,
                                 TaskSerializer, TaskEditSerializer,
-                                InstanceSerializer, VectorSerializer)
+                                InstanceSerializer, VectorSerializer,
+                                MatchSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 
@@ -29,11 +30,14 @@ class ViewSetManyAllowedMixin(object):
 class ProjectViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Project.objects.all()
   serializer_class = ProjectSerializer
+  filter_fields = ('created', 'owner', 'name', 'description', 'private')
 
 
 class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = File.objects.all()
   serializer_class = FileSerializer
+  filter_fields = ('created', 'owner', 'project', 'name', 'description',
+                   'md5hash')
 
 
 class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
@@ -43,6 +47,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
   serializer_class = TaskSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                         IsOwnerOrReadOnly)
+  filter_fields = ('task_id', 'created', 'finished', 'owner', 'status')
 
   def perform_create(self, serializer):
     result = tasks.match.delay()
@@ -55,16 +60,24 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     return serializer_class
 
 
+class MatchViewSet(viewsets.ReadOnlyModelViewSet):
+  queryset = Match.objects.all()
+  serializer_class = MatchSerializer
+  filter_fields = ('task', 'type', 'score')
+
+
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
   serializer_class = InstanceSerializer
+  filter_fields = ('owner', 'file', 'type')
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Vector.objects.all()
   serializer_class = VectorSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+  filter_fields = ('instance', 'file', 'type', 'type_version')
 
   @staticmethod
   def perform_create(serializer):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from collab.models import Project, File, Task, Instance, Vector
+from collab.models import Project, File, Task, Instance, Vector, Match
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -74,3 +74,9 @@ class VectorSerializer(serializers.ModelSerializer):
   class Meta:
     model = Vector
     fields = ('id', 'file', 'instance', 'type', 'type_version', 'data')
+
+
+class MatchSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Match
+    fields = ('task', 'type', 'score')
