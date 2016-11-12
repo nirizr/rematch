@@ -26,20 +26,20 @@ class BaseDialog(QtWidgets.QDialog):
     self.statusLbl = QtWidgets.QLabel()
     self.base_layout.addWidget(self.statusLbl)
 
-    okBtn = QtWidgets.QPushButton(ok_text)
-    okBtn.setDefault(True)
-    cancelBtn = QtWidgets.QPushButton(cencel_text)
-    SizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                       QtWidgets.QSizePolicy.Fixed)
-    okBtn.setSizePolicy(SizePolicy)
-    cancelBtn.setSizePolicy(SizePolicy)
-    buttonLyt = QtWidgets.QHBoxLayout()
-    buttonLyt.addWidget(okBtn)
-    buttonLyt.addWidget(cancelBtn)
-    self.base_layout.addLayout(buttonLyt)
+    ok_btn = QtWidgets.QPushButton(ok_text)
+    ok_btn.setDefault(True)
+    cancel_btn = QtWidgets.QPushButton(cencel_text)
+    size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
+                                        QtWidgets.QSizePolicy.Fixed)
+    ok_btn.setSizePolicy(size_policy)
+    cancel_btn.setSizePolicy(size_policy)
+    button_lyt = QtWidgets.QHBoxLayout()
+    button_lyt.addWidget(ok_btn)
+    button_lyt.addWidget(cancel_btn)
+    self.base_layout.addLayout(button_lyt)
 
-    okBtn.clicked.connect(self.submit_base)
-    cancelBtn.clicked.connect(self.reject_base)
+    ok_btn.clicked.connect(self.submit_base)
+    cancel_btn.clicked.connect(self.reject_base)
 
   def submit_base(self):
     # if no submit_handler, assume dialog is finished
@@ -171,6 +171,10 @@ class QRadioGroup(QtWidgets.QGroupBox):
           radio_extra_controls.setEnabled(False)
         else:
           radio_widget.setEnabled(False)
+        # if extra controller comes with a tooltip, copy that tooltip to
+        # radio button itself
+        if radio_extra_controls.toolTip():
+          radio_widget.setToolTip(radio_extra_controls.toolTip())
 
       # if checked is supplied, set correct radio as checked
       # else set first radio as checked`

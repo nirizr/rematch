@@ -10,8 +10,13 @@ class MatchDialog(base.BaseDialog):
 
     self.source_single = base.QFunctionSelect()
     self.source_range = base.QFunctionRangeSelect()
+    lbl = QtWidgets.QLabel("")
+    lbl.setDisabled(True)
+    lbl.setToolTip("Matching only user functions functionality is not "
+                   "currently supported. Plese express your need of this "
+                   "functionality at our github.")
     choices = [("Entire IDB", 'idb', None),
-               ("User functions", 'user', None),
+               ("User functions", 'user', lbl),
                ("Single function", 'single', self.source_single),
                ("Range", 'range', self.source_range)]
     self.sourceGrp = base.QRadioGroup("Match source", *choices)
@@ -32,14 +37,18 @@ class MatchDialog(base.BaseDialog):
     self.identity.setChecked(True)
     self.fuzzy.setChecked(True)
     self.graph.setChecked(True)
-    methodLyt = QtWidgets.QVBoxLayout()
-    methodLyt.addWidget(self.identity)
-    methodLyt.addWidget(self.fuzzy)
-    methodLyt.addWidget(self.graph)
+    method_lyt = QtWidgets.QVBoxLayout()
+    method_lyt.addWidget(self.identity)
+    method_lyt.addWidget(self.fuzzy)
+    method_lyt.addWidget(self.graph)
 
-    methodGbx = QtWidgets.QGroupBox("Match methods")
-    methodGbx.setLayout(methodLyt)
-    self.base_layout.addWidget(methodGbx)
+    method_gbx = QtWidgets.QGroupBox("Match methods")
+    method_gbx.setDisabled(True)
+    method_gbx.setToolTip("Match method control functionality is not "
+                          "currently supported. Plese express your need of "
+                          "this functionality at our github.")
+    method_gbx.setLayout(method_lyt)
+    self.base_layout.addWidget(method_gbx)
 
     self.bottom_layout("&Start matching")
 
