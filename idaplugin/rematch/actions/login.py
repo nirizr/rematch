@@ -6,7 +6,7 @@ from .. import exceptions
 from ..dialogs.login import LoginDialog
 
 
-class LoginAction(base.Action):
+class LoginAction(base.UnauthAction):
   name = "&Login"
   group = "User"
   dialog = LoginDialog
@@ -25,22 +25,17 @@ class LoginAction(base.Action):
           config['password'] = ""
         config.save()
 
-        self.dlg.accept()
-        self.force_update()
+        return True
     except (exceptions.ConnectionException, exceptions.ServerException):
       self.dlg.statusLbl.setText("Connection to server failed.")
       self.dlg.statusLbl.setStyleSheet("color: blue;")
     except (exceptions.QueryException, exceptions.AuthenticationException):
       self.dlg.statusLbl.setText("Invalid user name or password.")
       self.dlg.statusLbl.setStyleSheet("color: red;")
-
-  @staticmethod
-  def enabled(ctx):
-    del ctx
-    return not bool('is_authenticated' in user and user['is_authenticated'])
+    return False
 
 
-class LogoutAction(base.Action):
+class LogoutAction(base.AuthAction):
   name = "Log&out"
   group = "User"
 
@@ -48,8 +43,3 @@ class LogoutAction(base.Action):
   def activate(ctx):
     del ctx
     user.logout()
-
-  @staticmethod
-  def enabled(ctx):
-    del ctx
-    return bool('is_authenticated' in user and user['is_authenticated'])

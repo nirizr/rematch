@@ -10,6 +10,7 @@ class Action(idaapi.action_handler_t):
   dialog = None
 
   reject_handler = None
+  finish_handler = None
   submit_handler = None
   response_handler = None
   exception_handler = None
@@ -107,6 +108,9 @@ class Action(idaapi.action_handler_t):
                              submit_handler=self.submit_handler,
                              response_handler=self.response_handler,
                              exception_handler=self.exception_handler)
+      if self.finish_handler:
+        self.dlg.finished.connect(self.finish_handler)
+      self.dlg.finished.connect(self.force_update)
       self.dlg.show()
     else:
       logger('actions').warn("{}: no activation".format(self.__class__))
@@ -128,6 +132,13 @@ class IdbAction(Action):
   @staticmethod
   def enabled(ctx):
     return bool(idc.GetIdbPath())
+
+
+class UnauthAction(Action):
+  """This action is only available when a user is logged off"""
+  @staticmethod
+  def enabled(ctx):
+    return not bool(user['is_authenticated'])
 
 
 class AuthAction(Action):
