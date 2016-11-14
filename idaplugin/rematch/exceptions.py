@@ -81,7 +81,9 @@ def factory(ex):
 
 
 def handle_400(resp):
-  if isinstance(resp, dict) and "Invalid pk" in resp['file'][0]:
-    return UnknownObjectReferenceException
+  if isinstance(resp, dict):
+    for errors in resp.values():
+      if any("Invalid pk" in error for error in errors):
+        return UnknownObjectReferenceException
   else:
     return QueryException
