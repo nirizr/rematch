@@ -64,4 +64,5 @@ class Config(dict):
     self.save()
     super(Config, self).__del__()
 
+
 config = Config()

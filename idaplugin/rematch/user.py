@@ -71,4 +71,5 @@ class User(dict):
   def __setitem__(self, key, value):
     raise RuntimeError("User is a read only dict")
 
+
 user = User()

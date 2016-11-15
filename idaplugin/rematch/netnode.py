@@ -22,4 +22,5 @@ class NetNode(object):
   def bound_file_id(self):
     return self._nn.hashdel("bound_file_id")
 
+
 netnode = NetNode()
