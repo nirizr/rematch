@@ -100,7 +100,8 @@ class Task(models.Model):
                     (STATUS_DONE, "Done!"),
                     (STATUS_FAILED, "Failure"))
 
-  task_id = models.UUIDField(db_index=True, unique=True, editable=False)
+  task_id = models.UUIDField(db_index=True, null=True, unique=True,
+                             editable=False)
 
   # store matched objects
   created = models.DateTimeField(auto_now_add=True)

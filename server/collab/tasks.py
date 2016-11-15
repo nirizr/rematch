@@ -7,12 +7,13 @@ from celery import shared_task
 
 
 @shared_task
-def match():
+def match(task_id):
   try:
     # recording the task has started
-    task = Task.objects.filter(task_id=match.request.id)
+    task = Task.objects.filter(id=task_id)
     task.update(status=Task.STATUS_STARTED, progress=0,
-                progress_max=len(matches.match_list))
+                progress_max=len(matches.match_list),
+                task_id=match.request.id)
 
     # get input parameters
     task_values = task.values_list('id', 'source_file_id', 'source_start',

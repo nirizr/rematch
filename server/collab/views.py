@@ -50,8 +50,8 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
   filter_fields = ('task_id', 'created', 'finished', 'owner', 'status')
 
   def perform_create(self, serializer):
-    result = tasks.match.delay()
-    serializer.save(owner=self.request.user, task_id=result.id)
+    task = serializer.save(owner=self.request.user)
+    tasks.match.delay(task_id=task.id)
 
   def get_serializer_class(self):
     serializer_class = self.serializer_class
