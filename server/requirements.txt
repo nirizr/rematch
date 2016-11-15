@@ -6,5 +6,5 @@ django-registration-redux
 djangorestframework
 django-rest-auth
 django-allauth
-celery
+celery<4.0
 django-celery
