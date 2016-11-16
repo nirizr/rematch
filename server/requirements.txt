@@ -8,3 +8,4 @@ django-rest-auth
 django-allauth
 celery<4.0
 django-celery
+django-filter
