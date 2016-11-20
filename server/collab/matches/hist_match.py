@@ -34,6 +34,6 @@ class HistogramMatch(match.Match):
         target_id = target_ids[target_i]
         target_instance_id = target_instance_ids[target_i]
 
-        score = np.linalg.norm(source_vector - target_vector)
+        score = (1 - np.linalg.norm(source_vector - target_vector)) * 100
         yield (source_id, source_instance_id, target_id, target_instance_id,
                score)
