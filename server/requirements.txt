@@ -9,3 +9,4 @@ django-allauth
 celery<4.0
 django-celery
 django-filter
+mysqlclient # this requires package installed libmysqlclient-dev
