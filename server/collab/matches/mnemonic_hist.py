@@ -1,4 +1,4 @@
-import hist_match
+from . import hist_match
 
 
 class MnemonicHistogramMatch(hist_match.HistogramMatch):

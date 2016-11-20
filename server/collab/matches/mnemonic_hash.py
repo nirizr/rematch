@@ -1,4 +1,4 @@
-import hash_match
+from . import hash_match
 
 
 class MnemonicHashMatch(hash_match.HashMatch):

@@ -1,5 +1,5 @@
 import collections
-import match
+from . import match
 
 
 class HashMatch(match.Match):

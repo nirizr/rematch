@@ -1,7 +1,7 @@
 from django.utils.timezone import now
 from django.db.models import F
-from models import Task, Vector, Match
-import matches
+from collab.models import Task, Vector, Match
+from collab import matches
 
 from celery import shared_task
 

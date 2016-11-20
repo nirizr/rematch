@@ -39,6 +39,10 @@ install:
       conda install --yes python=${TRAVIS_PYTHON_VERSION} atlas numpy scipy scikit-learn;
     fi;
   - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
+  - if [ -f $tests/requirements.txt ]; then pip install -r $tests/requirements.txt ; fi
   - pip install flake8
 
-script: flake8 ${PROJECT} --show-source --statistics
+script:
+  - flake8 ./${PROJECT} --show-source --statistics
+  - if [ -d ./tests/{PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose ; fi
+    

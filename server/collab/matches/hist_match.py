@@ -6,7 +6,7 @@ import sklearn as skl
 import sklearn.preprocessing  # noqa flake8 importing as a different name
 import sklearn.feature_extraction  # noqa flake8 importing as a different name
 
-import match
+from . import match
 
 
 class HistogramMatch(match.Match):
