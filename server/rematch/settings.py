@@ -113,11 +113,10 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
         },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
