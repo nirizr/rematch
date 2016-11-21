@@ -23,7 +23,8 @@ class User(dict):
         return
 
       if 'username' in config and 'password' in config and 'server' in config:
-        self.login(config['username'], config['password'], config['server'])
+        self.login(config['login']['username'], config['login']['password'],
+                   config['login']['server'])
     except exceptions.RematchException as ex:
       logger('user').debug(ex)
       self.update(self.LOGGEDOUT_USER)
@@ -43,7 +44,7 @@ class User(dict):
 
     # save functioning token
     if self['is_authenticated']:
-      config['token'] = token
+      config['login']['token'] = token
       config.save()
 
     return self['is_authenticated']
@@ -54,17 +55,20 @@ class User(dict):
     except exceptions.AuthenticationException:
       pass
     if 'token' in config:
-      del config['token']
+      del config['config']['token']
     self.refresh()
 
   def refresh(self):
     self.clear()
     self.update(self.LOGGEDOUT_USER)
 
+    if not ('token' in config['login'] and config['login']['token']):
+      return
+
     try:
       self.update(network.query("GET", "accounts/profile/", json=True))
     except exceptions.AuthenticationException:
-      del config['token']
+      del config['login']['token']
     except exceptions.NotFoundException:
       pass
 

@@ -76,13 +76,13 @@ def query(method, url, server=None, token=None, params=None, json=False):
   if method not in ("GET", "POST"):
     raise exceptions.QueryException()
 
-  full_url = get_server(server) + url
+  server_url = get_server(server)
+  full_url = server_url + url
   headers = get_headers(token, json)
 
   logger('network').info("[query] {full_url}{headers}{params}"
                          "".format(full_url=full_url, headers=headers,
                                    params=params))
-
   # issue request
   try:
     if method == "GET":
@@ -103,6 +103,8 @@ def query(method, url, server=None, token=None, params=None, json=False):
     logger('network').info("[response] {}".format(return_obj))
     return return_obj
   except Exception as ex:
+    import traceback
+    logger.network('network').error(traceback.format_exc())
     rematch_ex = exceptions.factory(ex)
     logger('network').debug(rematch_ex)
     raise rematch_ex
@@ -111,15 +113,18 @@ def query(method, url, server=None, token=None, params=None, json=False):
 def get_server(server):
   """getting and finalzing server address"""
 
-  if not server:
-    if 'server' not in config or not config['server']:
+  try:
+   if not server:
+    if 'server' not in config and not config['login']['server']:
       raise exceptions.QueryException()
-    server = config['server']
-  if not (server.startswith("http://") or server.startswith("http://")):
-    server = "http://" + server
-  if not server.endswith("/"):
-    server = server + "/"
-
+    server = config['login']['server']
+   if not (server.startswith("http://") or server.startswith("http://")):
+     server = "http://" + server
+   if not server.endswith("/"):
+     server = server + "/"
+  except Exception:
+    import traceback
+    logger.network('network').error(traceback.format_exc())
   return server
 
 
@@ -130,8 +135,8 @@ def get_headers(token, json):
   if json:
     headers['Accept'] = 'application/json, text/html, */*'
     headers['Content-Type'] = 'application/json'
-  if token is None and 'token' in config and config['token']:
-    token = config['token']
+  if token is None and 'token' in config['login']:
+    token = config['login']['token']
   if token:
     headers['Authorization'] = 'Token {}'.format(token)
 

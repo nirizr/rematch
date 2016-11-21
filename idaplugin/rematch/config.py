@@ -12,7 +12,7 @@ class Config(dict):
              "login": {"username": "",
                        "password": "",
                        "server": "",
-                       "token": None},
+                       },
              "settings": {"update": {"autocheck": True,
                                      "autoupdate": True},
                           "login": {"autologin": True,
@@ -31,7 +31,8 @@ class Config(dict):
         os.mkdir(self.user_config_dir)
       except OSError:
         logger('config').warn("Could not create user configuration directory")
-    elif os.path.isfile(self.user_config_file):
+
+    if os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:
         try:
           _file = json.loads(fh.read())
@@ -39,6 +40,8 @@ class Config(dict):
           self.update(new)
         except Exception as ex:
           logger('config').warn(ex)
+    else:
+      self.update(self.DEFAULT)
 
     self.save()
 

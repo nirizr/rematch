@@ -8,9 +8,9 @@ class LoginDialog(base.BaseDialog):
   def __init__(self, **kwargs):
     super(LoginDialog, self).__init__(title="Login", **kwargs)
 
-    username = config['username']
-    password = config['password']
-    server = config['server']
+    username = config['login']['username']
+    password = config['login']['password']
+    server = config['login']['server']
 
     gridLyt = QtWidgets.QGridLayout()
 

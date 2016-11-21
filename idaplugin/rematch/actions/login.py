@@ -17,12 +17,12 @@ class LoginAction(base.UnauthAction):
         self.dlg.statusLbl.setText("Connected!")
         self.dlg.statusLbl.setStyleSheet("color: green;")
 
-        config['username'] = username
-        config['server'] = server
+        config['login']['username'] = username
+        config['login']['server'] = server
         if remember:
-          config['password'] = password
+          config['login']['password'] = password
         else:
-          config['password'] = ""
+          config['login']['password'] = ""
         config.save()
 
         return True
