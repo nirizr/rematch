@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/nirizr/rematch.svg?branch=master)](https://travis-ci.org/nirizr/rematch)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/244945976779490d8f78706a9d4ab46b)](https://www.codacy.com/app/nirizr/rematch?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=nirizr/rematch&amp;utm_campaign=Badge_Grade)
 
 # rematch
 
