@@ -52,5 +52,6 @@ before_script:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
+  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --verbose ; fi
   - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose ; fi
     
