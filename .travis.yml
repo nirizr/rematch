@@ -7,13 +7,14 @@ python:
   - "3.4"
   - "3.5"
 env:
-  - PROJECT=idaplugin
-  - PROJECT=server
+  - PROJECT=idaplugin COVERAGE='true'
+  - PROJECT=server COVERAGE='true'
+
 matrix:
   # idaplugin is run with python2.7, we'll check against python3 to assert compatibility
   exclude:
     - python: "3.4"
-      env: PROJECT=idaplugin
+      env: PROJECT=idaplugin COVERAGE='true'
 
 branches:
   only: 
@@ -44,14 +45,22 @@ install:
   - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
   - if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt ; fi
   - pip install flake8
+  - if [[ $COVERAGE == 'true' ]]; then pip install pytest-cov coveralls ; fi
 
 before_script:
   - if [ ${PROJECT} = "server" ]; then
       mysql -e 'SHOW VARIABLES LIKE "%version%";' ;
     fi;
+  - if [[ $COVERAGE == 'true' ]]; then
+      COVERAGE="--cov-report= --cov=$PROJECT" ;
+    else
+      COVERAGE="" ;
+    fi ;
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --verbose ; fi
-  - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose ; fi
-    
+  - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose ${COVERAGE} ; fi
+
+after_success:
+  - coveralls
