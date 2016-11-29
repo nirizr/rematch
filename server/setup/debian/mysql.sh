@@ -7,4 +7,3 @@ service mysql start
 pip install mysql-python --no-cache-dir
 mysql -uroot -e "create database rematch;"
 
-echo "ok"
