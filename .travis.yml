@@ -1,5 +1,6 @@
 services:
   - mysql
+  - rabbitmq
 
 language: python
 python:

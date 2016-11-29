@@ -53,7 +53,7 @@ class InstanceSerializer(serializers.ModelSerializer):
       fields = ('id', 'type', 'type_version', 'data')
 
   owner = serializers.ReadOnlyField(source='owner.username')
-  vectors = NestedVectorSerializer(many=True, required=False)
+  vectors = NestedVectorSerializer(many=True, required=True)
 
   class Meta:
     model = Instance
@@ -69,8 +69,6 @@ class InstanceSerializer(serializers.ModelSerializer):
 
 
 class VectorSerializer(serializers.ModelSerializer):
-  file = serializers.ReadOnlyField()
-
   class Meta:
     model = Vector
     fields = ('id', 'file', 'instance', 'type', 'type_version', 'data')
