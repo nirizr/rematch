@@ -54,7 +54,10 @@ class User(dict):
       self.update(network.query("POST", "accounts/logout/", json=True))
     except exceptions.AuthenticationException:
       pass
-    if 'token' in config:
+    except exceptions.ConnectionException:
+      pass
+
+    if 'login' in config and 'token' in config['login']:
       del config['config']['token']
     self.refresh()
 
