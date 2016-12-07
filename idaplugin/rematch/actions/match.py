@@ -4,8 +4,10 @@ import idautils
 from ..dialogs.match import MatchDialog
 
 from .. import instances
-from .. import network, netnode
+from .. import network, netnode, logger
 from . import base
+
+import hashlib
 
 
 class MatchAction(base.BoundFileAction):
@@ -18,6 +20,7 @@ class MatchAction(base.BoundFileAction):
     self.pbar = None
     self.timer = None
     self.task_id = None
+    self.file_version_id = None
     self.instance_set = []
 
     self.source = None
@@ -28,20 +31,17 @@ class MatchAction(base.BoundFileAction):
     self.target_file = None
     self.methods = None
 
-  def get_functions(self):
-    if self.source == 'idb':
-      return set(idautils.Functions())
-    elif self.source == 'user':
-      raise NotImplementedError("All user functions are not currently "
-                                "supported as source value.")
-    elif self.source == 'single':
-      return set([self.source_single])
-    elif self.source == 'range':
-      return set(idautils.Functions(self.source_range[0],
-                                    self.source_range[1]))
+  @staticmethod
+  def calc_file_version_hash():
+    version_obj = {}
+    version_obj['functions'] = {offset: list(idautils.Chunks(offset))
+                                  for offset in idautils.Functions()}
+    version_str = repr(version_obj)
+    version_hash = hashlib.md5(version_str).hexdigest()
 
-    raise ValueError("Invalid source value received from MatchDialog: {}"
-                     "".format(self.source))
+    logger('match_action').info("file version string: {}".format(version_str))
+    logger('match_action').info("file version hash: {}".format(version_hash))
+    return version_hash
 
   def submit_handler(self, source, source_single, source_range, target,
                      target_project, target_file, methods):
@@ -53,9 +53,23 @@ class MatchAction(base.BoundFileAction):
     self.target_file = target_file if target == 'file' else None
     self.methods = methods
 
-    self.functions = self.get_functions()
-    if not self.functions:
-      return False
+    file_version_hash = self.calc_file_version_hash()
+    uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
+                                                    file_version_hash)
+    return network.QueryWorker("POST", uri, json=True)
+
+  def response_handler(self, file_version):
+    self.file_version_id = file_version['id']
+
+    if file_version['created']:
+      self.start_upload()
+    else:
+      self.start_task()
+
+    return True
+
+  def start_upload(self):
+    self.functions = set(idautils.Functions())
 
     self.pbar = QtWidgets.QProgressDialog()
     self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
@@ -80,7 +94,7 @@ class MatchAction(base.BoundFileAction):
       return
 
     try:
-      func = instances.FunctionInstance(netnode.bound_file_id, offset)
+      func = instances.FunctionInstance(self.file_version_id, offset)
       self.instance_set.append(func.serialize())
 
       if len(self.instance_set) >= 100:
@@ -111,7 +125,9 @@ class MatchAction(base.BoundFileAction):
 
   def accept_upload(self):
     self.cancel_upload()
+    self.start_task()
 
+  def start_task(self):
     if self.source == 'idb':
       self.source_range = [None, None]
     elif self.source == 'single':
@@ -123,6 +139,7 @@ class MatchAction(base.BoundFileAction):
                                 "creation")
 
     params = {'source_file': netnode.bound_file_id,
+              'source_file_version': self.file_version_id,
               'source_start': self.source_range[0],
               'source_end': self.source_range[1],
               'target_project': self.target_project,

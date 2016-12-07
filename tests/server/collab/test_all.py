@@ -4,34 +4,46 @@ from functools import partial
 from rest_framework import status
 
 from django.db import models
-from collab.models import Project, File, Task, Instance, Vector
+from collab.models import Project, File, FileVersion, Task, Instance, Vector
+
+import random
+import string
+
+
+def rand_hash(n):
+  return ''.join(random.choice(string.ascii_uppercase) for _ in range(n))
 
 
 collab_models = {'projects': {'name': 'test_project_1', 'private': False,
                               'description': 'description_1', 'files': []},
-                 'files': {'instances': [], 'md5hash': 'H' * 32,
-                           'name': 'file1', 'description': 'desc1'},
-                 'tasks': {'source_file': 1, 'target_project': 1},
-                 'instances': {'offset': 0, 'type': 'function', 'file': 1,
-                               'vectors': []},
-                 'vectors': {'instance': 1, 'type': 'hash', 'type_version': 0,
+                 'files': {'md5hash': 'H' * 32, 'name': 'file1',
+                           'description': 'desc1'},
+                 'file_versions': {'md5hash': 'J' * 32},
+                 'tasks': {},
+                 'instances': {'offset': 0, 'type': 'function', 'vectors': []},
+                 'vectors': {'type': 'hash', 'type_version': 0,
                              'data': 'data'}}
 
 collab_model_objects = {'projects': partial(Project, private=False),
                         'files': partial(File, name='name', description='desc',
                                          md5hash='H' * 32),
+                        'file_versions': partial(FileVersion),
                         'tasks': Task,
                         'instances': partial(Instance, offset=0),
                         'vectors': partial(Vector, type='hash', data='data',
-                                           type_version=0)}
+                                           type_version=0),
+                        'rand_hash': partial(rand_hash, 32)}
 
 collab_model_reqs = {'projects': {},
                      'files': {},
+                     'file_versions': {'file': 'files',
+                                       'md5hash': 'rand_hash'},
                      'tasks': {'target_project': 'projects',
-                               'source_file': 'files'},
-                     'instances': {'file': 'files'},
-                     'vectors': {'file': 'files',
-                                 'instance': 'instances'}}
+                               'source_file_version': 'file_versions'},
+                     'instances': {'file_version': 'file_versions'},
+                     'vectors': {'instance': 'instances',
+                                 'file_version': 'file_versions',
+                                 'file': 'files'}}
 
 
 def resolve_reqs(model_name, user):
@@ -42,21 +54,24 @@ def resolve_reqs(model_name, user):
 
     create_model(req_model, user, base_obj=obj)
 
-    obj.owner = user
-    obj.save()
-    print("Created model: {} ({}) at {}".format(obj, obj.id, req_field))
+    if isinstance(obj, models.Model):
+      obj.owner = user
+      obj.save()
+      print("Created model: {} ({}) at {}".format(obj, obj.id, req_field))
     yield req_field, obj
 
 
 def create_model(model_name, user, base_obj=None):
   if base_obj is None:
     base_obj = collab_model_objects[model_name]()
-  base_obj.owner = user
 
-  for req_field, obj in resolve_reqs(model_name, user):
-    base_obj.__setattr__(req_field, obj)
+  if isinstance(base_obj, models.Model):
+    base_obj.owner = user
 
-  print(base_obj)
+    for req_field, obj in resolve_reqs(model_name, user):
+      base_obj.__setattr__(req_field, obj)
+
+  print("base_obj", base_obj)
   return base_obj
 
 
@@ -64,9 +79,12 @@ def setup_model(model_name, user):
   model_dict = collab_models[model_name]
 
   for req_field, obj in resolve_reqs(model_name, user):
-    model_dict[req_field] = obj.id
+    if isinstance(obj, models.Model):
+      model_dict[req_field] = obj.id
+    else:
+      model_dict[req_field] = obj
 
-  print(model_dict)
+  print("model_dict", model_dict)
   return model_dict
 
 
@@ -119,8 +137,10 @@ def test_model_guest_list(client, admin_user, model_name):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('model_name, model_data', collab_models.items())
-def test_model_guest_creation(client, model_name, model_data):
+@pytest.mark.parametrize('model_name', collab_models.keys())
+def test_model_guest_creation(client, admin_user, model_name):
+  model_data = setup_model(model_name, admin_user)
+
   response = client.post('/collab/{}/'.format(model_name),
                          data=json.dumps(model_data),
                          content_type="application/json")
@@ -128,9 +148,8 @@ def test_model_guest_creation(client, model_name, model_data):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize('model_name, model_data', collab_models.items())
-def test_model_creation(client, admin_client, admin_user, model_name,
-                        model_data):
+@pytest.mark.parametrize('model_name', collab_models.keys())
+def test_model_creation(client, admin_client, admin_user, model_name):
   model_data = setup_model(model_name, admin_user)
 
   response = admin_client.post('/collab/{}/'.format(model_name),

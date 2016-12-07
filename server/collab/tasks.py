@@ -16,14 +16,16 @@ def match(task_id):
                 task_id=match.request.id)
 
     # get input parameters
-    task_values = task.values_list('id', 'source_file_id', 'source_start',
-                                   'source_end', 'target_project_id',
-                                   'target_file_id')[0]
+    task_values = task.values_list('id', 'source_file_version__file_id',
+                                   'source_start', 'source_end',
+                                   'source_file_version_id',
+                                   'target_project_id', 'target_file_id')[0]
     print(task_values)
-    (task_id, source_file, source_start, source_end, target_project,
-     target_file) = task_values
+    (task_id, source_file, source_start, source_end, source_file_version,
+     target_project, target_file) = task_values
 
-    source_filter = {'file_id': source_file}
+    source_filter = {'file_id': source_file,
+                     'file_version_id': source_file_version}
     if source_start:
       source_filter['instance__offset__gte'] = source_start
     if source_end:

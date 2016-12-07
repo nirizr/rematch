@@ -36,6 +36,17 @@ class File(models.Model):
   __str__ = __unicode__
 
 
+class FileVersion(models.Model):
+  created = models.DateTimeField(auto_now_add=True)
+  file = models.ForeignKey(File, related_name='versions')
+  md5hash = models.CharField(max_length=32, unique=True,
+                             validators=[MinLengthValidator(32)])
+
+  def __unicode__(self):
+    return "File {} version {}".format(self.file.name, self.md5hash)
+  __str__ = __unicode__
+
+
 class Instance(models.Model):
   TYPE_EMPTY_DATA = 'empty_data'
   TYPE_DATA = 'data'
@@ -47,7 +58,7 @@ class Instance(models.Model):
                   (TYPE_FUNCTION, "Function"))
 
   owner = models.ForeignKey(User, db_index=True)
-  file = models.ForeignKey(File, related_name='instances')
+  file_version = models.ForeignKey(FileVersion, related_name='instances')
   type = models.CharField(max_length=16, choices=TYPE_CHOICES)
   offset = models.BigIntegerField()
 
@@ -55,8 +66,8 @@ class Instance(models.Model):
                                    related_name='related_to+')
 
   def __unicode__(self):
-    return "{} instance {} at {}".format(self.get_type_display(), self.offset,
-                                         self.file.name)
+    return "{} instance {} of {}".format(self.get_type_display(), self.offset,
+                                         self.file_version.file.name)
   __str__ = __unicode__
 
 
@@ -76,6 +87,7 @@ class Vector(models.Model):
 
   instance = models.ForeignKey(Instance, related_name='vectors')
   file = models.ForeignKey(File, related_name='vectors')
+  file_version = models.ForeignKey(FileVersion, related_name='vectors')
   type = models.CharField(max_length=16, choices=TYPE_CHOICES)
   type_version = models.IntegerField()
   data = models.TextField()
@@ -111,7 +123,8 @@ class Task(models.Model):
   status = models.CharField(default=STATUS_PENDING, max_length=16,
                             choices=STATUS_CHOICES)
 
-  source_file = models.ForeignKey(File, related_name='source_tasks')
+  source_file_version = models.ForeignKey(FileVersion,
+                                          related_name='source_tasks')
   # TODO: make sure start > end
   source_start = models.PositiveIntegerField(null=True)
   source_end = models.PositiveIntegerField(null=True)
