@@ -4,7 +4,7 @@ import idaapi
 
 from . import config, user, logger
 from . import actions
-from . import updater
+from . import update
 
 
 class RematchPlugin(idaapi.plugin_t):
@@ -27,8 +27,7 @@ class RematchPlugin(idaapi.plugin_t):
     self.timespent = None
 
   def init(self):
-    QtCore.QTimer.singleShot(100, lambda: updater.update())
-
+    update.check_update()
     self.setup()
 
     return idaapi.PLUGIN_KEEP
