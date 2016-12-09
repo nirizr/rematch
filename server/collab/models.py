@@ -39,8 +39,11 @@ class File(models.Model):
 class FileVersion(models.Model):
   created = models.DateTimeField(auto_now_add=True)
   file = models.ForeignKey(File, related_name='versions')
-  md5hash = models.CharField(max_length=32, unique=True,
+  md5hash = models.CharField(max_length=32,
                              validators=[MinLengthValidator(32)])
+
+  class Meta:
+    unique_together = (('file', 'md5hash'),)
 
   def __unicode__(self):
     return "File {} version {}".format(self.file.name, self.md5hash)
