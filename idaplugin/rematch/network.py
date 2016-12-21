@@ -17,10 +17,10 @@ _threadpool.setMaxThreadCount(config['network']['threadcount'])
 
 
 class WorkerSignals(QtCore.QObject):
-  result_dict = QtCore.pyqtSignal(dict)
-  result_list = QtCore.pyqtSignal(list)
-  result_str = QtCore.pyqtSignal(str)
-  result_exception = QtCore.pyqtSignal(Exception)
+  result_dict = QtCore.Signal(dict)
+  result_list = QtCore.Signal(list)
+  result_str = QtCore.Signal(str)
+  result_exception = QtCore.Signal(Exception)
 
 
 class QueryWorker(QtCore.QRunnable):
