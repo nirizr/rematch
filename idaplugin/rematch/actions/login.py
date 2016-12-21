@@ -11,28 +11,51 @@ class LoginAction(base.UnauthAction):
   group = "User"
   dialog = LoginDialog
 
+  def __init__(self):
+    super(LoginAction, self).__init__()
+    self.username = None
+    self.password = None
+    self.server = None
+    self.remember = None
+
   def submit_handler(self, username, password, server, remember):
-    try:
-      if user.login(username, password, server=server):
-        self.dlg.statusLbl.setText("Connected!")
-        self.dlg.statusLbl.setStyleSheet("color: green;")
+    self.username = username
+    self.password = password
+    self.server = server
+    self.remember = remember
 
-        config['login']['username'] = username
-        config['login']['server'] = server
-        if remember:
-          config['login']['password'] = password
-        else:
-          config['login']['password'] = ""
-        config.save()
+    user.login(username, password, server=server,
+               success_callback=self.handle_login,
+               exception_callback=self.handle_exception)
 
-        return True
-    except (exceptions.ConnectionException, exceptions.ServerException):
+    # don't hide the dialog
+    return False
+
+  def handle_login(self, response):
+    del response
+
+    self.dlg.statusLbl.setText("Connected!")
+    self.dlg.statusLbl.setStyleSheet("color: green;")
+
+    config['login']['username'] = self.username
+    config['login']['server'] = self.server
+    if self.remember:
+      config['login']['password'] = self.password
+    else:
+      config['login']['password'] = ""
+    config.save()
+
+    self.dlg.accept()
+
+  def handle_exception(self, exception):
+    if isinstance(exception, (exceptions.ConnectionException,
+                              exceptions.ServerException)):
       self.dlg.statusLbl.setText("Connection to server failed.")
       self.dlg.statusLbl.setStyleSheet("color: blue;")
-    except (exceptions.QueryException, exceptions.AuthenticationException):
+    elif isinstance(exception, (exceptions.QueryException,
+                                exceptions.AuthenticationException)):
       self.dlg.statusLbl.setText("Invalid user name or password.")
       self.dlg.statusLbl.setStyleSheet("color: red;")
-    return False
 
 
 class LogoutAction(base.AuthAction):

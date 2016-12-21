@@ -11,6 +11,8 @@ class User(dict):
   def __init__(self):
     super(User, self).__init__()
 
+    self.success_callback = None
+
     try:
       self.refresh()
 
@@ -29,37 +31,27 @@ class User(dict):
       logger('user').debug(ex)
       self.update(self.LOGGEDOUT_USER)
 
-  def login(self, username, password, server):
+  def login(self, username, password, server, success_callback=None,
+            exception_callback=None):
+    self.success_callback = success_callback
+
     # authenticate
     login_params = {'username': username, 'password': password}
-    r = network.query("POST", "accounts/login/", params=login_params,
-                      server=server, json=True)
-    token = r['key']
+    network.delayed_query("POST", "accounts/login/", params=login_params,
+                          server=server, json=True, callback=self.handle_login,
+                          exception_callback=exception_callback)
 
-    # receive new user account details
-    r = network.query("GET", "accounts/profile/", server=server, token=token,
-                      json=True)
-    self.clear()
-    self.update(r)
+  def handle_login(self, response):
+    config['login']['token'] = response['key']
+    config.save()
 
-    # save functioning token
-    if self['is_authenticated']:
-      config['login']['token'] = token
-      config.save()
-
-    return self['is_authenticated']
+    self.refresh()
 
   def logout(self):
-    try:
-      self.update(network.query("POST", "accounts/logout/", json=True))
-    except exceptions.AuthenticationException:
-      pass
-    except exceptions.ConnectionException:
-      pass
-
-    if 'login' in config and 'token' in config['login']:
-      del config['config']['token']
-    self.refresh()
+    network.delayed_query("POST", "accounts/logout/", json=True)
+    del config['login']['token']
+    self.clear()
+    self.update(self.LOGGEDOUT_USER)
 
   def refresh(self):
     self.clear()
@@ -68,12 +60,20 @@ class User(dict):
     if not ('token' in config['login'] and config['login']['token']):
       return
 
-    try:
-      self.update(network.query("GET", "accounts/profile/", json=True))
-    except exceptions.AuthenticationException:
+    network.delayed_query("GET", "accounts/profile/", json=True,
+                          callback=self.handle_refresh,
+                          exception_callback=self.handle_refresh_failure)
+
+  def handle_refresh(self, response):
+    self.update(response)
+    if self.success_callback:
+      self.success_callback(response)
+      self.success_callback = None
+
+  @staticmethod
+  def handle_refresh_failure(exception):
+    if isinstance(exception, exceptions.AuthenticationException):
       del config['login']['token']
-    except exceptions.NotFoundException:
-      pass
 
   def __setitem__(self, key, value):
     raise RuntimeError("User is a read only dict")
