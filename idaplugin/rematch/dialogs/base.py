@@ -194,6 +194,7 @@ class QFunctionSelect(QtWidgets.QWidget):
     super(QFunctionSelect, self).__init__(**kwargs)
 
     self.text_max = text_max_length
+    self.func = None
 
     self.label = QtWidgets.QPushButton()
     self.label.clicked.connect(self.label_clicked)
@@ -202,7 +203,9 @@ class QFunctionSelect(QtWidgets.QWidget):
     self.btn.setMaximumWidth(20)
     self.btn.clicked.connect(self.btn_clicked)
 
-    self.set_func(idaapi.get_func(idc.ScreenEA()))
+    current_func = idaapi.get_func(idc.ScreenEA())
+    if current_func:
+      self.set_func(current_func)
 
     layout = QtWidgets.QHBoxLayout()
     layout.setContentsMargins(0, 0, 0, 0)
@@ -224,7 +227,7 @@ class QFunctionSelect(QtWidgets.QWidget):
   def btn_clicked(self, checked):
     del checked
     f = idaapi.choose_func("Choose function to match with database",
-                           self.func.startEA)
+                           self.func.startEA if self.func else 0)
     if f:
       self.set_func(f)
       self.changed.emit()
@@ -248,6 +251,9 @@ class QFunctionRangeSelect(QtWidgets.QWidget):
     self.setLayout(layout)
 
   def selection_changed(self):
+    if not self.start.func or not self.end.func:
+      return
+
     if self.start.func.startEA < self.end.func.endEA:
       return
 
