@@ -12,6 +12,7 @@ class User(dict):
     super(User, self).__init__()
 
     self.success_callback = None
+    self.server = None
 
     try:
       self.refresh()
@@ -34,6 +35,7 @@ class User(dict):
   def login(self, username, password, server, success_callback=None,
             exception_callback=None):
     self.success_callback = success_callback
+    self.server = server
 
     # authenticate
     login_params = {'username': username, 'password': password}
@@ -43,6 +45,7 @@ class User(dict):
 
   def handle_login(self, response):
     config['login']['token'] = response['key']
+    config['login']['server'] = self.server
     config.save()
 
     self.refresh()
