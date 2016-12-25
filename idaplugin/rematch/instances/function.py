@@ -7,7 +7,6 @@ class EmptyFunctionInstance(base.BaseInstance):
 
   def __init__(self, *args, **kwargs):
     super(EmptyFunctionInstance, self).__init__(*args, **kwargs)
-    # self.vectors.add(collectors.name_hash)
 
 
 class FunctionInstance(EmptyFunctionInstance):
@@ -18,5 +17,3 @@ class FunctionInstance(EmptyFunctionInstance):
     self.vectors.add(collectors.AssemblyHashVector)
     self.vectors.add(collectors.MnemonicHashVector)
     self.vectors.add(collectors.MnemonicHistVector)
-    # self.vectors.add(collectors.data_hash)
-    # self.vectors.add(collectors.opcode_hash)

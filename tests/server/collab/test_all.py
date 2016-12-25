@@ -21,7 +21,7 @@ collab_models = {'projects': {'name': 'test_project_1', 'private': False,
                  'file_versions': {'md5hash': 'J' * 32},
                  'tasks': {},
                  'instances': {'offset': 0, 'type': 'function', 'vectors': []},
-                 'vectors': {'type': 'hash', 'type_version': 0,
+                 'vectors': {'type': 'assembly_hash', 'type_version': 0,
                              'data': 'data'}}
 
 collab_model_objects = {'projects': partial(Project, private=False),
@@ -30,8 +30,8 @@ collab_model_objects = {'projects': partial(Project, private=False),
                         'file_versions': partial(FileVersion),
                         'tasks': Task,
                         'instances': partial(Instance, offset=0),
-                        'vectors': partial(Vector, type='hash', data='data',
-                                           type_version=0),
+                        'vectors': partial(Vector, type='assembly_hash',
+                                           data='data', type_version=0),
                         'rand_hash': partial(rand_hash, 32)}
 
 collab_model_reqs = {'projects': {},
