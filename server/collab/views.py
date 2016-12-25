@@ -60,7 +60,7 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
 
     resp_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
     response_data = serializer.data
-    response_data['created'] = created
+    response_data['newly_created'] = created
     return response.Response(response_data, status=resp_status)
 
 

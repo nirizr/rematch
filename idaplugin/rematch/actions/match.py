@@ -61,7 +61,7 @@ class MatchAction(base.BoundFileAction):
   def response_handler(self, file_version):
     self.file_version_id = file_version['id']
 
-    if file_version['created']:
+    if file_version['newly_created']:
       self.start_upload()
     else:
       self.start_task()
