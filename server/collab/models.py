@@ -146,34 +146,10 @@ class Match(models.Model):
   score = models.FloatField()
 
 
-#
-# Anotations
-#
-
 class Annotation(models.Model):
-  created = models.DateTimeField(auto_now_add=True)
-  modified = models.DateTimeField(auto_now=True)
-  owner = models.ForeignKey(User, db_index=True)
-  instance = models.ForeignKey(Instance)
+  TYPE_NAME = 'name'
+  TYPE_CHOICES = ((TYPE_NAME, "Name"),)
 
-  offset = models.IntegerField()
-
-
-class NameAnnotation(Annotation):
-  name = models.CharField(max_length=256)
-
-
-class CommentAnnotation(Annotation):
-  comment = models.TextField()
-
-
-class RptCommentAnnotation(Annotation):
-  comment = models.TextField()
-
-
-class AboveLineCommentAnnotation(Annotation):
-  comment = models.TextField()
-
-
-class BelowLineCommentAnnotation(Annotation):
-  comment = models.TextField()
+  instance = models.ForeignKey(Instance, related_name='annotations')
+  type = models.CharField(max_length=16, choices=TYPE_CHOICES)
+  data = models.TextField()

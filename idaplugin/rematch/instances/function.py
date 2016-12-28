@@ -17,3 +17,4 @@ class FunctionInstance(EmptyFunctionInstance):
     self.vectors.add(collectors.AssemblyHashVector)
     self.vectors.add(collectors.MnemonicHashVector)
     self.vectors.add(collectors.MnemonicHistVector)
+    self.annotations.add(collectors.AssemblyAnnotation)

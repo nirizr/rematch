@@ -1,7 +1,5 @@
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
-                           NameAnnotation, CommentAnnotation,
-                           RptCommentAnnotation, AboveLineCommentAnnotation,
-                           BelowLineCommentAnnotation)
+                           Annotation)
 from django.contrib import admin
 
 admin.site.register(Project)
@@ -10,10 +8,4 @@ admin.site.register(FileVersion)
 admin.site.register(Task)
 admin.site.register(Instance)
 admin.site.register(Vector)
-
-# TODO: add in a different list
-admin.site.register(NameAnnotation)
-admin.site.register(CommentAnnotation)
-admin.site.register(RptCommentAnnotation)
-admin.site.register(AboveLineCommentAnnotation)
-admin.site.register(BelowLineCommentAnnotation)
+admin.site.register(Annotation)

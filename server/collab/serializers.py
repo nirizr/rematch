@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
-                           Match)
+                           Annotation, Match)
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -62,17 +62,24 @@ class InstanceSerializer(serializers.ModelSerializer):
       model = Vector
       fields = ('id', 'type', 'type_version', 'data')
 
+  class NestedAnnotationSerializer(serializers.ModelSerializer):
+    class Meta:
+      model = Annotation
+      fields = ('id', 'type', 'data')
+
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
   vectors = NestedVectorSerializer(many=True, required=True)
+  annotations = NestedAnnotationSerializer(many=True, required=True)
 
   class Meta:
     model = Instance
     fields = ('id', 'owner', 'file', 'file_version', 'type', 'offset',
-              'vectors')
+              'vectors', 'annotations')
 
   def create(self, validated_data):
     vectors_data = validated_data.pop('vectors')
+    annotations_data = validated_data.pop('annotations')
     file_version = validated_data['file_version']
 
     obj = self.Meta.model.objects.create(**validated_data)
@@ -80,6 +87,9 @@ class InstanceSerializer(serializers.ModelSerializer):
                       file=file_version.file, **vector_data)
                for vector_data in vectors_data)
     Vector.objects.bulk_create(vectors)
+    annotations = (Annotation(instance=obj, **annotation_data)
+                   for annotation_data in annotations_data)
+    Annotation.objects.bulk_create(annotations)
     return obj
 
 

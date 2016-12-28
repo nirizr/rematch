@@ -20,7 +20,8 @@ collab_models = {'projects': {'name': 'test_project_1', 'private': False,
                            'description': 'desc1'},
                  'file_versions': {'md5hash': 'J' * 32},
                  'tasks': {},
-                 'instances': {'offset': 0, 'type': 'function', 'vectors': []},
+                 'instances': {'offset': 0, 'type': 'function', 'vectors': [],
+                               'annotations': []},
                  'vectors': {'type': 'assembly_hash', 'type_version': 0,
                              'data': 'data'}}
 
