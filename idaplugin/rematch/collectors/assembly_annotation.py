@@ -1,6 +1,5 @@
 import idaapi
 import idautils
-import ida_lines
 
 from .annotation import Annotation
 
@@ -14,7 +13,7 @@ class AssemblyAnnotation(Annotation):
 
     nodes = {}
     for node in flow_chart:
-      assembly = [ida_lines.generate_disasm_line(ea)
+      assembly = [idaapi.generate_disasm_line(ea)
                     for ea in idautils.Heads(node.startEA, node.endEA)]
       successive_nodes = [succ.id for succ in node.succs()]
       serialized_node = {'id': node.id, 'type': node.type,
