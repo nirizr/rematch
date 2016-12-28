@@ -51,7 +51,7 @@ def match(task_id):
       if source_vectors.count() and target_vectors.count():
         match_objs = gen_match_objs(task_id, match_type, source_vectors,
                                     target_vectors)
-        Match.objects.bulk_create(match_objs)
+        Match.objects.bulk_create(match_objs, batch_size=10000)
       print("\tTook: {}".format(now() - start))
 
       task.update(progress=F('progress') + 1)
