@@ -62,9 +62,12 @@ class MatchDialog(base.BaseDialog):
       methods.append('graph')
 
     return {'source': self.sourceGrp.get_result(),
-            'source_single': self.source_single.func.startEA,
-            'source_range': [self.source_range.start.func.startEA,
-                             self.source_range.end.func.endEA],
+            'source_single': self.source_single.func.startEA
+                               if self.source_single.func else None,
+            'source_range': [self.source_range.start.func.startEA
+                               if self.source_range.start.func else None,
+                             self.source_range.end.func.endEA
+                               if self.source_range.end.func else None],
             'target': self.targetGrp.get_result(),
             'target_project': self.target_project.currentData(),
             'target_file': self.target_file.currentData(),
