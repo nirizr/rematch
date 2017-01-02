@@ -148,7 +148,9 @@ class Match(models.Model):
 
 class Annotation(models.Model):
   TYPE_NAME = 'name'
-  TYPE_CHOICES = ((TYPE_NAME, "Name"),)
+  TYPE_ASSEMBLY = 'assembly'
+  TYPE_CHOICES = ((TYPE_NAME, "Name"),
+                  (TYPE_ASSEMBLY, "Assembly"))
 
   instance = models.ForeignKey(Instance, related_name='annotations')
   type = models.CharField(max_length=16, choices=TYPE_CHOICES)
