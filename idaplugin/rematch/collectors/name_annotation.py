@@ -10,6 +10,5 @@ class NameAnnotation(Annotation):
     f = idc.GetFlags(self.offset)
     return idc.hasUserName(f)
 
-  @property
-  def data(self):
+  def _data(self):
     return idc.Name(self.offset)

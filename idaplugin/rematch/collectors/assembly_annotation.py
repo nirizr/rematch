@@ -7,8 +7,7 @@ from .annotation import Annotation
 class AssemblyAnnotation(Annotation):
   type = 'assembly'
 
-  @property
-  def data(self):
+  def _data(self):
     flow_chart = idaapi.FlowChart(idaapi.get_func(self.offset))
 
     nodes = {}

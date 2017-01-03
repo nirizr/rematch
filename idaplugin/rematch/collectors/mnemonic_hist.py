@@ -10,8 +10,7 @@ class MnemonicHistVector(Vector):
   type = 'mnemonic_hist'
   type_version = 0
 
-  @property
-  def data(self):
+  def _data(self):
     instruction_hist = defaultdict(int)
 
     for offset in idautils.FuncItems(self.offset):

@@ -10,8 +10,7 @@ class AssemblyHashVector(Vector):
   type = 'assembly_hash'
   type_version = 0
 
-  @property
-  def data(self):
+  def _data(self):
     md5 = hashlib.md5()
     for offset in idautils.FuncItems(self.offset):
       asm_line = idc.GetDisasmEx(offset, idc.GENDSM_MULTI_LINE)
