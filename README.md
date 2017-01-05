@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/nirizr/rematch.svg?branch=master)](https://travis-ci.org/nirizr/rematch)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/244945976779490d8f78706a9d4ab46b)](https://www.codacy.com/app/rematch/rematch?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=rematch/rematch&amp;utm_campaign=Badge_Grade)
+[![rematch-idaplugin PyPI](https://img.shields.io/pypi/v/rematch-idaplugin.svg)](https://pypi.python.org/pypi/rematch-idaplugin)
+[![rematch-server PyPI](https://img.shields.io/pypi/v/rematch-server.svg)](https://pypi.python.org/pypi/rematch-server)
 
 # rematch
 
