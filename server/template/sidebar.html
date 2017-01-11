@@ -7,12 +7,12 @@
 
 {% for menu in navigation %}
       <li class="{{ menu.menu_class }}">
-        <a href="{{ menu.url }}"{% if menu.active %} class="active"{% endif %}>
+        <a href="{% if menu.url %}{% url menu.url %}i{% else %}javascript:;{% endif %}"{% if menu.active %} class="active"{% endif %}>
           <i class="fa {{menu.icon}}"></i>
           <span>{{menu.name}}</span>
         </a>{% if menu.submenu %}
         <ul class="sub">{% for submenu in menu.submenu %}
-          <li{% if submenu.active %} class="active"{% endif %}><a href="{{ submenu.url }}">{{ submenu.name }}</a></li>{% endfor %}
+          <li{% if submenu.active %} class="active"{% endif %}><a href="{% url submenu.url %}">{{ submenu.name }}</a></li>{% endfor %}
         </ul>{% endif %}
       </li>
 {% endfor %}
