@@ -77,7 +77,7 @@ class FileVersionViewSet(viewsets.ModelViewSet):
 
 class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                   mixins.DestroyModelMixin, mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
+                  viewsets.GenericViewSet, ViewSetTemplateMixin):
   queryset = Task.objects.all()
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                         IsOwnerOrReadOnly)
