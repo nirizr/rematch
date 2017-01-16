@@ -1,13 +1,17 @@
 # objects
 from . import logger
 from . import config
-
-# modules
 from . import network
 from . import exceptions
+from . import utils
 from .version import __version__
 
 # builtin
+import os
+import shutil
+import urllib2
+import tempfile
+import zipfile
 from distutils.version import StrictVersion
 
 # ida
@@ -18,18 +22,16 @@ def check_update():
   if not config['settings']['update']['autocheck']:
     return
 
-  url = ("repos/{owner}/{repo}/releases/latest"
-         "").format(owner=config['git']['owner'],
-                    repo=config['git']['repository'])
+  url = "pypi/{package}/json".format(package=config['pypi']['package'])
 
-  network.delayed_query("GET", url, server=config['git']['server'], token="",
+  network.delayed_query("GET", url, server=config['pypi']['server'], token="",
                         json=True, callback=handle_update,
                         exception_callback=handle_exception)
 
 
 def handle_update(response):
   local_version = StrictVersion(__version__)
-  remote_version = StrictVersion(response['tag_name'])
+  remote_version = StrictVersion(response['info']['version'])
   logger('update').info("local version: {}, latest version: {}"
                         .format(local_version, remote_version))
 
@@ -42,7 +44,7 @@ def handle_update(response):
 
   logger('update').info("update is available")
 
-  if remote_version in config['settings']['update']['skipped']:
+  if str(remote_version) in config['settings']['update']['skipped']:
     logger('update').info("version update marked skip")
     return
 
@@ -60,7 +62,34 @@ def handle_update(response):
     if update == -1:
       return
 
-    # TODO: actually update the plugin
+  # get latest version's package url
+  new_release = response['releases'][str(remote_version)]
+  new_url = new_release[0]['url']
+  update_version(new_url)
+
+
+def update_version(url):
+  PACKAGE_PATH = '/idaplugin/'
+
+  logger('update').info("New version package url: {}".format(url))
+  package_download = urllib2.urlopen(url)
+  temp_zip = tempfile.TemporaryFile()
+  temp_dir = tempfile.mkdtemp()
+
+  try:
+    temp_zip.write(package_download.read())
+    package_zip = zipfile.ZipFile(temp_zip)
+    files = [f for f in package_zip.namelist() if PACKAGE_PATH in f]
+    package_zip.extractall(temp_dir, files)
+
+    for filename in files:
+      source = os.path.join(temp_dir, *filename.split('/'))
+      target_file_parts = filename.split(PACKAGE_PATH, 1)[1].split('/')
+      target = utils.getPluginBase(*target_file_parts)
+      shutil.move(source, target)
+  finally:
+    temp_zip.close()
+    shutil.rmtree(temp_dir)
 
 
 def handle_exception(exception):
