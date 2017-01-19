@@ -1,0 +1,20 @@
+uses:
+  - django
+  - celery
+
+python-targets:
+  - 2
+  - 3
+
+requirements:
+  - setup/setup_server.py
+  - setup/setup_idaplugin.py
+
+test-warnings: true
+
+pylint:
+  disable:
+    - bad-indentation
+pep8:
+  disable:
+    - E114
