@@ -60,8 +60,10 @@ class Config(dict):
       json_config = json.dumps(self, indent=4, sort_keys=True)
       with open(self.user_config_file, 'w') as fh:
         fh.write(json_config)
-    except:
-      logger('config').error("Could not save configuration file")
+    except Exception:
+      import traceback
+      logger('config').error("Could not save configuration file: %s",
+                             traceback.format_exc())
 
   def __del__(self):
     self.save()

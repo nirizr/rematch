@@ -86,7 +86,7 @@ class Action(idaapi.action_handler_t):
     action = cls()
     r = idaapi.register_action(action.get_desc())
     if not r:
-      logger('actions').warn("failed registering {}: {}".format(cls, r))
+      logger('actions').warn("failed registering %s: %s", cls, r)
       return
     idaapi.attach_action_to_menu(
         action.get_action_path(),
@@ -96,7 +96,7 @@ class Action(idaapi.action_handler_t):
         "AnalysisToolBar",
         action.get_id())
     if not r:
-      logger('actions').warn("registration of {} failed: {}".format(cls, r))
+      logger('actions').warn("registration of %s failed: %s", cls, r)
     return action
 
   def update(self, ctx):
@@ -113,7 +113,7 @@ class Action(idaapi.action_handler_t):
       self.dlg.finished.connect(self.force_update)
       self.dlg.show()
     else:
-      logger('actions').warn("{}: no activation".format(self.__class__))
+      logger('actions').warn("%s: no activation", self.__class__)
       logger('actions').debug(map(str, (ctx.form, ctx.form_type,
                                         ctx.form_title, ctx.chooser_selection,
                                         ctx.action, ctx.cur_flags)))
@@ -139,6 +139,7 @@ class UnauthAction(Action):
   """This action is only available when a user is logged off"""
   @staticmethod
   def enabled(ctx):
+    del ctx
     return not bool(user['is_authenticated'])
 
 
@@ -146,6 +147,7 @@ class AuthAction(Action):
   """This action is only available when a user is logged in"""
   @staticmethod
   def enabled(ctx):
+    del ctx
     return bool(user['is_authenticated'])
 
 

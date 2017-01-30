@@ -64,7 +64,7 @@ class RematchPlugin(idaapi.plugin_t):
     # start status bar periodic update
     self.statusbar_timer = QtCore.QTimer()
     self.statusbar_timer.setInterval(1000)
-    self.statusbar_timer.timeout.connect(lambda: self.update_statusbar())
+    self.statusbar_timer.timeout.connect(self.update_statusbar)
     self.statusbar_timer.start()
 
     self.timespent = QtWidgets.QProgressBar()
@@ -89,10 +89,10 @@ class RematchPlugin(idaapi.plugin_t):
       self.statusbar_label.setText("Rematch loaded")
 
   def delay_setup(self):
-    QtCore.QTimer.singleShot(1000, lambda: self.setup())
+    QtCore.QTimer.singleShot(1000, self.setup)
 
   def run(self, arg=0):
-    logger('main').debug("run with arg: {}".format(arg))
+    logger('main').debug("run with arg: %s", arg)
 
   def term(self):
     if self.timespent_timer:

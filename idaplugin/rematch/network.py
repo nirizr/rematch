@@ -80,9 +80,8 @@ def query(method, url, server=None, token=None, params=None, json=False):
   full_url = server_url + url
   headers = get_headers(token, json)
 
-  logger('network').info("[query] {full_url}{headers}{params}"
-                         "".format(full_url=full_url, headers=headers,
-                                   params=params))
+  logger('network').info("[query] %s%s%s", full_url, headers, params)
+
   # issue request
   try:
     if method == "GET":
@@ -100,11 +99,11 @@ def query(method, url, server=None, token=None, params=None, json=False):
 
     # return response
     return_obj = loads(response.read()) if json else response.read()
-    logger('network').info("[response] {}".format(return_obj))
+    logger('network').info("[response] %s", return_obj)
     return return_obj
   except Exception as ex:
     import traceback
-    logger('network').error(traceback.format_exc())
+    logger('network').error("%s", traceback.format_exc())
     rematch_ex = exceptions.factory(ex)
     logger('network').debug(rematch_ex)
     raise rematch_ex
@@ -124,7 +123,7 @@ def get_server(server):
      server = server + "/"
   except Exception:
     import traceback
-    logger('network').error(traceback.format_exc())
+    logger('network').error("%s", traceback.format_exc())
   return server
 
 

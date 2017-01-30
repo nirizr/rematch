@@ -32,8 +32,8 @@ def check_update():
 def handle_update(response):
   local_version = StrictVersion(__version__)
   remote_version = StrictVersion(response['info']['version'])
-  logger('update').info("local version: {}, latest version: {}"
-                        .format(local_version, remote_version))
+  logger('update').info("local version: %s, latest version: %s", local_version,
+                        remote_version)
 
   if remote_version < local_version:
     logger('update').debug("You're using a version newer than latest")
@@ -71,7 +71,7 @@ def handle_update(response):
 def update_version(url):
   PACKAGE_PATH = '/idaplugin/'
 
-  logger('update').info("New version package url: {}".format(url))
+  logger('update').info("New version package url: %s", url)
   package_download = urllib2.urlopen(url)
   temp_zip = tempfile.TemporaryFile()
   temp_dir = tempfile.mkdtemp()
