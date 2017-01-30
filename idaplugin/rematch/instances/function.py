@@ -7,6 +7,7 @@ class EmptyFunctionInstance(base.BaseInstance):
 
   def __init__(self, *args, **kwargs):
     super(EmptyFunctionInstance, self).__init__(*args, **kwargs)
+    self.annotations.add(collectors.PrototypeAnnotation)
 
 
 class FunctionInstance(EmptyFunctionInstance):
