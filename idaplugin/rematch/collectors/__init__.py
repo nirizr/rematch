@@ -6,6 +6,7 @@ from .mnemonic_hist import MnemonicHistVector
 from .annotation import Annotation
 from .name_annotation import NameAnnotation
 from .assembly_annotation import AssemblyAnnotation
+from .prototype_annotation import PrototypeAnnotation
 
 
 def collect(offset, collectors):
@@ -15,5 +16,6 @@ def collect(offset, collectors):
       yield c.serialize()
 
 
-__all__ = [collect, Collector, Vector, AssemblyHashVector, MnemonicHashVector,
-           MnemonicHistVector, Annotation, NameAnnotation, AssemblyAnnotation]
+__all__ = ["collect", "Collector", "Vector", "AssemblyHashVector",
+           "MnemonicHashVector", "MnemonicHistVector", "Annotation",
+           "NameAnnotation", "AssemblyAnnotation", "PrototypeAnnotation"]
