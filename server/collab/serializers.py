@@ -47,15 +47,6 @@ class TaskSerializer(serializers.ModelSerializer):
               'progress_max')
 
 
-class TaskEditSerializer(TaskSerializer):
-  target_project = serializers.ReadOnlyField()
-  target_file = serializers.ReadOnlyField()
-  source_file = serializers.ReadOnlyField()
-  source_file_version = serializers.ReadOnlyField()
-  source_start = serializers.ReadOnlyField()
-  source_end = serializers.ReadOnlyField()
-
-
 class SimpleInstanceSerializer(serializers.ModelSerializer):
   name = serializers.SerializerMethodField()
 
