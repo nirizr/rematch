@@ -84,6 +84,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'rematch.navigation.navigation',
             ],
+            'builtins': ['templatetags'],
         },
     },
 ]

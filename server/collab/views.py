@@ -9,7 +9,7 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 AnnotationSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
-from utils import ViewSetTemplateMixin
+from rematch.template import ViewSetTemplateMixin
 
 
 class ViewSetOwnerMixin(object):
@@ -37,6 +37,7 @@ class ProjectViewSet(ViewSetOwnerMixin, ViewSetTemplateMixin,
   serializer_class = ProjectSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
   filter_fields = ('created', 'owner', 'name', 'description', 'private')
+  template_fields = ('name', 'description', 'private', 'created', 'owner')
 
 
 class FileViewSet(ViewSetOwnerMixin, ViewSetTemplateMixin,
@@ -46,6 +47,8 @@ class FileViewSet(ViewSetOwnerMixin, ViewSetTemplateMixin,
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
   filter_fields = ('created', 'owner', 'project', 'name', 'description',
                    'md5hash')
+  template_fields = ('name', 'md5hash', 'description', 'project', 'created',
+                     'owner', 'file')
 
   @decorators.detail_route(url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)",
                            methods=['GET', 'POST'])
