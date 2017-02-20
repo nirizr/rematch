@@ -1,10 +1,3 @@
-{% extends "base.html" %}
-
-{% block title %}
-Collaboration - Projects
-{% endblock %}
-
-{% block content %}
 <table class="table table-striped table-advance table-hover">
   <thead>
     <tr>
@@ -15,7 +8,7 @@ Collaboration - Projects
     </tr>
   </thead>
   <tbody>
-    {% for item in data %}
+    {% for item in items %}
     {{ item }}
     <tr>
       {% for header in headers %}
@@ -24,10 +17,9 @@ Collaboration - Projects
       <td>
         <button class="btn btn-success btn-xs"><i class="fa fa-check"></i></button>
         <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>
-        <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>
+        <button class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i></button>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-{% endblock %}

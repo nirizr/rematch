@@ -16,11 +16,3 @@ class ViewSetTemplateMixin(object):
 
   def get_template_fields(self):
     return self.template_fields
-
-  def list(self, request):
-    response = super(ViewSetTemplateMixin, self).list(request)
-
-    if request.accepted_renderer.format == 'html':
-      response.data = {'data': response.data,
-                       'headers': self.get_template_fields()}
-    return response
