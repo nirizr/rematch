@@ -2,7 +2,7 @@ from idasix import QtCore, QtWidgets
 
 import idaapi
 
-from . import config, user, logger
+from . import config, user
 from . import actions
 from . import update
 
@@ -92,7 +92,7 @@ class RematchPlugin(idaapi.plugin_t):
     QtCore.QTimer.singleShot(1000, self.setup)
 
   def run(self, arg=0):
-    logger('main').debug("run with arg: %s", arg)
+    pass
 
   def term(self):
     if self.timespent_timer:

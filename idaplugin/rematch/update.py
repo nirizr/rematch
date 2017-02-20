@@ -1,3 +1,5 @@
+# pylint: disable= not-callable
+
 # objects
 from . import logger
 from . import config

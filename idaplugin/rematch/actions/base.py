@@ -86,7 +86,8 @@ class Action(idaapi.action_handler_t):
     action = cls()
     r = idaapi.register_action(action.get_desc())
     if not r:
-      logger('actions').warn("failed registering %s: %s", cls, r)
+      logger('actions').warn("failed registering %s: %s",
+                             cls, r)  # pylint:disable=not-callable
       return
     idaapi.attach_action_to_menu(
         action.get_action_path(),
@@ -96,13 +97,15 @@ class Action(idaapi.action_handler_t):
         "AnalysisToolBar",
         action.get_id())
     if not r:
-      logger('actions').warn("registration of %s failed: %s", cls, r)
+      logger('actions').warn("registration of %s failed: %s",
+                             cls, r)  # pylint:disable=not-callable
     return action
 
   def update(self, ctx):
     return idaapi.AST_ENABLE if self.enabled(ctx) else idaapi.AST_DISABLE
 
   def activate(self, ctx):
+    del ctx
     if callable(self.dialog):
       self.dlg = self.dialog(reject_handler=self.reject_handler,
                              submit_handler=self.submit_handler,
@@ -113,10 +116,8 @@ class Action(idaapi.action_handler_t):
       self.dlg.finished.connect(self.force_update)
       self.dlg.show()
     else:
-      logger('actions').warn("%s: no activation", self.__class__)
-      logger('actions').debug(map(str, (ctx.form, ctx.form_type,
-                                        ctx.form_title, ctx.chooser_selection,
-                                        ctx.action, ctx.cur_flags)))
+      logger('actions').warn("%s: no activation",
+                             self.__class__)  # pylint:disable=not-callable
 
   @staticmethod
   def force_update():

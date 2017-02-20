@@ -39,8 +39,10 @@ class MatchAction(base.BoundFileAction):
     version_str = repr(version_obj)
     version_hash = hashlib.md5(version_str).hexdigest()
 
-    logger('match_action').info("file version string: %s", version_str)
-    logger('match_action').info("file version hash: %s", version_hash)
+    logger('match_action').info("file version string: %s",
+                                version_str)  # pylint:disable=not-callable
+    logger('match_action').info("file version hash: %s",
+                                version_hash)  # pylint:disable=not-callable
     return version_hash
 
   def submit_handler(self, source, source_single, source_range, target,

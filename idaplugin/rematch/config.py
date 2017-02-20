@@ -30,16 +30,14 @@ class Config(dict):
       try:
         os.mkdir(self.user_config_dir)
       except OSError:
-        logger('config').warn("Could not create user configuration directory")
+        logger('config').exception("Could not create user configuration "
+                                   "directory")  # pylint:disable=not-callable
 
     if os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:
-        try:
-          _file = json.loads(fh.read())
-          new = self.merge_map(self.DEFAULT, _file)
-          self.update(new)
-        except Exception as ex:
-          logger('config').warn(ex)
+        _file = json.loads(fh.read())
+        new = self.merge_map(self.DEFAULT, _file)
+        self.update(new)
     else:
       self.update(self.DEFAULT)
 
@@ -61,9 +59,8 @@ class Config(dict):
       with open(self.user_config_file, 'w') as fh:
         fh.write(json_config)
     except Exception:
-      import traceback
-      logger('config').error("Could not save configuration file: %s",
-                             traceback.format_exc())
+      logger('config').exception("Could not save configuration "
+                                 "file")  # pylint:disable=not-callable
 
   def __del__(self):
     self.save()
