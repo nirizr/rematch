@@ -8,9 +8,15 @@ from setuptools import setup, find_packages
 def read(fname):
   return open(fname).read()
 
-def get_version(ppath):
+def get_version(path):
   context = {}
-  execfile(os.path.join(ppath, 'version.py'), context)
+  version_path = os.path.join(path, 'version.py')
+  try:
+    execfile(version_path, context)
+  except NameError:
+    version_code = open(version_path, "rb").read()
+    exec(compile(version_code, version_path, 'exec'), context)
+
   return context['__version__']
 
 def get_requirements(fname):
