@@ -1,4 +1,4 @@
-from .. import user, logger, netnode, utils
+from .. import user, log, netnode, utils
 
 import idaapi
 import idc
@@ -86,8 +86,7 @@ class Action(idaapi.action_handler_t):
     action = cls()
     r = idaapi.register_action(action.get_desc())
     if not r:
-      logger('actions').warn("failed registering %s: %s",
-                             cls, r)  # pylint:disable=not-callable
+      log('actions').warn("failed registering %s: %s", cls, r)
       return
     idaapi.attach_action_to_menu(
         action.get_action_path(),
@@ -97,8 +96,7 @@ class Action(idaapi.action_handler_t):
         "AnalysisToolBar",
         action.get_id())
     if not r:
-      logger('actions').warn("registration of %s failed: %s",
-                             cls, r)  # pylint:disable=not-callable
+      log('actions').warn("registration of %s failed: %s", cls, r)
     return action
 
   def update(self, ctx):
@@ -116,8 +114,7 @@ class Action(idaapi.action_handler_t):
       self.dlg.finished.connect(self.force_update)
       self.dlg.show()
     else:
-      logger('actions').warn("%s: no activation",
-                             self.__class__)  # pylint:disable=not-callable
+      log('actions').warn("%s: no activation", self.__class__)
 
   @staticmethod
   def force_update():

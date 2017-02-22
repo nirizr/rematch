@@ -1,7 +1,7 @@
 from . import exceptions
 from . import network
 
-from . import config, logger
+from . import config, log
 
 
 class User(dict):
@@ -28,8 +28,8 @@ class User(dict):
       if 'username' in config and 'password' in config and 'server' in config:
         self.login(config['login']['username'], config['login']['password'],
                    config['login']['server'])
-    except exceptions.RematchException as ex:
-      logger('user').debug(ex)  # pylint:disable=not-callable
+    except exceptions.RematchException:
+      log('user').exception("Failed logging in at startup")
       self.update(self.LOGGEDOUT_USER)
 
   def login(self, username, password, server, success_callback=None,

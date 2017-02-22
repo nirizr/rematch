@@ -3,7 +3,7 @@ import logging
 logging.basicConfig()
 
 
-def logger(module):
+def log(module):
   from . import config
   logger = logging.getLogger(module)
   if 'debug' in config and config['debug']:

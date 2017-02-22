@@ -1,7 +1,7 @@
 import os
 import json
 
-from . import logger
+from . import log
 
 
 class Config(dict):
@@ -30,8 +30,8 @@ class Config(dict):
       try:
         os.mkdir(self.user_config_dir)
       except OSError:
-        logger('config').exception("Could not create user configuration "
-                                   "directory")  # pylint:disable=not-callable
+        log('config').exception("Could not create user configuration "
+                                   "directory")
 
     if os.path.isfile(self.user_config_file):
       with open(self.user_config_file, 'r') as fh:
@@ -59,8 +59,7 @@ class Config(dict):
       with open(self.user_config_file, 'w') as fh:
         fh.write(json_config)
     except Exception:
-      logger('config').exception("Could not save configuration "
-                                 "file")  # pylint:disable=not-callable
+      log('config').exception("Could not save configuration file")
 
   def __del__(self):
     self.save()

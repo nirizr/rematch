@@ -1,7 +1,5 @@
-# pylint: disable= not-callable
-
 # objects
-from . import logger
+from . import log
 from . import config
 from . import network
 from . import exceptions
@@ -34,20 +32,20 @@ def check_update():
 def handle_update(response):
   local_version = StrictVersion(__version__)
   remote_version = StrictVersion(response['info']['version'])
-  logger('update').info("local version: %s, latest version: %s", local_version,
+  log('update').info("local version: %s, latest version: %s", local_version,
                         remote_version)
 
   if remote_version < local_version:
-    logger('update').debug("You're using a version newer than latest")
+    log('update').debug("You're using a version newer than latest")
     return
   if remote_version == local_version:
-    logger('update').debug("Version is up to date")
+    log('update').debug("Version is up to date")
     return
 
-  logger('update').info("update is available")
+  log('update').info("update is available")
 
   if str(remote_version) in config['settings']['update']['skipped']:
-    logger('update').info("version update marked skip")
+    log('update').info("version update marked skip")
     return
 
   if config['settings']['update']['autoupdate']:
@@ -59,7 +57,7 @@ def handle_update(response):
                           .format(remote_version, local_version))
     if update == 0:
       config['settings']['update']['skipped'].append(str(remote_version))
-      logger('update').info("Version update suppressed")
+      log('update').info("Version update suppressed")
       return
     if update == -1:
       return
@@ -73,7 +71,7 @@ def handle_update(response):
 def update_version(url):
   PACKAGE_PATH = '/idaplugin/'
 
-  logger('update').info("New version package url: %s", url)
+  log('update').info("New version package url: %s", url)
   package_download = urllib2.urlopen(url)
   temp_zip = tempfile.TemporaryFile()
   temp_dir = tempfile.mkdtemp()
@@ -96,6 +94,6 @@ def update_version(url):
 
 def handle_exception(exception):
   if isinstance(exception, exceptions.NotFoundException):
-    logger('update').info("Couldn't find latest release for plugin")
+    log('update').info("Couldn't find latest release for plugin")
   else:
-    logger('update').warning("Update check failed")
+    log('update').warning("Update check failed")

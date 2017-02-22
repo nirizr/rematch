@@ -6,7 +6,7 @@ from cookielib import CookieJar
 from json import loads, dumps
 
 import exceptions
-from . import config, logger
+from . import config, log
 
 # building opener
 cookiejar = CookieJar()
@@ -80,8 +80,7 @@ def query(method, url, server=None, token=None, params=None, json=False):
   full_url = server_url + url
   headers = get_headers(token, json)
 
-  logger('network').info("[query] %s%s%s", full_url,
-                         headers, params)  # pylint:disable=not-callable
+  log('network').info("[query] %s%s%s", full_url, headers, params)
 
   # issue request
   try:
@@ -100,13 +99,11 @@ def query(method, url, server=None, token=None, params=None, json=False):
 
     # return response
     return_obj = loads(response.read()) if json else response.read()
-    logger('network').info("[response] %s",
-                           return_obj)  # pylint:disable=not-callable
+    log('network').info("[response] %s", return_obj)
     return return_obj
   except Exception as ex:
-    # pylint:disable=not-callable
     rematch_ex = exceptions.factory(ex)
-    logger('network').exception(rematch_ex)
+    log('network').exception(rematch_ex)
     raise rematch_ex
 
 
@@ -123,8 +120,7 @@ def get_server(server):
    if not server.endswith("/"):
      server = server + "/"
   except Exception:
-    # pylint:disable=not-callable
-    logger('network').exception("Failed generating server aadress")
+    log('network').exception("Failed generating server aadress")
   return server
 
 
