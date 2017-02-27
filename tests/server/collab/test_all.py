@@ -1,12 +1,23 @@
 import pytest
-import json
 from functools import partial
-from rest_framework import status
+from rest_framework import status, test
 
 from django.db import models
 from collab.models import Project, File, FileVersion, Task, Instance, Vector
 
 import random
+
+
+@pytest.fixture
+def api_client():
+  return test.APIClient()
+
+
+@pytest.fixture
+def admin_api_client(admin_user):
+  client = test.APIClient()
+  client.force_authenticate(user=admin_user)
+  return client
 
 
 def rand_hash(n):
@@ -119,47 +130,55 @@ def assert_response(response, status, data=None):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_empty_lists(client, model_name):
-  response = client.get('/collab/{}/'.format(model_name))
+def test_empty_lists(api_client, model_name):
+  response = api_client.get('/collab/{}/'.format(model_name),
+                            HTTP_ACCEPT='application/json')
   assert_response(response, status.HTTP_200_OK, [])
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_model_guest_list(client, admin_user, model_name):
+def test_model_guest_list(api_client, admin_user, model_name):
   # setup objects
   obj = create_model(model_name, admin_user)
   obj.save()
 
-  response = client.get('/collab/{}/'.format(model_name))
+  response = api_client.get('/collab/{}/'.format(model_name),
+                            HTTP_ACCEPT="application/json")
   assert_response(response, status.HTTP_200_OK, [obj])
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_model_guest_creation(client, admin_user, model_name):
+def test_model_guest_creation(api_client, admin_user, model_name):
   model_data = setup_model(model_name, admin_user)
 
-  response = client.post('/collab/{}/'.format(model_name),
-                         data=json.dumps(model_data),
-                         content_type="application/json")
+  response = api_client.post('/collab/{}/'.format(model_name),
+                             data=model_data,
+                             HTTP_ACCEPT="application/json")
   assert_response(response, status.HTTP_401_UNAUTHORIZED)
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_model_creation(client, admin_client, admin_user, model_name):
+def test_model_creation(api_client, admin_api_client, admin_user, model_name):
   model_data = setup_model(model_name, admin_user)
 
-  response = admin_client.post('/collab/{}/'.format(model_name),
-                               data=json.dumps(model_data),
-                               content_type="application/json")
+  response = admin_api_client.post('/collab/{}/'.format(model_name),
+                                   data=model_data,
+                                   HTTP_ACCEPT='application/json')
 
   assert_response(response, status.HTTP_201_CREATED)
   projects_created = [response.json()]
 
-  response = client.get('/collab/{}/'.format(model_name))
+  response = api_client.get('/collab/{}/'.format(model_name),
+                            HTTP_ACCEPT="application/json")
   assert_eq(response.json(), projects_created)
+
+
+def test_template(admin_client):
+  response = admin_client.get('/accounts/profile/')
+  assert_response(response, status.HTTP_200_OK)
 
 
 @pytest.mark.django_db
