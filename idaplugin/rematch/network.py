@@ -2,6 +2,7 @@ from idasix import QtCore
 
 import urllib
 import urllib2
+from urlparse import urlparse
 from cookielib import CookieJar
 from json import loads, dumps
 
@@ -25,7 +26,7 @@ class WorkerSignals(QtCore.QObject):
 
 class QueryWorker(QtCore.QRunnable):
   def __init__(self, method, url, server=None, token=None, params=None,
-               json=False):
+               json=False, paginate=False):
     super(QueryWorker, self).__init__()
 
     self.method = method
@@ -34,42 +35,66 @@ class QueryWorker(QtCore.QRunnable):
     self.token = token
     self.params = params
     self.json = json
+    self.paginate = paginate
+    self.running = True
+    self.started = False
+
+    if self.paginate and not self.json:
+      raise Exception("paginate=True must accompany json=True")
 
     self.signals = WorkerSignals()
 
+  def start(self, callback=None, exception_callback=None):
+    if self.started:
+      raise Exception("query worker already started")
+    self.started = True
+
+    if callback:
+      self.signals.result_dict.connect(callback)
+      self.signals.result_list.connect(callback)
+      self.signals.result_str.connect(callback)
+    if not exception_callback:
+      exception_callback = default_exception_callback
+    self.signals.result_exception.connect(exception_callback)
+    _threadpool.start(self)
+
+  def cancel(self):
+    self.running = False
+
   def run(self):
     try:
-      response = query(self.method, self.url, self.server, self.token,
-                       self.params, self.json)
-      if isinstance(response, dict):
-        self.signals.result_dict.emit(response)
-      elif isinstance(response, list):
-        self.signals.result_list.emit(response)
-      elif isinstance(response, str):
-        self.signals.result_str.emit(response)
+      while self.running:
+        response = query(self.method, self.url, self.server, self.token,
+                         self.params, self.json)
+        if not self.running:
+          break
+
+        if isinstance(response, dict):
+          self.signals.result_dict.emit(response)
+        elif isinstance(response, list):
+          self.signals.result_list.emit(response)
+        elif isinstance(response, str):
+          self.signals.result_str.emit(response)
+
+        # if request is paginated and was successful, automatically request
+        # next page if specified. otherwise, break out of the loop
+        if not self.paginate:
+          break
+
+        if not isinstance(response, dict):
+          raise ValueError("Paginated response object is not a json dict")
+
+        if 'next' not in response or not response['next']:
+          break
+
+        url_obj = urlparse(response['next'])
+        self.params = url_obj.query
     except Exception as ex:
       self.signals.result_exception.emit(ex)
 
 
 def default_exception_callback(exception):
   raise exception
-
-
-def delayed_query(method, url, server=None, token=None, params=None,
-                  json=False, callback=None, exception_callback=None):
-  query_worker = QueryWorker(method, url, server, token, params, json)
-  return delayed_worker(query_worker, callback, exception_callback)
-
-
-def delayed_worker(query_worker, callback=None, exception_callback=None):
-  if callback:
-    query_worker.signals.result_dict.connect(callback)
-    query_worker.signals.result_list.connect(callback)
-    query_worker.signals.result_str.connect(callback)
-  if not exception_callback:
-    exception_callback = default_exception_callback
-  query_worker.signals.result_exception.connect(exception_callback)
-  _threadpool.start(query_worker)
 
 
 def query(method, url, server=None, token=None, params=None, json=False):
@@ -86,7 +111,9 @@ def query(method, url, server=None, token=None, params=None, json=False):
   try:
     if method == "GET":
       if params:
-        full_url += "?" + urllib.urlencode(params)
+        if isinstance(params, dict):
+          params = urllib.urlencode(params)
+        full_url += "?" + params
       request = urllib2.Request(full_url, headers=headers)
     elif method == "POST":
       if not params:

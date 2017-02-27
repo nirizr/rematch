@@ -56,7 +56,39 @@ class TaskEditSerializer(TaskSerializer):
   source_end = serializers.ReadOnlyField()
 
 
+class SimpleInstanceSerializer(serializers.ModelSerializer):
+  name = serializers.SerializerMethodField()
+
+  class Meta:
+    model = Instance
+    fields = ('id', 'file_version', 'type', 'name', 'offset')
+
+  @staticmethod
+  def get_name(instance):
+    try:
+      annotation = Annotation.objects.values_list('data')
+      return annotation.get(instance=instance, type='name')[0]
+    except Annotation.DoesNotExist:
+      return "sub_{:X}".format(instance.offset)
+
+
 class InstanceSerializer(serializers.ModelSerializer):
+  owner = serializers.ReadOnlyField(source='owner.username')
+  file = serializers.ReadOnlyField(source='file_version.file_id')
+
+  class Meta:
+    model = Instance
+    fields = ('id', 'owner', 'file', 'file_version', 'type', 'offset',
+              'vectors', 'annotations')
+
+
+class AnnotationSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Annotation
+    fields = ('id', 'instance', 'type', 'data')
+
+
+class InstanceVectorSerializer(InstanceSerializer):
   class NestedVectorSerializer(serializers.ModelSerializer):
     class Meta:
       model = Vector
@@ -67,15 +99,8 @@ class InstanceSerializer(serializers.ModelSerializer):
       model = Annotation
       fields = ('id', 'type', 'data')
 
-  owner = serializers.ReadOnlyField(source='owner.username')
-  file = serializers.ReadOnlyField(source='file_version.file_id')
   vectors = NestedVectorSerializer(many=True, required=True)
   annotations = NestedAnnotationSerializer(many=True, required=True)
-
-  class Meta:
-    model = Instance
-    fields = ('id', 'owner', 'file', 'file_version', 'type', 'offset',
-              'vectors', 'annotations')
 
   def create(self, validated_data):
     vectors_data = validated_data.pop('vectors')
@@ -109,4 +134,4 @@ class VectorSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
   class Meta:
     model = Match
-    fields = ('task', 'type', 'score')
+    fields = ('from_instance', 'to_instance', 'task', 'type', 'score')

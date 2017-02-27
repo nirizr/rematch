@@ -15,14 +15,13 @@ class HistogramMatch(match.Match):
   @staticmethod
   def match(source, target):
     start = time.time()
-    source_values = itertools.izip(*source.values_list('id', 'instance_id',
-                                                       'data'))
-    target_values = itertools.izip(*target.values_list('id', 'instance_id',
-                                                       'data'))
+    source_values = itertools.izip(*source.values_list('instance_id', 'data'))
+    target_values = itertools.izip(*target.values_list('instance_id', 'data'))
+
     print("izip time: {}".format(time.time() - start))
 
-    source_ids, source_instance_ids, source_data = source_values
-    target_ids, target_instance_ids, target_data = target_values
+    source_instance_ids, source_data = source_values
+    target_instance_ids, target_data = target_values
     print("split time: {}".format(time.time() - start))
 
     source_list = [json.loads(d) for d in source_data]
@@ -49,13 +48,9 @@ class HistogramMatch(match.Match):
                                                       distance_matrix.max()))
 
     for source_i, target_i in np.ndindex(*distance_matrix.shape):
-      source_id = source_ids[source_i]
       source_instance_id = source_instance_ids[source_i]
-
-      target_id = target_ids[target_i]
       target_instance_id = target_instance_ids[target_i]
 
       distance = distance_matrix[source_i][target_i]
       score = (1 - distance) * 100
-      yield (source_id, source_instance_id, target_id, target_instance_id,
-             score)
+      yield (source_instance_id, target_instance_id, score)

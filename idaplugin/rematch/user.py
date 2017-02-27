@@ -39,9 +39,9 @@ class User(dict):
 
     # authenticate
     login_params = {'username': username, 'password': password}
-    network.delayed_query("POST", "accounts/login/", params=login_params,
-                          server=server, json=True, callback=self.handle_login,
-                          exception_callback=exception_callback)
+    q = network.QueryWorker("POST", "accounts/login/", params=login_params,
+                            server=server, json=True)
+    q.start(self.handle_login, exception_callback)
 
   def handle_login(self, response):
     config['login']['token'] = response['key']
@@ -51,7 +51,8 @@ class User(dict):
     self.refresh()
 
   def logout(self):
-    network.delayed_query("POST", "accounts/logout/", json=True)
+    q = network.QueryWorker("POST", "accounts/logout/", json=True)
+    q.start()
     del config['login']['token']
     self.clear()
     self.update(self.LOGGEDOUT_USER)
@@ -63,9 +64,8 @@ class User(dict):
     if not ('token' in config['login'] and config['login']['token']):
       return
 
-    network.delayed_query("GET", "accounts/profile/", json=True,
-                          callback=self.handle_refresh,
-                          exception_callback=self.handle_refresh_failure)
+    q = network.QueryWorker("GET", "accounts/profile/", json=True)
+    q.start(self.handle_refresh, self.handle_refresh_failure)
 
   def handle_refresh(self, response):
     self.update(response)

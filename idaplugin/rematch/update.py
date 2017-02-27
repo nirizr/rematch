@@ -24,9 +24,9 @@ def check_update():
 
   url = "pypi/{package}/json".format(package=config['pypi']['package'])
 
-  network.delayed_query("GET", url, server=config['pypi']['server'], token="",
-                        json=True, callback=handle_update,
-                        exception_callback=handle_exception)
+  q = network.QueryWorker("GET", url, server=config['pypi']['server'],
+                          token="", json=True)
+  q.start(handle_update, handle_exception)
 
 
 def handle_update(response):

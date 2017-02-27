@@ -1,11 +1,12 @@
 from rest_framework import (viewsets, permissions, mixins, decorators, status,
                             response)
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
-                           Match)
+                           Match, Annotation)
 from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
-                                TaskEditSerializer, InstanceSerializer,
-                                VectorSerializer, MatchSerializer)
+                                TaskEditSerializer, InstanceVectorSerializer,
+                                VectorSerializer, MatchSerializer,
+                                SimpleInstanceSerializer, AnnotationSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 
@@ -75,7 +76,6 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                   mixins.DestroyModelMixin, mixins.ListModelMixin,
                   viewsets.GenericViewSet):
   queryset = Task.objects.all()
-  serializer_class = TaskSerializer
   permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                         IsOwnerOrReadOnly)
   filter_fields = ('task_id', 'created', 'finished', 'owner', 'status')
@@ -85,10 +85,68 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     tasks.match.delay(task_id=task.id)
 
   def get_serializer_class(self):
-    serializer_class = self.serializer_class
+    serializer_class = TaskSerializer
     if self.request.method in ('PATCH', 'PUT'):
       serializer_class = TaskEditSerializer
     return serializer_class
+
+  @decorators.detail_route(url_path="locals")
+  def locals(self, request, pk):
+    del request
+    del pk
+
+    task = self.get_object()
+
+    # include local matches (created for specified file_version and are a
+    # 'from_instance' match). for those, include the match objects themselves
+    queryset = Instance.objects.filter(from_matches__task=task).distinct()
+
+    # pagination code
+    page = self.paginate_queryset(queryset)
+    if page is not None:
+      serializer = SimpleInstanceSerializer(page, many=True)
+      return self.get_paginated_response(serializer.data)
+    else:
+      serializer = SimpleInstanceSerializer(queryset, many=True)
+      return response.Response(serializer.data)
+
+  @decorators.detail_route(url_path="remotes")
+  def remotes(self, request, pk):
+    del request
+    del pk
+
+    task = self.get_object()
+
+    # include remote matches (are a 'to_instance' match), those are referenced
+    # by match records of local instances
+    queryset = Instance.objects.filter(to_matches__task=task).distinct()
+
+    # pagination code
+    page = self.paginate_queryset(queryset)
+    if page is not None:
+      serializer = SimpleInstanceSerializer(page, many=True)
+      return self.get_paginated_response(serializer.data)
+    else:
+      serializer = SimpleInstanceSerializer(queryset, many=True)
+      return response.Response(serializer.data)
+
+  @decorators.detail_route(url_path="matches")
+  def matches(self, request, pk):
+    del request
+    del pk
+
+    task = self.get_object()
+
+    queryset = Match.objects.filter(task=task)
+
+    # pagination code
+    page = self.paginate_queryset(queryset)
+    if page is not None:
+      serializer = MatchSerializer(page, many=True)
+      return self.get_paginated_response(serializer.data)
+    else:
+      serializer = MatchSerializer(queryset, many=True)
+      return response.Response(serializer.data)
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
@@ -100,7 +158,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
-  serializer_class = InstanceSerializer
+  serializer_class = InstanceVectorSerializer
   filter_fields = ('owner', 'file_version', 'type')
 
 
@@ -114,3 +172,9 @@ class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   def perform_create(serializer):
     file_version = serializer.validated_data['instance'].file_version
     serializer.save(file_version=file_version)
+
+
+class AnnotationViewSet(viewsets.ModelViewSet):
+  queryset = Annotation.objects.all()
+  serializer_class = AnnotationSerializer
+  filter_fields = ('instance', 'type', 'data')

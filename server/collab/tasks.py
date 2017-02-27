@@ -19,7 +19,7 @@ def match(task_id):
     task_values = task.values_list('id', 'source_file_version__file_id',
                                    'source_start', 'source_end',
                                    'source_file_version_id',
-                                   'target_project_id', 'target_file_id')[0]
+                                   'target_project_id', 'target_file_id').get()
     print(task_values)
     (task_id, source_file, source_start, source_end, source_file_version,
      target_project, target_file) = task_values
@@ -43,14 +43,18 @@ def match(task_id):
     print("Running task {}".format(match.request.id))
     # TODO: order might be important here
     for match_type in matches.match_list:
-      print(match_type)
       start = now()
       source_vectors = base_source_vectors.filter(type=match_type.vector_type)
       target_vectors = base_target_vectors.filter(type=match_type.vector_type)
 
-      if source_vectors.count() and target_vectors.count():
-        match_objs = gen_match_objs(task_id, match_type, source_vectors,
-                                    target_vectors)
+      source_count = source_vectors.count()
+      target_count = target_vectors.count()
+      if source_count and target_count:
+        match_objs = list(gen_match_objs(task_id, match_type, source_vectors,
+                                         target_vectors))
+        print("Matching {} local vectors to {} remote vectors by {} yielded "
+              "{} matches".format(source_count, target_count, match_type,
+                                  len(match_objs)))
         Match.objects.bulk_create(match_objs, batch_size=10000)
       print("\tTook: {}".format(now() - start))
 
@@ -64,9 +68,10 @@ def match(task_id):
 
 def gen_match_objs(task_id, match_type, source_vectors, target_vectors):
   matches = match_type.match(source_vectors, target_vectors)
-  for source, source_instance, target, target_instance, score in matches:
-    mat = Match(task_id=task_id, from_vector_id=source, to_vector_id=target,
-                from_instance_id=source_instance,
-                to_instance_id=target_instance,
-                score=score, type=match_type.match_type)
+  for source_instance, target_instance, score in matches:
+    if score < 50:
+      continue
+    mat = Match(task_id=task_id, from_instance_id=source_instance,
+                to_instance_id=target_instance, score=score,
+                type=match_type.match_type)
     yield mat

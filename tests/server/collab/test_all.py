@@ -7,11 +7,10 @@ from django.db import models
 from collab.models import Project, File, FileVersion, Task, Instance, Vector
 
 import random
-import string
 
 
 def rand_hash(n):
-  return ''.join(random.choice(string.ascii_uppercase) for _ in range(n))
+  return ''.join(random.choice("01234567890ABCDEF") for _ in range(n))
 
 
 collab_models = {'projects': {'name': 'test_project_1', 'private': False,
@@ -109,18 +108,20 @@ def assert_eq(a, b):
                                            o_type=o_type))
 
 
-def assert_response(response, status):
+def assert_response(response, status, data=None):
   print(response.content)
   assert response.status_code == status
+  if isinstance(data, (list, dict)):
+    assert_eq(response.json(), data)
+  elif data:
+    assert_eq(response.content, data)
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
 def test_empty_lists(client, model_name):
   response = client.get('/collab/{}/'.format(model_name))
-  assert_response(response, status.HTTP_200_OK)
-  json_response = response.json()
-  assert json_response == []
+  assert_response(response, status.HTTP_200_OK, [])
 
 
 @pytest.mark.django_db
@@ -131,10 +132,7 @@ def test_model_guest_list(client, admin_user, model_name):
   obj.save()
 
   response = client.get('/collab/{}/'.format(model_name))
-  assert_response(response, status.HTTP_200_OK)
-  dct_list = response.json()
-  dct = dct_list[-1]
-  assert_eq(dct, obj)
+  assert_response(response, status.HTTP_200_OK, [obj])
 
 
 @pytest.mark.django_db
@@ -162,3 +160,47 @@ def test_model_creation(client, admin_client, admin_user, model_name):
 
   response = client.get('/collab/{}/'.format(model_name))
   assert_eq(response.json(), projects_created)
+
+
+@pytest.mark.django_db
+def test_file_fileversion(admin_client, admin_user):
+  file = create_model('files', admin_user)
+  file.save()
+
+  file_version = rand_hash(32)
+  url = '/collab/files/{}/file_version/{}/'.format(file.id, file_version)
+
+  response = admin_client.post(url, content_type="application/json")
+  obj = {'newly_created': True, 'md5hash': file_version, 'file': file.id}
+  assert_response(response, status.HTTP_201_CREATED, obj)
+
+  response = admin_client.get(url, content_type="application/json")
+  obj = {'newly_created': False, 'md5hash': file_version, 'file': file.id}
+  assert_response(response, status.HTTP_200_OK, obj)
+
+
+def test_task_locals_empty(admin_client, admin_user):
+  task = create_model('tasks', admin_user)
+  task.save()
+
+  response = admin_client.get('/collab/tasks/{}/locals/'.format(task.id),
+                              content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, [])
+
+
+def test_task_remotes_empty(admin_client, admin_user):
+  task = create_model('tasks', admin_user)
+  task.save()
+
+  response = admin_client.get('/collab/tasks/{}/remotes/'.format(task.id),
+                              content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, [])
+
+
+def test_task_matches_empty(admin_client, admin_user):
+  task = create_model('tasks', admin_user)
+  task.save()
+
+  response = admin_client.get('/collab/tasks/{}/matches/'.format(task.id),
+                              content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, [])

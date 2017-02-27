@@ -91,9 +91,6 @@ class Vector(models.Model):
   type_version = models.IntegerField()
   data = models.TextField()
 
-  matches = models.ManyToManyField('self', symmetrical=False, through='Match',
-                                   related_name='related_to+')
-
   def __unicode__(self):
     return "{} vector version {} for {}".format(self.get_type_display(),
                                                 self.type_version,
@@ -136,11 +133,8 @@ class Task(models.Model):
 
 
 class Match(models.Model):
-  from_vector = models.ForeignKey(Vector, related_name='from_vector')
-  to_vector = models.ForeignKey(Vector, related_name='to_vector')
-
-  from_instance = models.ForeignKey(Instance, related_name='from_instance')
-  to_instance = models.ForeignKey(Instance, related_name='to_instance')
+  from_instance = models.ForeignKey(Instance, related_name='from_matches')
+  to_instance = models.ForeignKey(Instance, related_name='to_matches')
 
   task = models.ForeignKey(Task, db_index=True, related_name='matches')
 
