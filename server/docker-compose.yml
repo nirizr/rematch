@@ -1,16 +1,26 @@
 version: '2'
 services:
-  db:
+  db1:
     image: mysql
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=qwe123QWE!@#
+      - MYSQL_PASSWORD=qwe123QWE!@#
+      - MYSQL_DATABASE=rematch
+    ports:
+      - "3306:3306"
+    expose:
+     - 3306
   web:
     image: django
     build: .
-    command: bash -c "while ! nc -w 1 -z db 3306; do sleep 0.1; done; while :; do ./start_web.sh 0.0.0.0:8000; sleep 1; done;"
+    #command: bash -c "apt-get install -yq netcat; while ! nc -w 1 -z 0.0.0.0 3306; do sleep 0.1; done; while :; do ./start_web.sh 0.0.0.0:8000; sleep 1; done;"
+    command: bash -c "while :; do /code/code/manage.py runserver 0.0.0.0:8000; sleep 1; done;"
     volumes:
       - .:/rematch
     ports:
       - "80:8000"
-    depends_on:
-     - db
     environment:
       IN_DOCKER: 1
+    links:
+      - db1
