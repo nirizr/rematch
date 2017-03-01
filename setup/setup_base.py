@@ -49,7 +49,7 @@ def build_setup(name, package_name, version_path, package_base,
     extras_require['test'] = get_requirements(test_requirements_path)
 
   version_path = os.path.join(base_path, package_base, version_path)
-  readme_path = os.path.join(base_path, "README.md")
+  readme_path = os.path.join(base_path, "README.rst")
   setup(
     name = package_name,
     version = get_version(version_path),
