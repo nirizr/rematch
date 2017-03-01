@@ -10,4 +10,4 @@ WORKDIR /code
 ADD requirements.txt /code/
 RUN pip install -r requirements.txt
 ADD . ./code/
-CMD DEBIAN_FRONTEND=noninteractive apt-get install -yq nc 
+CMD DEBIAN_FRONTEND=noninteractive apt-get install -yq nc rabbitmq-server

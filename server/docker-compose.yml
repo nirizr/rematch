@@ -1,5 +1,19 @@
 version: '2'
 services:
+  redis:
+    image: redis
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass123
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    expose:
+      - 5672
+      - 15672
   db1:
     image: mysql
     environment:
@@ -15,7 +29,7 @@ services:
     image: django
     build: .
     #command: bash -c "apt-get install -yq netcat; while ! nc -w 1 -z 0.0.0.0 3306; do sleep 0.1; done; while :; do ./start_web.sh 0.0.0.0:8000; sleep 1; done;"
-    command: bash -c "while :; do /code/code/manage.py runserver 0.0.0.0:8000; sleep 1; done;"
+    command: bash -c "while :; do /code/code/start_server.sh 0.0.0.0:8000; sleep 1; done;"
     volumes:
       - .:/rematch
     ports:
@@ -24,3 +38,4 @@ services:
       IN_DOCKER: 1
     links:
       - db1
+      - rabbitmq
