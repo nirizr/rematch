@@ -113,7 +113,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'rematch',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'qwe123QWE!@#',
+        'HOST' : 'db1_1',
+        'PORT': 3306,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
         },
