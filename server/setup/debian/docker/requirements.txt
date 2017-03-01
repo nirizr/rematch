@@ -1,0 +1,12 @@
+django
+numpy
+scipy
+scikit-learn
+django-registration-redux
+djangorestframework
+django-rest-auth
+django-allauth
+celery<4.0
+django-celery
+django-filter
+mysqlclient 

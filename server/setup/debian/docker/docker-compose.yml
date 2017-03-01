@@ -1,0 +1,16 @@
+version: '2'
+services:
+  db:
+    image: mysql
+  web:
+    image: django
+    build: .
+    command: bash -c "while ! nc -w 1 -z db 3306; do sleep 0.1; done; while :; do ./start_web.sh 0.0.0.0:8000; sleep 1; done;"
+    volumes:
+      - .:/rematch_server
+    ports:
+      - "80:8000"
+    depends_on:
+      db
+    environment:
+      IN_DOCKER: 1
