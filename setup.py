@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+import sys
 import os
 from setuptools import setup, find_packages
 
@@ -32,7 +35,7 @@ def build_setup(name, package_name, version_path, package_base,
     package_data = {}
 
   # generate install_requires based on requirements.txt
-  base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+  base_path = os.path.abspath(os.path.dirname(__file__))
   requirements_path = os.path.join(base_path, package_base, "requirements.txt")
   if os.path.exists(requirements_path):
     install_requires = get_requirements(requirements_path)
@@ -70,3 +73,27 @@ def build_setup(name, package_name, version_path, package_base,
     ],
   )
 
+if __name__ == '__main__':
+  packages = set(os.listdir('.')) & {'server', 'idaplugin'}
+
+  if len(sys.argv) < 2:
+    print("Usage: {} {{package name}}".format(sys.argv[0]))
+    print("Available packages are: {}".format(", ".join(packages)))
+    sys.exit(1)
+
+  package = packages.pop() if len(packages) == 1 else sys.argv[1]
+
+  if sys.argv[1] == package:
+    sys.argv = sys.argv[:1] + sys.argv[2:]
+  if package  == 'server':
+    build_setup(name='server',
+                package_name='rematch-server',
+                version_path='./',
+                package_base='server')
+  elif package == 'idaplugin':
+    package_data = {'idaplugin/rematch': ['images/*']}
+    build_setup(name='idaplugin',
+                package_name='rematch-idaplugin',
+                version_path='rematch',
+                package_base='idaplugin',
+                package_data=package_data)
