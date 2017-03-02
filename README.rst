@@ -10,8 +10,8 @@ fully functional at the moment.  We're currently working on bringing up basic
 functionality. Check us out again soon, or watch for updates!
 
 It is intended to be used by reverse engineers by revealing and identifying
-previously reverse engineered similar functions and migrate documentation and
-annotations to current IDB. It does that by locally collecting data about
+previously reverse engineered similar functions and migrate documentation
+and annotations to current IDB. It does that by locally collecting data about
 functions in your IDB and uploads that information to a web service (which
 you're supposed to set up as well). Upon request, the web service can match
 your functions against all (or part) of previously uploaded functions and
@@ -23,10 +23,10 @@ synchronization between multiple reverse engineers working on the same file.
 Goal of REmatch
 ===============
 
-The goal of REmatch is to act as a maintained, extendable, open source tool for
-advanced assembly function-level binary comparison and matching. Hopefully,
-this will be a completely open source and free (as in speech) community-driven
-tool.
+The goal of REmatch is to act as a maintained, extendable, open source tool
+for advanced assembly function-level binary comparison and matching. 
+Hopefully, this will be a completely open source and free (as in speech) 
+community-driven tool.
 
 We've noticed that although there are more than several existing binary
 matching tools, there's no one tool that provides all of the following:
@@ -41,11 +41,41 @@ matching tools, there's no one tool that provides all of the following:
 Status updates
 ==============
 
-We'll try to occasionally update here about what's going on in the project and
-briefly describe advancements we've had.
+We'll try to occasionally update here about what's going on in the project
+and briefly describe advancements we've had.
 
-Current status (November 9th, 2016)
+Current status (March 1st, 2017)
 -----------------------------------
+
+We recently got another big PR in, `Match results dialog
+<https://github.com/nirizr/rematch/pull/17>`_, that ended up being more then
+just implementing the match results dialog. It shows graphs of remote 
+functions being matched, it has a python based scripting to filter the 
+match results, it had quite a bit of speedup improvements to the matching
+engine as well as fixing some related bugs. 
+We also added the concept of "file version" as part of the architecture.
+Additionally, we've added more matchers and more annotations ( with more 
+coming on the way).
+We had some major code quality improvements and improved the plugin and 
+server installation process.
+
+Our current goal is the first relase, which requires:
+
+#. Basic documentation being in (partially done).
+#. Server deployments using docker and easier installation (in progress).
+
+And will optionally have:
+
+#. Web interface for the server.
+#. An achievements / score system. Yay gamification!
+
+Old statuses
+------------
+
+Old status paragraphs will be pushed here.
+
+(November 9th, 2016)
+++++++++++++++++++++
 
 We recently got a big PR in, `implement match backend
 <https://github.com/nirizr/rematch/pull/22>`_, that basically sets up the
@@ -62,13 +92,8 @@ results dialog is the next big task. We have some basic match configuration
 going on for the matching process such as which functions to match and against
 what (there's a picture in the PR ticket). 
 
-We also added quite a bit of minor changes (bug fixes, speedup and architecture
-improvements, richer UI).
-
-Old statuses
-------------
-
-Old status paragraphs will be pushed here
+We also added quite a bit of minor changes (bug fixes, speedup and 
+architecture improvements, richer UI).
 
 (August 30th, 2016)
 +++++++++++++++++++
