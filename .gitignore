@@ -91,5 +91,6 @@ ENV/
 # django test sqlite database
 server/db.sqlite3
 
-# ignore windows image thumbnails file
+# ignore temporary OS files
+.DS_Store
 Thumbs.db
