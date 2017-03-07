@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,7 +25,10 @@ SECRET_KEY = 'qvc7t@rd5#1l-n_%%&+_fu+-lu#sp2oonf9mto%bn-1#i7$(tu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # FIXME
-DEBUG = False
+if "celeryd" in sys.argv or "celery" in sys.argv:
+  DEBUG = False
+else:
+  DEBUG = True
 
 
 # As of django 1.10, allowed hosts are validated in debug as well,
