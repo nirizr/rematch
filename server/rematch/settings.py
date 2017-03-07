@@ -36,7 +36,8 @@ else:
 # running in debug mode. for more details see
 # https://docs.djangoproject.com/en/1.10/ref/settings/
 # for security implications see
-# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
+# https://docs.djangoproject.com/en/1.10/topics/security/ \
+# #host-headers-virtual-hosting
 if DEBUG:
   ALLOWED_HOSTS = ['*']
 else:
@@ -126,6 +127,16 @@ DATABASES = {
         },
     }
 }
+
+# in case we're not in docker we have all the environment
+# locally, unless someone specified something else.
+# this condition is for Travis and other code
+# analysis systems
+indocker = os.environ.get('IN_DOCKER')
+if indocker is None:
+  DATABASES.pop('HOST')
+  DATABASES.pop('PASSWORD')
+  DATABASES.pop('PORT')
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -229,7 +240,8 @@ CELERY_SEND_TASK_ERROR_EMAILS = False
 CELERY_TASK_RESULT_EXPIRES = 600
 
 # Set redis as celery result backend
-#CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
+# CELERY_RESULT_BACKEND = 'redis://%s:%d/%d'\
+#  %(REDIS_HOST, REDIS_PORT, REDIS_DB)
 CELERY_REDIS_MAX_CONNECTIONS = 1
 
 # Don't use pickle as serializer, json is much safer
