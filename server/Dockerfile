@@ -7,8 +7,8 @@ RUN apt-get clean
 ENV PYTHONUNBUFFERED 1
 RUN mkdir /rematch_server
 WORKDIR /rematch_server
-ADD requirements.txt /rematch_webserver
-RUN pip install -r requirements.txt
+#ADD requirements.txt /rematch_webserver/requirements.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq libmysqlclient-dev  netcat-traditional python-redis mysql-client-5.5
 ADD . ./
+RUN pip install -r /rematch_server/requirements.txt
 CMD DEBIAN_FRONTEND=noninteractive apt-get install -yq rabbitmq-server 
