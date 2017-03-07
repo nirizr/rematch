@@ -5,10 +5,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq python-pip python-numpy p
 RUN pip install --upgrade pip
 RUN apt-get clean
 ENV PYTHONUNBUFFERED 1
-RUN mkdir /code
-WORKDIR /code
-ADD requirements.txt /code/
+RUN mkdir /rematch_server
+WORKDIR /rematch_server
+ADD requirements.txt /rematch_webserver
 RUN pip install -r requirements.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq libmysqlclient-dev  netcat-traditional python-redis mysql-client-5.5
-ADD . ./code/
+ADD . ./
 CMD DEBIAN_FRONTEND=noninteractive apt-get install -yq rabbitmq-server 
