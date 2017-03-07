@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os
+import os,sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,7 +23,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'qvc7t@rd5#1l-n_%%&+_fu+-lu#sp2oonf9mto%bn-1#i7$(tu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#if "celeryd" in sys.argv:
+#  DEBUG = False
+#else:
+#  DEBUG = True
+DEBUG = False
 
 
 # As of django 1.10, allowed hosts are validated in debug as well,
@@ -35,7 +39,7 @@ DEBUG = True
 if DEBUG:
   ALLOWED_HOSTS = ['*']
 else:
-  ALLOWED_HOSTS = []
+  ALLOWED_HOSTS = ['127.0.0.0.1', '172*','192*']
 
 
 # Application definition
@@ -113,8 +117,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'rematch',
         'USER': 'root',
-        'PASSWORD': 'qwe123QWE!@#',
-        'HOST' : 'db1_1',
+        'PASSWORD': 'qwe123',
+        'HOST' : 'db0_1',
         'PORT': 3306,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
@@ -166,8 +170,69 @@ STATIC_URL = '/static/'
 
 
 # Celery configuration
-
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+
+# docker conf
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', 'redis_1')
+
+RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq_1')
+
+
+if RABBIT_HOSTNAME.startswith('tcp://'):  
+    RABBIT_HOSTNAME = RABBIT_HOSTNAME.split('//')[1]
+
+BROKER_URL = os.environ.get('BROKER_URL',  
+                            '')
+if not BROKER_URL:  
+    BROKER_URL = 'amqp://{user}:{password}@{hostname}/{vhost}/'.format(
+        user=os.environ.get('RABBIT_ENV_USER', 'admin'),
+        password=os.environ.get('RABBIT_ENV_RABBITMQ_PASS', 'mypass'),
+        hostname=RABBIT_HOSTNAME,
+        vhost=os.environ.get('RABBIT_ENV_VHOST', ''))
+
+# We don't want to have dead connections stored on rabbitmq, so we have to negotiate using heartbeats
+BROKER_HEARTBEAT = '?heartbeat=30'  
+if not BROKER_URL.endswith(BROKER_HEARTBEAT):  
+    BROKER_URL += BROKER_HEARTBEAT
+
+BROKER_POOL_LIMIT = 1  
+BROKER_CONNECTION_TIMEOUT = 10
+
+# Celery configuration
+
+# configure queues, currently we have only one
+#CELERY_DEFAULT_QUEUE = 'default'  
+#CELERY_QUEUES = (  
+#    Queue('default', Exchange('default'), routing_key='default'),
+#)
+
+# Sensible settings for celery
+CELERY_ALWAYS_EAGER = False  
+CELERY_ACKS_LATE = True  
+CELERY_TASK_PUBLISH_RETRY = True  
+CELERY_DISABLE_RATE_LIMITS = False
+
+# By default we will ignore result
+# If you want to see results and try out tasks interactively, change it to False
+# Or change this setting on tasks level
+CELERY_IGNORE_RESULT = True  
+CELERY_SEND_TASK_ERROR_EMAILS = False  
+CELERY_TASK_RESULT_EXPIRES = 600
+
+# Set redis as celery result backend
+CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)  
+CELERY_REDIS_MAX_CONNECTIONS = 1
+
+# Don't use pickle as serializer, json is much safer
+CELERY_TASK_SERIALIZER = "json"  
+CELERY_ACCEPT_CONTENT = ['application/json']
+
+CELERYD_HIJACK_ROOT_LOGGER = False  
+CELERYD_PREFETCH_MULTIPLIER = 1  
+CELERYD_MAX_TASKS_PER_CHILD = 1000 
