@@ -6,6 +6,7 @@ services:
     hostname: redis
     depends_on:
       - db0
+    restart: always 
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -21,6 +22,7 @@ services:
       - 15672
     depends_on:
       - db0
+    restart: always 
 
   db0:
     image: mysql
@@ -34,17 +36,19 @@ services:
       - "3306:3306"
     expose:
      - 3306
+    restart: always 
 
   web:
     image: django
     hostname: web
     build: .
-    #command: bash -c "apt-get install -yq netcat; while ! nc -w 1 -z 0.0.0.0 3306; do sleep 0.1; done; while :; do ./start_web.sh 0.0.0.0:8000; sleep 1; done;"
     command: bash -c "while ! nc -w 1 -z db0_1 3306; do sleep 1; done; while :; do /code/code/start_server.sh 0.0.0.0:8000; sleep 1; done;"
     volumes:
       - /home/deb/rematch/server/
     ports:
-      - "80:8000"
+      - "8000:8000"
+    expose: 
+      - "8000"
     environment:
       IN_DOCKER: 1
     links:
@@ -53,3 +57,4 @@ services:
     depends_on:
       - db0
       - rabbitmq
+    restart: always 
