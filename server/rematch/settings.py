@@ -134,9 +134,9 @@ DATABASES = {
 # analysis systems
 indocker = os.environ.get('IN_DOCKER')
 if indocker is None:
-  DATABASES.pop('HOST')
-  DATABASES.pop('PASSWORD')
-  DATABASES.pop('PORT')
+  DATABASES['default'].pop('HOST')
+  DATABASES['default'].pop('PASSWORD')
+  DATABASES['default'].pop('PORT')
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
