@@ -39,7 +39,7 @@ DEBUG = False
 if DEBUG:
   ALLOWED_HOSTS = ['*']
 else:
-  ALLOWED_HOSTS = ['127.0.0.0.1', '172*','192*']
+  ALLOWED_HOSTS = ['127.0.0.1', '172.18.0.*','192*']
 
 
 # Application definition
