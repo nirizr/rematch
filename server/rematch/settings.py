@@ -193,7 +193,8 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_HOST = os.environ.get('REDIS_PORT_6379_TCP_ADDR', 'redis_1')
 
-RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq_1')
+if os.environ.get('IN_DOCKER') is None:
+  RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq_1')
 
 
 if RABBIT_HOSTNAME.startswith('tcp://'):
