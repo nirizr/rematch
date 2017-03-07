@@ -210,9 +210,9 @@ if os.environ.get('IN_DOCKER') is not None:
 
   # We don't want to have dead connections stored on rabbitmq
   # , so we have to negotiate using heartbeats
-  BROKER_HEARTBEAT = '?heartbeat=30'
-  if not BROKER_URL.endswith(BROKER_HEARTBEAT):
-      BROKER_URL += BROKER_HEARTBEAT
+  # BROKER_HEARTBEAT = '?heartbeat=30'
+  # if not BROKER_URL.endswith(BROKER_HEARTBEAT):
+  #    BROKER_URL += BROKER_HEARTBEAT
 
   BROKER_POOL_LIMIT = 1
   BROKER_CONNECTION_TIMEOUT = 10
