@@ -1,13 +1,6 @@
 version: '2'
 services:
 
-  redis:
-    image: redis
-    hostname: redis
-    depends_on:
-      - db0
-    restart: always 
-
   rabbitmq:
     image: "rabbitmq:3-management"
     hostname: rabbit
