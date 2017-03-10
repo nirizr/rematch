@@ -3,7 +3,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq tmux git python-dev \
           python-mysqldb build-essential libmysqlclient-dev python-pip \
           python-numpy python-sklearn netcat-traditional libmysqlclient-dev \
-          mysql-client-5.5 rabbitmq-server 
+          mysql-client-5.5 rabbitmq-server supervisor
 RUN pip install --upgrade pip
 RUN apt-get clean
 RUN apt-get autoremove
@@ -15,3 +15,4 @@ WORKDIR /rematch_server
 #            netcat-traditional python-redis mysql-client-5.5 rabbitmq-server 
 ADD . ./
 RUN pip install -r /rematch_server/requirements.txt
+RUN pip install uwsgi 
