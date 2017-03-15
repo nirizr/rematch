@@ -40,8 +40,10 @@ services:
       - /home/deb/rematch/server/
     ports:
       - "8000:8000"
+      - "80:80"
     expose: 
       - "8000"
+      - "80"
     environment:
       IN_DOCKER: 1
     links:
