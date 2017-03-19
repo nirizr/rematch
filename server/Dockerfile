@@ -16,4 +16,4 @@ WORKDIR /rematch_server
 ADD . ./
 RUN pip install -r /rematch_server/requirements.txt
 RUN pip install uwsgi 
-RUN sudo apt-get install nginx 
+RUN apt-get install -yq nginx 
