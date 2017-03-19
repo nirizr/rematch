@@ -3,7 +3,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq tmux git python-dev \
           python-mysqldb build-essential libmysqlclient-dev python-pip \
           python-numpy python-sklearn netcat-traditional libmysqlclient-dev \
-          mysql-client-5.5 rabbitmq-server supervisor  
+          mysql-client-5.5 rabbitmq-server 
 RUN pip install --upgrade pip
 RUN apt-get clean
 RUN apt-get autoremove

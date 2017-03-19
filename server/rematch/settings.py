@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import sys
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -191,7 +190,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 
 if os.environ.get('IN_DOCKER') is not None:
- 
   # docker conf
   REDIS_PORT = 6379
   REDIS_DB = 0
