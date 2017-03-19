@@ -6,7 +6,6 @@ if [ -n "$IN_DOCKER" ]; then
   cd /rematch_server && /rematch_server/start_celery.sh &&
    uwsgi --socket :80001 --module rematch.wsgi
 else
-  ./create_superuser.sh
-  ./start_web.py 0.0.0.0:8000 &
+  ./start_web.sh 0.0.0.0:8000 &
   ./start_celery.sh
 fi;
