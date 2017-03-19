@@ -1,13 +1,13 @@
 import collections
-from . import match
+from . import matcher
 
 
-class HashMatch(match.Match):
+class HashMatcher(matcher.Matcher):
   @classmethod
   def match(cls, source, target):
     # unique_values = set(source_dict.values())
     flipped_rest = collections.defaultdict(list)
-    # TODO: could be optimized by enumerating all identity matchs together
+    # TODO: could be optimized by enumerating all identity matches together
     target_values = target.values_list('id', 'instance_id', 'data').iterator()
     for target_id, target_instance_id, target_data in target_values:
       # TODO: could be optimized by uncommenting next line as most 'target'

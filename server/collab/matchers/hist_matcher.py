@@ -8,10 +8,10 @@ import sklearn.metrics  # noqa flake8 importing as a different name
 import sklearn.preprocessing  # noqa flake8 importing as a different name
 import sklearn.feature_extraction  # noqa flake8 importing as a different name
 
-from . import match
+from . import matcher
 
 
-class HistogramMatch(match.Match):
+class HistogramMatcher(matcher.Matcher):
   @staticmethod
   def match(source, target):
     start = time.time()
