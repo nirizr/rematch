@@ -44,6 +44,9 @@ services:
       - "8000"
     environment:
       IN_DOCKER: 1
+      USERNAME: "magic"
+      PASSWORD: "qwe123QWE!@#"
+      EMAIL: "admin@remat.ch"
     links:
       - db0
       - rabbitmq
