@@ -15,6 +15,8 @@ test-warnings: true
 pylint:
   disable:
     - bad-indentation
+  options:
+    max-args: 8
 pep8:
   disable:
     - E114
