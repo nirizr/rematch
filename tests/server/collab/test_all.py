@@ -198,28 +198,11 @@ def test_file_fileversion(admin_client, admin_user):
   assert_response(response, status.HTTP_200_OK, obj)
 
 
-def test_task_locals_empty(admin_client, admin_user):
+@pytest.mark.parametrize('resource', ['locals', 'remotes', 'matches'])
+def test_task_resource_empty(resource, admin_client, admin_user):
   task = create_model('tasks', admin_user)
   task.save()
 
-  response = admin_client.get('/collab/tasks/{}/locals/'.format(task.id),
-                              content_type="application/json")
-  assert_response(response, status.HTTP_200_OK, [])
-
-
-def test_task_remotes_empty(admin_client, admin_user):
-  task = create_model('tasks', admin_user)
-  task.save()
-
-  response = admin_client.get('/collab/tasks/{}/remotes/'.format(task.id),
-                              content_type="application/json")
-  assert_response(response, status.HTTP_200_OK, [])
-
-
-def test_task_matches_empty(admin_client, admin_user):
-  task = create_model('tasks', admin_user)
-  task.save()
-
-  response = admin_client.get('/collab/tasks/{}/matches/'.format(task.id),
+  response = admin_client.get('/collab/tasks/{}/{}/'.format(task.id, resource),
                               content_type="application/json")
   assert_response(response, status.HTTP_200_OK, [])
