@@ -6,7 +6,7 @@ from . import log
 
 class Config(dict):
   DEFAULT = {"debug": False,
-             "pypi": {"server": "http://testpypi.python.org",
+             "pypi": {"server": "http://pypi.python.org",
                       "package": "rematch-idaplugin"},
              "login": {"username": "",
                        "password": "",
