@@ -31,36 +31,17 @@ class MatchDialog(base.BaseDialog):
     self.targetGrp = base.QRadioGroup("Match target", *choices)
     self.base_layout.addWidget(self.targetGrp)
 
-    self.identity = QtWidgets.QCheckBox("Identify matches")
-    self.fuzzy = QtWidgets.QCheckBox("Fuzzy matches")
-    self.graph = QtWidgets.QCheckBox("Graph matches")
-    self.identity.setChecked(True)
-    self.fuzzy.setChecked(True)
-    self.graph.setChecked(True)
-    method_lyt = QtWidgets.QVBoxLayout()
-    method_lyt.addWidget(self.identity)
-    method_lyt.addWidget(self.fuzzy)
-    method_lyt.addWidget(self.graph)
+    self.matchers = base.QItemCheckBoxes(item='matches/matchers',
+                                         name_field='matcher_name',
+                                         id_field='match_type')
 
     method_gbx = QtWidgets.QGroupBox("Match methods")
-    method_gbx.setDisabled(True)
-    method_gbx.setToolTip("Match method control functionality is not "
-                          "currently supported. Plese express your need of "
-                          "this functionality at our github.")
-    method_gbx.setLayout(method_lyt)
+    method_gbx.setLayout(self.matchers)
     self.base_layout.addWidget(method_gbx)
 
     self.bottom_layout("&Start matching")
 
   def data(self):
-    methods = []
-    if self.identity.isChecked():
-      methods.append('identity')
-    if self.fuzzy.isChecked():
-      methods.append('fuzzy')
-    if self.graph.isChecked():
-      methods.append('graph')
-
     return {'source': self.sourceGrp.get_result(),
             'source_single': self.source_single.func.startEA
                                if self.source_single.func else None,
@@ -71,4 +52,4 @@ class MatchDialog(base.BaseDialog):
             'target': self.targetGrp.get_result(),
             'target_project': self.target_project.currentData(),
             'target_file': self.target_file.currentData(),
-            'methods': methods}
+            'matchers': self.matchers.get_result()}

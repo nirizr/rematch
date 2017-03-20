@@ -145,6 +145,41 @@ class QItemSelect(QtWidgets.QComboBox):
       self.setEnabled(False)
 
 
+class QItemCheckBoxes(QtWidgets.QGridLayout):
+  def __init__(self, item, name_field='name', id_field='id', exclude=None,
+               columns=3):
+    super(QItemCheckBoxes, self).__init__()
+    self.item = item
+    self.name_field = name_field
+    self.id_field = id_field
+    self.exclude = exclude
+    self.columns = columns
+    self.checkboxes = []
+
+    self.refresh()
+
+  def refresh(self):
+    response = network.query("GET", "collab/{}/".format(self.item), json=True)
+
+    self.checkboxes = []
+    for i, obj in enumerate(response):
+      item_name = obj[self.name_field]
+      item_id = obj[self.id_field]
+
+      if self.exclude and (item_name in self.exclude or
+                           item_id in self.exclude):
+        continue
+
+      checkbox_widget = QtWidgets.QCheckBox(item_name)
+      checkbox_widget.id = item_id
+      checkbox_widget.setChecked(True)
+      self.addWidget(checkbox_widget, i / self.columns, i % self.columns)
+      self.checkboxes.append(checkbox_widget)
+
+  def get_result(self):
+    return [cb.id for cb in self.checkboxes if cb.isChecked()]
+
+
 class QRadioGroup(QtWidgets.QGroupBox):
   def __init__(self, title, *radios, **kwargs):
     checked = kwargs.pop('checked', None)

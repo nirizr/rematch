@@ -127,6 +127,7 @@ class Task(models.Model):
   # TODO: make sure only at least one of target_file/target_project is null
   target_file = models.ForeignKey(File, null=True)
   target_project = models.ForeignKey(Project, null=True)
+  matchers = models.TextField(default='[]')
 
   progress = models.PositiveSmallIntegerField(default=0)
   progress_max = models.PositiveSmallIntegerField(null=True)

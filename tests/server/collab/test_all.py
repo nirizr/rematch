@@ -4,8 +4,10 @@ from rest_framework import status, test
 
 from django.db import models
 from collab.models import Project, File, FileVersion, Task, Instance, Vector
+from collab.matchers import matchers_list
 
 import random
+import json
 
 
 @pytest.fixture
@@ -24,6 +26,8 @@ def rand_hash(n):
   return ''.join(random.choice("01234567890ABCDEF") for _ in range(n))
 
 
+requested_matchers = json.dumps([m.match_type for m in matchers_list])
+
 collab_models = {'projects': {'name': 'test_project_1', 'private': False,
                               'description': 'description_1', 'files': []},
                  'files': {'md5hash': 'H' * 32, 'name': 'file1',
@@ -39,7 +43,7 @@ collab_model_objects = {'projects': partial(Project, private=False),
                         'files': partial(File, name='name', description='desc',
                                          md5hash='H' * 32),
                         'file_versions': partial(FileVersion),
-                        'tasks': Task,
+                        'tasks': partial(Task, matchers=requested_matchers),
                         'instances': partial(Instance, offset=0),
                         'vectors': partial(Vector, type='assembly_hash',
                                            data='data', type_version=0),
@@ -214,3 +218,9 @@ def test_task(admin_user):
 
   from collab.tasks import match
   match(task.id)
+
+
+def test_matchers(admin_client):
+  response = admin_client.get('/collab/matches/matchers/',
+                              content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, matchers_list)

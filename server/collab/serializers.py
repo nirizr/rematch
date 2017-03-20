@@ -43,8 +43,8 @@ class TaskSerializer(serializers.ModelSerializer):
     model = Task
     fields = ('id', 'task_id', 'created', 'finished', 'owner', 'status',
               'target_project', 'target_file', 'source_file',
-              'source_file_version', 'source_start', 'source_end', 'progress',
-              'progress_max')
+              'source_file_version', 'source_start', 'source_end', 'matchers',
+              'progress', 'progress_max')
 
 
 class TaskEditSerializer(TaskSerializer):
@@ -54,6 +54,7 @@ class TaskEditSerializer(TaskSerializer):
   source_file_version = serializers.ReadOnlyField()
   source_start = serializers.ReadOnlyField()
   source_end = serializers.ReadOnlyField()
+  matchers = serializers.ReadOnlyField()
 
 
 class SimpleInstanceSerializer(serializers.ModelSerializer):
@@ -135,3 +136,9 @@ class MatchSerializer(serializers.ModelSerializer):
   class Meta:
     model = Match
     fields = ('from_instance', 'to_instance', 'task', 'type', 'score')
+
+
+class MatcherSerializer(serializers.Serializer):
+  match_type = serializers.ReadOnlyField()
+  vector_type = serializers.ReadOnlyField()
+  matcher_name = serializers.ReadOnlyField()

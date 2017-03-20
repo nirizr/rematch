@@ -9,6 +9,7 @@ from .. import network, netnode, log
 from . import base
 
 import hashlib
+import json
 
 
 class MatchAction(base.BoundFileAction):
@@ -29,7 +30,7 @@ class MatchAction(base.BoundFileAction):
     self.target = None
     self.target_project = None
     self.target_file = None
-    self.methods = None
+    self.matchers = None
 
     self.delayed_queries = []
 
@@ -75,14 +76,14 @@ class MatchAction(base.BoundFileAction):
     return version_hash
 
   def submit_handler(self, source, source_single, source_range, target,
-                     target_project, target_file, methods):
+                     target_project, target_file, matchers):
     self.source = source
     self.source_single = source_single
     self.source_range = source_range
     self.target = target
     self.target_project = target_project if target == 'project' else None
     self.target_file = target_file if target == 'file' else None
-    self.methods = methods
+    self.matchers = matchers
 
     file_version_hash = self.calc_file_version_hash()
     uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
@@ -168,7 +169,7 @@ class MatchAction(base.BoundFileAction):
               'source_end': self.source_range[1],
               'target_project': self.target_project,
               'target_file': self.target_file,
-              'source': self.source, 'methods': self.methods}
+              'source': self.source, 'matchers': json.dumps(self.matchers)}
     r = network.query("POST", "collab/tasks/", params=params, json=True)
     self.task_id = r['id']
 

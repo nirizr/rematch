@@ -6,9 +6,11 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
-                                SimpleInstanceSerializer, AnnotationSerializer)
+                                SimpleInstanceSerializer, AnnotationSerializer,
+                                MatcherSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
+from collab.matchers import matchers_list
 
 
 class ViewSetOwnerMixin(object):
@@ -153,6 +155,13 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()
   serializer_class = MatchSerializer
   filter_fields = ('task', 'type', 'score')
+
+  @staticmethod
+  @decorators.list_route()
+  def matchers(request):
+    del request
+    serializer = MatcherSerializer(matchers_list, many=True)
+    return response.Response(serializer.data)
 
 
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
