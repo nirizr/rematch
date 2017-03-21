@@ -104,6 +104,9 @@ class Action(idaapi.action_handler_t):
 
   def activate(self, ctx):
     del ctx
+    if self.running():
+      return
+
     if callable(self.dialog):
       self.dlg = self.dialog(reject_handler=self.reject_handler,
                              submit_handler=self.submit_handler,
@@ -111,10 +114,18 @@ class Action(idaapi.action_handler_t):
                              exception_handler=self.exception_handler)
       if self.finish_handler:
         self.dlg.finished.connect(self.finish_handler)
+      self.dlg.finished.connect(self.close_dialog)
       self.dlg.finished.connect(self.force_update)
       self.dlg.show()
     else:
       log('actions').warn("%s: no activation", self.__class__)
+
+  def running(self):
+    return self.dlg is not None
+
+  def close_dialog(self):
+    del self.dlg
+    self.dlg = None
 
   @staticmethod
   def force_update():
