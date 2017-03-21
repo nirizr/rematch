@@ -55,9 +55,9 @@ before_script:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
-  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source; fi
+  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi
   - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi
   - ./setup.py ${PROJECT} sdist --formats=zip ; pip install ./dist/rematch-${PROJECT}-*.zip
 
 after_success:
-  - coveralls
+  - if [ -d ./tests/${PROJECT} ]; then coveralls ; fi
