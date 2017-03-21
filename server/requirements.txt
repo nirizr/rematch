@@ -4,8 +4,7 @@ scipy
 scikit-learn
 django-registration-redux
 djangorestframework
-django-rest-auth
-django-allauth
+django-rest-auth >= 0.8.2
 celery<4.0
 django-celery
 django-filter
