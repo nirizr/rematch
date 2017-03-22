@@ -60,7 +60,8 @@ participate:
 
 - Source Code: https://github.com/nirizr/rematch
 - Issue Tracker: https://github.com/nirizr/rematch/issues
-- IRC channel: ircs://freenode/#rematch
+- IRC channel: `ircs://freenode/#rematch <ircs://freenode/#rematch>`_ (or
+  `insecure <irc://freenode/#rematch>`_)
 - Telegram Chat: https://t.me/joinchat/AAAAAAzNqvnjC03QYpv_iQ
 
 In particular, we're having trouble with implementing a stylish web interface
