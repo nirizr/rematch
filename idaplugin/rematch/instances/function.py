@@ -15,7 +15,8 @@ class FunctionInstance(EmptyFunctionInstance):
 
   def __init__(self, *args, **kwargs):
     super(FunctionInstance, self).__init__(*args, **kwargs)
-    self.vectors |= {collectors.AssemblyHashVector,
+    self.vectors |= {collectors.IdentityHashVector,
+                     collectors.AssemblyHashVector,
                      collectors.MnemonicHashVector,
                      collectors.MnemonicHistVector}
     self.annotations |= {collectors.AssemblyAnnotation}
