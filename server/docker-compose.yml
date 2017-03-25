@@ -1,0 +1,53 @@
+version: '2'
+services:
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: rabbit
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    expose:
+      - 5672
+      - 15672
+    depends_on:
+      - db0
+    restart: always 
+
+  db0:
+    image: mysql
+    hostname: db
+    environment:
+      - MYSQL_USER=root
+      #- MYSQL_ROOT_HOST="'root'@'172.%'"
+      - MYSQL_ROOT_PASSWORD=qwe123
+      - MYSQL_DATABASE=rematch
+    ports:
+      - "3306:3306"
+    expose:
+     - 3306
+    restart: always 
+
+  web:
+    image: django
+    hostname: web
+    build: .
+    command: bash -c "while ! nc -w 1 -z db0_1 3306; do sleep 1; done; while :; do /rematch_server/start_server.sh 0.0.0.0:8000; sleep 1; done;"
+    volumes:
+      - /home/deb/rematch/server/
+    ports:
+      - "8000:8000"
+    expose: 
+      - "8000"
+    environment:
+      IN_DOCKER: 1
+    links:
+      - db0
+      - rabbitmq
+    depends_on:
+      - db0
+      - rabbitmq
+    restart: always 
