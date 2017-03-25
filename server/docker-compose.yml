@@ -22,9 +22,10 @@ services:
     hostname: db
     environment:
       - MYSQL_USER=root
-      #- MYSQL_ROOT_HOST="'root'@'172.%'"
       - MYSQL_ROOT_PASSWORD=qwe123
       - MYSQL_DATABASE=rematch
+      - MYSQL_REMATCH_HOST=db0_1
+      - MYSQL_REMATCH_PORT=3306
     ports:
       - "3306:3306"
     expose:
