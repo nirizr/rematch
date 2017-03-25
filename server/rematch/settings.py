@@ -122,7 +122,7 @@ DATABASES = {
         'NAME': 'rematch',
         'USER': 'root',
         'PASSWORD': 'qwe123',
-        'HOST': 'db0_1',
+        'HOST': 'db_1',
         'PORT': 3306,
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",

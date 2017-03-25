@@ -14,17 +14,17 @@ services:
       - 5672
       - 15672
     depends_on:
-      - db0
+      - db
     restart: always 
 
-  db0:
+  db:
     image: mysql
     hostname: db
     environment:
       - MYSQL_USER=root
       - MYSQL_ROOT_PASSWORD=qwe123
       - MYSQL_DATABASE=rematch
-      - MYSQL_REMATCH_HOST=db0_1
+      - MYSQL_REMATCH_HOST=db_1
       - MYSQL_REMATCH_PORT=3306
     ports:
       - "3306:3306"
@@ -36,7 +36,7 @@ services:
     image: django
     hostname: web
     build: .
-    command: bash -c "while ! nc -w 1 -z db0_1 3306; do sleep 1; done; while :; do /rematch_server/start_server.sh 0.0.0.0:8000; sleep 1; done;"
+    command: bash -c "/rematch_server/start_server.sh"
     volumes:
       - /home/deb/rematch/server/
     ports:
@@ -49,9 +49,9 @@ services:
       PASSWORD: "qwe123QWE!@#"
       EMAIL: "admin@remat.ch"
     links:
-      - db0
+      - db
       - rabbitmq
     depends_on:
-      - db0
+      - db
       - rabbitmq
     restart: always 
