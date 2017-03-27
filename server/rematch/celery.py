@@ -6,7 +6,7 @@ from celery import Celery
 import django
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rematch.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rematch.settings.production')
 django.setup()
 
 

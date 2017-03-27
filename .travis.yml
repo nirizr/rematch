@@ -3,22 +3,20 @@ services:
   - rabbitmq
 
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-env:
-  - PROJECT=idaplugin
-  - PROJECT=server
 
 matrix:
-  # idaplugin is run with python2.7, we'll check against python3 to assert compatibility
-  exclude:
-    - python: "3.4"
+  include:
+    - python: "2.7"
       env: PROJECT=idaplugin
+    - python: "3.5"
+      env: PROJECT=idaplugin
+    - python: "2.7"
+      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+    - python: "3.5"
+      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.production'
 
 branches:
-  only: 
+  only:
     - master
 
 # Handle git submodules ourselves to replace ssh login with https login
@@ -49,9 +47,7 @@ install:
   - pip install pytest-cov coveralls
 
 before_script:
-  - if [ ${PROJECT} = "server" ]; then
-      mysql -e 'SHOW VARIABLES LIKE "%version%";' ;
-    fi;
+  - if [ ${PROJECT} = "server" ]; then mysql -e 'SHOW VARIABLES LIKE "%version%";' ; fi;
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
