@@ -29,7 +29,7 @@ def match(task_id):
     task.update(status=Task.STATUS_STARTED, progress=0,
                 progress_max=len(requested_matchers), task_id=match.request.id)
 
-    source_filter = {'file_id': source_file,
+    source_filter = {'file_version__file': source_file,
                      'file_version_id': source_file_version}
     if source_start:
       source_filter['instance__offset__gte'] = source_start
@@ -39,11 +39,12 @@ def match(task_id):
 
     target_filter = {}
     if target_project:
-      target_filter = {'file__project_id': target_project}
+      target_filter = {'file_version__file__project_id': target_project}
     elif target_file:
-      target_filter = {'file_id': target_file}
+      target_filter = {'file_version__file': target_file}
     base_target_vectors = Vector.objects.filter(**target_filter)
-    base_target_vectors = base_target_vectors.exclude(file_id=source_file)
+    self_exclude = {'file_version__file': source_file}
+    base_target_vectors = base_target_vectors.exclude(**self_exclude)
 
     print("Running task {}".format(match.request.id))
     # TODO: order might be important here

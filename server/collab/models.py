@@ -85,7 +85,6 @@ class Vector(models.Model):
                   (TYPE_MNEMONIC_HIST, "Mnemonic Hist")]
 
   instance = models.ForeignKey(Instance, related_name='vectors')
-  file = models.ForeignKey(File, related_name='vectors')
   file_version = models.ForeignKey(FileVersion, related_name='vectors')
   type = models.CharField(max_length=16, choices=TYPE_CHOICES)
   type_version = models.IntegerField()

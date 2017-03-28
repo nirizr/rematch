@@ -8,6 +8,16 @@ from collab.matchers import matchers_list
 
 import random
 import json
+import inspect
+from dateutil.parser import parse as parse_date
+
+
+try:
+  strtypes = (str, unicode)
+  inttypes = (int, long)
+except NameError:
+  strtypes = str
+  inttypes = int
 
 
 @pytest.fixture
@@ -57,8 +67,7 @@ collab_model_reqs = {'projects': {},
                                'source_file_version': 'file_versions'},
                      'instances': {'file_version': 'file_versions'},
                      'vectors': {'instance': 'instances',
-                                 'file_version': 'file_versions',
-                                 'file': 'files'}}
+                                 'file_version': 'file_versions'}}
 
 
 def resolve_reqs(model_name, user):
@@ -103,31 +112,60 @@ def setup_model(model_name, user):
   return model_dict
 
 
+def simplify_object(obj):
+  try:
+    obj = parse_date(obj)
+  except (AttributeError, ValueError, TypeError):
+    pass
+  try:
+    obj = obj.replace(microsecond=0, tzinfo=None).isoformat()
+  except (AttributeError, TypeError):
+    pass
+  return obj
+
+
 def assert_eq(a, b):
+  a, b = simplify_object(a), simplify_object(b)
+  print(a, b)
   if isinstance(a, list) and isinstance(b, list):
     assert len(a) == len(b)
     for a_item, b_item in zip(a, b):
       assert_eq(a_item, b_item)
-  if isinstance(a, models.Model) and isinstance(b, dict):
+  elif isinstance(a, dict) and isinstance(b, dict):
     for k in b:
-      d_value = b.__getitem__(k)
-      o_value = a.__getattribute__(k)
-      d_type = type(d_value)
-      o_type = type(o_value)
-      if d_type == o_type:
-        assert d_value == o_value
-      else:
-        print("Skipped matching {k}: {d_value}({d_type}) ?? "
-              "{o_value}({o_type})".format(k=k, d_value=d_value,
-                                           d_type=d_type, o_value=o_value,
-                                           o_type=o_type))
+      assert_eq(a[k], b[k])
+  elif isinstance(b, dict) and (isinstance(a, models.Model) or
+                                inspect.isclass(a)):
+    assert_eq(b, a)
+  elif isinstance(a, dict) and (isinstance(b, models.Model) or
+                                inspect.isclass(b)):
+    for k in a:
+      # TODO: serializer-added values cannot be validated, so we'll have to
+      # ignore any attribute that does not exist in Model object
+      if not hasattr(b, k):
+        print("Ignoring missing model parameter: {} in {}".format(k, b))
+        continue
+      a_value = a.__getitem__(k)
+      b_value = getattr(b, k)
+      assert_eq(a_value, b_value)
+  elif isinstance(a, inttypes) and isinstance(b, models.Model):
+    assert_eq(a, b.id)
+  elif isinstance(a, strtypes) and isinstance(b, models.Model):
+    assert_eq(a, b.username)
+  elif b.__class__.__name__ == 'RelatedManager':
+    assert_eq(a, list(b.all()))
+  else:
+    assert a == b
 
 
 def assert_response(response, status, data=None):
   print(response.content)
   assert response.status_code == status
   if isinstance(data, (list, dict)):
-    assert_eq(response.json(), data)
+    if 'results' in response.data:
+      assert_eq(response.data['results'], data)
+    else:
+      assert_eq(response.data, data)
   elif data:
     assert_eq(response.content, data)
 
@@ -202,13 +240,15 @@ def test_file_fileversion(admin_client, admin_user):
   assert_response(response, status.HTTP_200_OK, obj)
 
 
+@pytest.mark.parametrize('limit', [None, 10])
 @pytest.mark.parametrize('resource', ['locals', 'remotes', 'matches'])
-def test_task_resource_empty(resource, admin_client, admin_user):
+def test_task_resource_empty(resource, limit, admin_client, admin_user):
   task = create_model('tasks', admin_user)
   task.save()
 
+  data = {'limit': limit} if limit else {}
   response = admin_client.get('/collab/tasks/{}/{}/'.format(task.id, resource),
-                              content_type="application/json")
+                              data=data, content_type="application/json")
   assert_response(response, status.HTTP_200_OK, [])
 
 
