@@ -14,6 +14,8 @@ matrix:
       env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.debug'
     - python: "3.5"
       env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.production'
+    - python: "2.7"
+      env: PROJECT=setup.py
 
 branches:
   only:
@@ -53,7 +55,6 @@ script:
   - flake8 ./${PROJECT} --show-source --statistics
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi
   - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi
-  - ./setup.py ${PROJECT} sdist --formats=zip ; pip install ./dist/rematch-${PROJECT}-*.zip
 
 after_success:
   - if [ -d ./tests/${PROJECT} ]; then coveralls ; fi

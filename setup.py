@@ -4,12 +4,14 @@ import sys
 import os
 from setuptools import setup, find_packages
 
+
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
 def read(fname):
   return open(fname).read()
+
 
 def get_version(path):
   context = {}
@@ -22,12 +24,15 @@ def get_version(path):
 
   return context['__version__']
 
+
 def get_requirements(fname):
   return open(fname).readlines()
 
+
 def find_packages_relative(base):
-  return [base] + [os.path.join(base, package)
-           for package in find_packages(base)]
+  return ([os.path.join(base, package) for package in find_packages(base)] +
+          [base])
+
 
 def build_setup(name, package_name, version_path, package_base,
                 package_data=None, script_args=None):
@@ -39,7 +44,7 @@ def build_setup(name, package_name, version_path, package_base,
   requirements_path = os.path.join(base_path, package_base, "requirements.txt")
   if os.path.exists(requirements_path):
     install_requires = get_requirements(requirements_path)
-    if not package_base in package_data:
+    if package_base not in package_data:
       package_data[package_base] = []
     package_data[package_base].append('requirements.txt')
   else:
@@ -55,15 +60,15 @@ def build_setup(name, package_name, version_path, package_base,
   readme_path = os.path.join(base_path, "README.rst")
   setup(
     script_args=script_args,
-    name = package_name,
-    version = get_version(version_path),
-    author = "Nir Izraeli",
-    author_email = "nirizr@gmail.com",
-    description = ("A IDA Pro plugin and server framework for binary function "
-                   "level diffing."),
-    keywords = ["rematch", "ida", "idapro", "bindiff", "binary diffing",
-                "reverse engineering"],
-    url = "https://www.github.com/nirizr/rematch/",
+    name=package_name,
+    version=get_version(version_path),
+    author="Nir Izraeli",
+    author_email="nirizr@gmail.com",
+    description=("A IDA Pro plugin and server framework for binary function "
+                 "level diffing."),
+    keywords=["rematch", "ida", "idapro", "bindiff", "binary diffing",
+              "reverse engineering"],
+    url="https://www.github.com/nirizr/rematch/",
     packages=find_packages_relative(package_base),
     package_data=package_data,
     extras_require=extras_require,
@@ -73,6 +78,7 @@ def build_setup(name, package_name, version_path, package_base,
       "Development Status :: 3 - Alpha",
     ],
   )
+
 
 def build_setup_server(script_args=None):
   build_setup(name='server',
@@ -113,7 +119,7 @@ if __name__ == '__main__':
     package = packages.pop() if len(packages) == 1 else sys.argv[1]
     if sys.argv[1] == package:
       sys.argv = sys.argv[:1] + sys.argv[2:]
-    if package  == 'server':
+    if package == 'server':
       build_setup_server()
     elif package == 'idaplugin':
       build_setup_idaplugin()
