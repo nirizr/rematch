@@ -1,6 +1,6 @@
 from ..idasix import QtCore, QtWidgets
 
-from ..dialogs.match import MatchDialog
+from ..dialogs.review import ReviewDialog
 
 from .. import network, netnode, log
 from . import base
@@ -8,13 +8,12 @@ from . import base
 import json
 
 
-class MatchAction(base.BoundFileAction):
-  name = "&Match"
-  dialog = MatchDialog
+class ReviewAction(base.BoundFileAction):
+  name = "&Review"
+  dialog = ReviewDialog
 
   def __init__(self, *args, **kwargs):
-    super(MatchAction, self).__init__(*args, **kwargs)
-    self._running = False
+    super(ReviewAction, self).__init__(*args, **kwargs)
     self.functions = None
     self.results = None
     self.task_id = None
@@ -31,7 +30,11 @@ class MatchAction(base.BoundFileAction):
 
     self.delayed_queries = []
 
-    self.pbar = None
+    self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.canceled.connect(self.cancel)
+    self.pbar.rejected.connect(self.cancel)
+    self.pbar.hide()
+
     self.timer = QtCore.QTimer()
 
   def clean(self):
@@ -66,16 +69,13 @@ class MatchAction(base.BoundFileAction):
     self.target_file = target_file if target == 'file' else None
     self.matchers = matchers
 
+    file_version_hash = self.calc_file_version_hash()
     uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
                                                     file_version_hash)
     return network.QueryWorker("POST", uri, json=True)
 
   def response_handler(self, file_version):
     self.file_version_id = file_version['id']
-
-    self.pbar = QtWidgets.QProgressDialog()
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
 
     if file_version['newly_created']:
       self.start_upload()
@@ -155,19 +155,19 @@ class MatchAction(base.BoundFileAction):
 
     log('match_action').info("Result download started")
     locals_url = "collab/tasks/{}/locals/".format(self.task_id)
-    q = network.QueryWorker("GET", locals_url, json=True, pageable=True,
+    q = network.QueryWorker("GET", locals_url, json=True, paginate=True,
                             params={'limit': 100})
     q.start(self.handle_locals)
     self.delayed_queries.append(q)
 
     remotes_url = "collab/tasks/{}/remotes/".format(self.task_id)
-    q = network.QueryWorker("GET", remotes_url, json=True, pageable=True,
+    q = network.QueryWorker("GET", remotes_url, json=True, paginate=True,
                             params={'limit': 100})
     q.start(self.handle_remotes)
     self.delayed_queries.append(q)
 
     matches_url = "collab/tasks/{}/matches/".format(self.task_id)
-    q = network.QueryWorker("GET", matches_url, json=True, pageable=True,
+    q = network.QueryWorker("GET", matches_url, json=True, paginate=True,
                             params={'limit': 100})
     q.start(self.handle_matches)
     self.delayed_queries.append(q)

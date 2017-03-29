@@ -15,7 +15,7 @@ from . import resultscript
 from . import serializedgraph
 
 
-class MatchResultDialog(gui.GuiDialog):
+class ReviewDialog(gui.GuiDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
@@ -29,7 +29,7 @@ class MatchResultDialog(gui.GuiDialog):
   def __init__(self, task_id, *args, **kwargs):
     if 'model' not in kwargs:
       kwargs['modal'] = False
-    super(MatchResultDialog, self).__init__(*args, **kwargs)
+    super(ReviewDialog, self).__init__(*args, **kwargs)
 
     self.task_id = task_id
     self.locals = {}
@@ -116,7 +116,7 @@ class MatchResultDialog(gui.GuiDialog):
     self.finalize_matches()
     self.populate_tree()
     self.set_checks()
-    super(MatchResultDialog, self).show(*args, **kwargs)
+    super(ReviewDialog, self).show(*args, **kwargs)
     self.graph_dialog.Show()
 
   def get_obj(self, obj_id):
