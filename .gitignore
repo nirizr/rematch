@@ -94,3 +94,5 @@ server/db.sqlite3
 # ignore temporary OS files
 .DS_Store
 Thumbs.db
+*.un~
+*.swp
