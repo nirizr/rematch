@@ -32,6 +32,7 @@ synchronization between multiple reverse engineers working on the same file.
    usage
    engines
    architecture
+   faq
    glossary
 
 Goal of Rematch
