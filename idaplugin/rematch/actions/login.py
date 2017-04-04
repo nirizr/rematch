@@ -3,16 +3,13 @@ from .. import user
 from .. import config
 from .. import exceptions
 
-from ..dialogs.login import LoginDialog
-
 
 class LoginAction(base.UnauthAction):
   name = "&Login"
   group = "User"
-  dialog = LoginDialog
 
-  def __init__(self):
-    super(LoginAction, self).__init__()
+  def __init__(self, *args, **kwargs):
+    super(LoginAction, self).__init__(*args, **kwargs)
     self.username = None
     self.password = None
     self.server = None
@@ -34,8 +31,8 @@ class LoginAction(base.UnauthAction):
   def handle_login(self, response):
     del response
 
-    self.dlg.statusLbl.setText("Connected!")
-    self.dlg.statusLbl.setStyleSheet("color: green;")
+    self.ui.statusLbl.setText("Connected!")
+    self.ui.statusLbl.setStyleSheet("color: green;")
 
     config['login']['username'] = self.username
     config['login']['server'] = self.server
@@ -45,17 +42,17 @@ class LoginAction(base.UnauthAction):
       config['login']['password'] = ""
     config.save()
 
-    self.dlg.accept()
+    self.ui.accept()
 
   def handle_exception(self, exception):
     if isinstance(exception, (exceptions.ConnectionException,
                               exceptions.ServerException)):
-      self.dlg.statusLbl.setText("Connection to server failed.")
-      self.dlg.statusLbl.setStyleSheet("color: blue;")
+      self.ui.statusLbl.setText("Connection to server failed.")
+      self.ui.statusLbl.setStyleSheet("color: blue;")
     elif isinstance(exception, (exceptions.QueryException,
                                 exceptions.AuthenticationException)):
-      self.dlg.statusLbl.setText("Invalid user name or password.")
-      self.dlg.statusLbl.setStyleSheet("color: red;")
+      self.ui.statusLbl.setText("Invalid user name or password.")
+      self.ui.statusLbl.setStyleSheet("color: red;")
 
 
 class LogoutAction(base.AuthAction):

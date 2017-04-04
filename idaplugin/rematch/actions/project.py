@@ -1,5 +1,4 @@
 from . import base
-from ..dialogs.project import AddProjectDialog, AddFileDialog
 
 from .. import netnode
 from .. import network
@@ -8,7 +7,6 @@ from .. import network
 class AddProjectAction(base.AuthAction):
   name = "&Add project"
   group = "Project"
-  dialog = AddProjectDialog
 
   @staticmethod
   def submit_handler(name, description, private, bind_current):
@@ -31,7 +29,6 @@ class AddProjectAction(base.AuthAction):
 class AddFileAction(base.UnboundFileAction):
   name = "&Add file"
   group = "Project"
-  dialog = AddFileDialog
 
   @staticmethod
   def submit_handler(project, name, md5hash, description, shareidb):
