@@ -4,7 +4,7 @@ import idaapi
 import idc
 
 
-class Action():
+class Action(object):
   reject_handler = None
   finish_handler = None
   submit_handler = None
