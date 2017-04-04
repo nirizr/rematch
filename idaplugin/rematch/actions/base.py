@@ -12,6 +12,7 @@ class Action(object):
   exception_handler = None
 
   def __init__(self, ui_class):
+    super(Action, self).__init__()
     self.ui_class = ui_class
     self.ui = None
 
@@ -22,7 +23,7 @@ class Action(object):
     return self.ui is not None
 
 
-class IDAAction(idaapi.action_handler_t, Action):
+class IDAAction(Action, idaapi.action_handler_t):
   """Actions are objects registered to IDA's interface and added to the
   rematch menu and toolbar"""
 
