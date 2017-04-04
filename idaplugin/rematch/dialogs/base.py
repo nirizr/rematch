@@ -105,8 +105,8 @@ class BaseDialog(QtWidgets.QDialog):
 
 class QItemSelect(QtWidgets.QComboBox):
   def __init__(self, item, name_field='name', id_field='id', allow_none=True,
-               exclude=None, default_id=None):
-    super(QItemSelect, self).__init__()
+               exclude=None, default_id=None, **kwargs):
+    super(QItemSelect, self).__init__(**kwargs)
     self.item = item
     self.name_field = name_field
     self.id_field = id_field
@@ -123,7 +123,7 @@ class QItemSelect(QtWidgets.QComboBox):
     if self.currentIndex() == -1:
       selected_id = self.default_id
     else:
-      self.currentData()
+      selected_id = self.currentData()
 
     # only clear after response is received
     self.clear()
@@ -267,6 +267,9 @@ class QFunctionSelect(QtWidgets.QWidget):
       self.set_func(f)
       self.changed.emit()
 
+  def get_result(self):
+    return self.func.startEA if self.func else None
+
 
 class QFunctionRangeSelect(QtWidgets.QWidget):
   def __init__(self, text_max_length=30, **kwargs):
@@ -295,3 +298,7 @@ class QFunctionRangeSelect(QtWidgets.QWidget):
     start_func = self.start.func
     self.start.set_func(self.end.func)
     self.end.set_func(start_func)
+
+  def get_result(self):
+    return [self.start.func.startEA if self.start.func else None,
+            self.start.func.endEA if self.start.func else None]

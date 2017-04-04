@@ -43,12 +43,8 @@ class MatchDialog(base.BaseDialog):
 
   def data(self):
     return {'source': self.sourceGrp.get_result(),
-            'source_single': self.source_single.func.startEA
-                               if self.source_single.func else None,
-            'source_range': [self.source_range.start.func.startEA
-                               if self.source_range.start.func else None,
-                             self.source_range.end.func.endEA
-                               if self.source_range.end.func else None],
+            'source_single': self.source_single.get_result(),
+            'source_range': self.source_range.get_result(),
             'target': self.targetGrp.get_result(),
             'target_project': self.target_project.currentData(),
             'target_file': self.target_file.currentData(),
