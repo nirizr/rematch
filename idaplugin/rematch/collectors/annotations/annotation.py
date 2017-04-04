@@ -1,4 +1,4 @@
-from . import collector
+from .. import collector
 
 
 class Annotation(collector.Collector):

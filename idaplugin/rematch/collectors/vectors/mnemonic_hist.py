@@ -1,12 +1,12 @@
 import idautils
 import idc
 
-from .vector import Vector
+from . import vector
 
 from collections import defaultdict
 
 
-class MnemonicHistVector(Vector):
+class MnemonicHistVector(vector.Vector):
   type = 'mnemonic_hist'
   type_version = 0
 

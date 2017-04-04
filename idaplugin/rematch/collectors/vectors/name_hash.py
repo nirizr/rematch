@@ -3,10 +3,10 @@ import idc
 
 import hashlib
 
-from .vector import Vector
+from . import vector
 
 
-class NameHashVector(Vector):
+class NameHashVector(vector.Vector):
   type = 'name_hash'
   type_version = 0
 

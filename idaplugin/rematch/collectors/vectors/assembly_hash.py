@@ -3,10 +3,10 @@ import idc
 
 import hashlib
 
-from .vector import Vector
+from . import vector
 
 
-class AssemblyHashVector(Vector):
+class AssemblyHashVector(vector.Vector):
   type = 'assembly_hash'
   type_version = 0
 

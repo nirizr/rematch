@@ -1,9 +1,9 @@
 import idc
 
-from .annotation import Annotation
+from . import annotation
 
 
-class PrototypeAnnotation(Annotation):
+class PrototypeAnnotation(annotation.Annotation):
   type = 'prototype'
 
   def include(self):

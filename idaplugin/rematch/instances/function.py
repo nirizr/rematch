@@ -7,7 +7,7 @@ class EmptyFunctionInstance(base.BaseInstance):
 
   def __init__(self, *args, **kwargs):
     super(EmptyFunctionInstance, self).__init__(*args, **kwargs)
-    self.annotations |= {collectors.PrototypeAnnotation}
+    self.annotations |= {collectors.annotations.PrototypeAnnotation}
 
 
 class FunctionInstance(EmptyFunctionInstance):
@@ -15,8 +15,8 @@ class FunctionInstance(EmptyFunctionInstance):
 
   def __init__(self, *args, **kwargs):
     super(FunctionInstance, self).__init__(*args, **kwargs)
-    self.vectors |= {collectors.IdentityHashVector,
-                     collectors.AssemblyHashVector,
-                     collectors.MnemonicHashVector,
-                     collectors.MnemonicHistVector}
-    self.annotations |= {collectors.AssemblyAnnotation}
+    self.vectors |= {collectors.vectors.IdentityHashVector,
+                     collectors.vectors.AssemblyHashVector,
+                     collectors.vectors.MnemonicHashVector,
+                     collectors.vectors.MnemonicHistVector}
+    self.annotations |= {collectors.annotations.AssemblyAnnotation}

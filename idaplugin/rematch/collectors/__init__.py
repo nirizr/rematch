@@ -1,14 +1,6 @@
 from .collector import Collector
-from .vector import Vector
-from .identity_hash import IdentityHashVector
-from .name_hash import NameHashVector
-from .assembly_hash import AssemblyHashVector
-from .mnemonic_hash import MnemonicHashVector
-from .mnemonic_hist import MnemonicHistVector
-from .annotation import Annotation
-from .name_annotation import NameAnnotation
-from .assembly_annotation import AssemblyAnnotation
-from .prototype_annotation import PrototypeAnnotation
+from . import vectors
+from . import annotations
 
 
 def collect(offset, collectors):
@@ -18,7 +10,4 @@ def collect(offset, collectors):
       yield c.serialize()
 
 
-__all__ = ["collect", "Collector", "Vector", "IdentityHashVector",
-           "NameHashVector", "AssemblyHashVector", "MnemonicHashVector",
-           "MnemonicHistVector", "Annotation", "NameAnnotation",
-           "AssemblyAnnotation", "PrototypeAnnotation"]
+__all__ = ["collect", "Collector", "vectors", "annotations"]

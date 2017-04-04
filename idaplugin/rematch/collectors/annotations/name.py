@@ -1,9 +1,9 @@
 import idc
 
-from .annotation import Annotation
+from . import annotation
 
 
-class NameAnnotation(Annotation):
+class NameAnnotation(annotation.Annotation):
   type = 'name'
 
   def include(self):

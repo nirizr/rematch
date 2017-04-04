@@ -1,10 +1,10 @@
 import idaapi
 import idautils
 
-from .annotation import Annotation
+from . import annotation
 
 
-class AssemblyAnnotation(Annotation):
+class AssemblyAnnotation(annotation.Annotation):
   type = 'assembly'
 
   def _data(self):

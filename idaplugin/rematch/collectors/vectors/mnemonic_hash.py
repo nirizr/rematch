@@ -3,10 +3,10 @@ import idc
 
 import hashlib
 
-from .vector import Vector
+from . import vector
 
 
-class MnemonicHashVector(Vector):
+class MnemonicHashVector(vector.Vector):
   type = 'mnemonic_hash'
   type_version = 0
 

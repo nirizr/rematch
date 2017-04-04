@@ -1,10 +1,10 @@
 import idautils
 import idc
 
-from .vector import Vector
+from . import vector
 
 
-class IdentityHashVector(Vector):
+class IdentityHashVector(vector.Vector):
   type = 'identity_hash'
   type_version = 0
 
