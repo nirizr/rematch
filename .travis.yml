@@ -56,5 +56,5 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi
   - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi
 
-after_success:
+after_script:
   - if [ -d ./tests/${PROJECT} ]; then coveralls ; fi
