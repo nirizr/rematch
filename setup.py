@@ -3,6 +3,7 @@
 import sys
 import os
 from setuptools import setup, find_packages
+import re
 
 
 # Utility function to read the README file.
@@ -14,15 +15,10 @@ def read(fname):
 
 
 def get_version(path):
-  context = {}
   version_path = os.path.join(path, 'version.py')
-  try:
-    execfile(version_path, context)
-  except NameError:
-    version_code = open(version_path, "rb").read()
-    exec(compile(version_code, version_path, 'exec'), context)
-
-  return context['__version__']
+  return re.search(
+    r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment too
+    open(version_path).read()).group(1)
 
 
 def get_requirements(fname):
