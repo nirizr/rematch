@@ -25,7 +25,8 @@ class User(dict):
       if not config['settings']['login']['autologin']:
         return
 
-      if 'username' in config and 'password' in config and 'server' in config:
+      if ('login' in config and 'username' in config['login'] and
+          'password' in config['login'] and 'server' in config['login']):
         self.login(config['login']['username'], config['login']['password'],
                    config['login']['server'])
     except exceptions.RematchException:
@@ -53,7 +54,8 @@ class User(dict):
   def logout(self):
     q = network.QueryWorker("POST", "accounts/logout/", json=True)
     q.start()
-    del config['login']['token']
+    if 'token' in config['login']:
+      del config['login']['token']
     self.clear()
     self.update(self.LOGGEDOUT_USER)
 
