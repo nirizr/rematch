@@ -12,9 +12,9 @@ class IdentityHashVector(vector.Vector):
   # http://movies.stackexchange.com/q/11495
   keleven = 17391172068829961267
 
-  def __init__(self, **kwargs):
-    super(IdentityHashVector, self).__init__(**kwargs)
+  def __init__(self, *args, **kwargs):
     self.hash = self.keleven
+    super(IdentityHashVector, self).__init__(*args, **kwargs)
 
   def _cycle(self, b):
     self.hash |= 5

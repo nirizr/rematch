@@ -7,7 +7,7 @@ except NameError:
   strtypes = (str,)
 
 
-class Collector:
+class Collector(object):
   def __init__(self, offset, instance_id=None):
     self.instance_id = instance_id
     self.offset = offset
