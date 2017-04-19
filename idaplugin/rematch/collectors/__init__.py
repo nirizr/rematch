@@ -3,11 +3,16 @@ from . import vectors
 from . import annotations
 
 
-def collect(offset, collectors):
+def collect(collectors, offset, instance_id=None):
   for collector in collectors:
-    c = collector(offset)
-    if c.include():
-      yield c.serialize()
+    r = collector.collect(offset, instance_id)
+    if r:
+      yield r
 
 
-__all__ = ["collect", "Collector", "vectors", "annotations"]
+def apply(collectors, offset, data):
+  for collector in collectors:
+    collector.apply(offset, data)
+
+
+__all__ = ["collect", "apply", "Collector", "vectors", "annotations"]

@@ -16,19 +16,23 @@ class IdentityHashVector(vector.Vector):
     self.hash = self.keleven
     super(IdentityHashVector, self).__init__(*args, **kwargs)
 
-  def _cycle(self, b):
-    self.hash |= 5
-    self.hash ^= b
-    self.hash *= self.hash
-    self.hash ^= (self.hash >> 32)
-    self.hash &= 0xffffffffffffffff
+  @staticmethod
+  def _cycle(h, b):
+    h |= 5
+    h ^= b
+    h *= h
+    h ^= (h >> 32)
+    h &= 0xffffffffffffffff
+    return h
 
-  def _data(self):
-    for ea in idautils.FuncItems(self.offset):
-      self._cycle(idc.Byte(ea))
+  @classmethod
+  def _data(cls, offset):
+    h = cls.keleven
+    for ea in idautils.FuncItems(offset):
+      h = cls._cycle(h, idc.Byte(ea))
       # skip additional bytes of any instruction that contains an offset in it
       if idautils.CodeRefsFrom(ea, True) or idautils.DataRefsFrom(ea):
         continue
       for i in range(ea + 1, ea + idc.ItemSize(ea)):
-        self._cycle(idc.Byte(i))
-    return self.hash
+        h = cls._cycle(h, idc.Byte(i))
+    return h

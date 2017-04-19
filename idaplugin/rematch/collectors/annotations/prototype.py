@@ -1,20 +1,29 @@
+import ida_typeinf
 import idc
 
+from ... import log
 from . import annotation
 
 
 class PrototypeAnnotation(annotation.Annotation):
   type = 'prototype'
 
-  def include(self):
-    t = idc.GetType(self.offset)
+  @classmethod
+  def _data(cls, offset):
+    t = ida_typeinf.idc_get_type(offset)
     # if failed getting type, there's no annotation here
     if t is None:
       return False
-    # if type equals guessed type, no need to save annotation
-    if t == idc.GuessType(self.offset):
-      return False
-    return True
 
-  def _data(self):
-    return idc.GetType(self.offset)
+    # if type equals guessed type, no need to save annotation
+    if t == ida_typeinf.idc_guess_type(offset):
+      return False
+
+    return {'prototype': t}
+
+  @classmethod
+  def apply(cls, offset, data):
+    prototype = data['prototype']
+    if idc.SetType(offset, prototype) is None:
+      log('annotation_prototype').warn("Setting prototype failed at {} with {}"
+                                       "".format(offset, data))

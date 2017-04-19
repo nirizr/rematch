@@ -10,11 +10,12 @@ class MnemonicHistVector(vector.Vector):
   type = 'mnemonic_hist'
   type_version = 0
 
-  def _data(self):
+  @classmethod
+  def _data(cls, offset):
     instruction_hist = defaultdict(int)
 
-    for offset in idautils.FuncItems(self.offset):
-      mnem_line = idc.GetMnem(offset)
+    for ea in idautils.FuncItems(offset):
+      mnem_line = idc.GetMnem(ea)
       mnem_line = mnem_line.lower()
       instruction_hist[mnem_line] += 1
 

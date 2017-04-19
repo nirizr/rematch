@@ -1,4 +1,4 @@
-import idc
+import ida_name
 
 from . import annotation
 
@@ -6,9 +6,18 @@ from . import annotation
 class NameAnnotation(annotation.Annotation):
   type = 'name'
 
-  def include(self):
-    f = idc.GetFlags(self.offset)
-    return idc.hasUserName(f)
+  @classmethod
+  def _data(cls, offset):
+    name = ida_name.get_name(offset)
+    if ida_name.is_uname(name):
+      # TODO: get flags here
+      return {'name': name}
+    return None
 
-  def _data(self):
-    return idc.Name(self.offset)
+  @classmethod
+  def apply(cls, offset, data):
+    name = data['name']
+    # TODO: flags should be abstructed away from thier enum values to support
+    # changes between versions
+    flags = data['flags']
+    ida_name.set_name(offset, name, flags)

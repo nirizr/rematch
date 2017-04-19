@@ -9,8 +9,9 @@ from . import annotation
 class AssemblyAnnotation(annotation.Annotation):
   type = 'assembly'
 
-  def _data(self):
-    flow_chart = ida_gdl.FlowChart(ida_funcs.get_func(self.offset))
+  @classmethod
+  def _data(cls, offset):
+    flow_chart = ida_gdl.FlowChart(ida_funcs.get_func(offset))
 
     nodes = {}
     for node in flow_chart:
@@ -23,3 +24,8 @@ class AssemblyAnnotation(annotation.Annotation):
       nodes[node.id] = serialized_node
 
     return nodes
+
+  @classmethod
+  def apply(self, offset, data):
+    del offset
+    del data
