@@ -7,8 +7,8 @@ python-targets:
   - 3
 
 requirements:
-  - setup/setup_server.py
-  - setup/setup_idaplugin.py
+  - setup.py
+  - server/requirements.txt
 
 test-warnings: true
 
