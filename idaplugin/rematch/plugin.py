@@ -16,8 +16,8 @@ class RematchPlugin(ida_idaapi.plugin_t):
   wanted_name = "Rematch"
   wanted_hotkey = "Alt-F8"
 
-  def __init__(self):
-    ida_idaapi.plugin_t.__init__(self)
+  def __init__(self, *args, **kwargs):
+    super(RematchPlugin, self).__init__(*args, **kwargs)
 
     self.mainwindow = None
     self.toolbar = None
