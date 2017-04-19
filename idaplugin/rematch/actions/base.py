@@ -1,6 +1,6 @@
 from .. import user, log, netnode, utils
 
-import idaapi
+import ida_kernwin
 import idc
 
 
@@ -23,7 +23,7 @@ class Action(object):
     return self.ui is not None
 
 
-class IDAAction(Action, idaapi.action_handler_t):
+class IDAAction(Action, ida_kernwin.action_handler_t):
   """Actions are objects registered to IDA's interface and added to the
   rematch menu and toolbar"""
 
@@ -37,7 +37,7 @@ class IDAAction(Action, idaapi.action_handler_t):
   def __del__(self):
     super(IDAAction, self).__del__()
     if self._icon:
-      idaapi.free_custom_icon(self._icon)
+      ida_kernwin.free_custom_icon(self._icon)
 
   def get_name(self):
     return self.name
@@ -66,11 +66,11 @@ class IDAAction(Action, idaapi.action_handler_t):
   def get_icon(self):
     if not self._icon:
       image_path = utils.getPluginPath('images', self.get_id() + ".png")
-      self._icon = idaapi.py_load_custom_icon_fn(image_path)
+      self._icon = ida_kernwin.py_load_custom_icon_fn(image_path)
     return self._icon
 
   def get_desc(self):
-    return idaapi.action_desc_t(
+    return ida_kernwin.action_desc_t(
       self.get_id(),
       self.get_text(),
       self,
@@ -95,22 +95,25 @@ class IDAAction(Action, idaapi.action_handler_t):
     return '/'.join(t)
 
   def register(self):
-    r = idaapi.register_action(self.get_desc())
+    r = ida_kernwin.register_action(self.get_desc())
     if not r:
       log('actions').warn("failed registering %s: %s", self, r)
       return
-    idaapi.attach_action_to_menu(
+    ida_kernwin.attach_action_to_menu(
         self.get_action_path(),
         self.get_id(),
-        idaapi.SETMENU_APP)
-    r = idaapi.attach_action_to_toolbar(
+        ida_kernwin.SETMENU_APP)
+    r = ida_kernwin.attach_action_to_toolbar(
         "AnalysisToolBar",
         self.get_id())
     if not r:
       log('actions').warn("registration of %s failed: %s", self, r)
 
   def update(self, ctx):
-    return idaapi.AST_ENABLE if self.enabled(ctx) else idaapi.AST_DISABLE
+    if self.enabled(ctx):
+      return ida_kernwin.AST_ENABLE
+    else:
+      return ida_kernwin.AST_DISABLE
 
   def activate(self, ctx):
     del ctx
@@ -140,7 +143,7 @@ class IDAAction(Action, idaapi.action_handler_t):
     for when delayed actions modify the program and/or plugin state without
     IDA's awareness"""
     iwid_all = 0xFFFFFFFF
-    idaapi.request_refresh(iwid_all)
+    ida_kernwin.request_refresh(iwid_all)
 
 
 class IdbAction(IDAAction):

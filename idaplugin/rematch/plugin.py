@@ -1,6 +1,6 @@
 from idasix import QtCore, QtWidgets
 
-import idaapi
+import ida_idaapi
 
 from . import config, user
 from . import actions
@@ -8,16 +8,16 @@ from . import dialogs
 from . import update
 
 
-class RematchPlugin(idaapi.plugin_t):
+class RematchPlugin(ida_idaapi.plugin_t):
   # Load when IDA starts and don't unload until it exists
-  flags = idaapi.PLUGIN_FIX
+  flags = ida_idaapi.PLUGIN_FIX
   comment = "Rematch"
   help = ""
   wanted_name = "Rematch"
   wanted_hotkey = "Alt-F8"
 
   def __init__(self):
-    idaapi.plugin_t.__init__(self)
+    ida_idaapi.plugin_t.__init__(self)
 
     self.mainwindow = None
     self.toolbar = None
@@ -31,7 +31,7 @@ class RematchPlugin(idaapi.plugin_t):
     update.check_update()
     self.setup()
 
-    return idaapi.PLUGIN_KEEP
+    return ida_idaapi.PLUGIN_KEEP
 
   def setup(self):
     if not self.get_mainwindow():

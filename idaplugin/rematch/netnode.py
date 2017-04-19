@@ -1,10 +1,10 @@
-import idaapi
+import ida_netnode
 
 
 class NetNode(object):
   @property
   def _nn(self):
-    return idaapi.netnode("$rematch", 0, True)
+    return ida_netnode.netnode("$rematch", 0, True)
 
   @property
   def bound_file_id(self):

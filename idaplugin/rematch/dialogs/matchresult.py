@@ -1,4 +1,4 @@
-import idaapi
+import ida_kernwin
 import idc
 
 import json
@@ -194,7 +194,7 @@ class MatchResultDialog(base.BaseDialog):
       remote_item = item
 
     if local_item:
-      idaapi.jumpto(self.get_obj(local_item.api_id)['offset'])
+      ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
 
     if remote_item:
       # TODO: change graph to a "loading..." message
@@ -257,7 +257,7 @@ class MatchResultDialog(base.BaseDialog):
       apply_pbar.setValue(apply_pbar.value() + 1)
 
     # refresh ida's views
-    # _idaapi.refresh_idaview_anyway()
+    # ida_kernwin.refresh_idaview_anyway()
 
   def clear_checks(self):
     root = self.tree.invisibleRootItem()

@@ -1,6 +1,6 @@
 from ..idasix import QtWidgets, QtCore
 
-import idaapi
+import ida_funcs
 import idc
 
 from .. import network
@@ -238,7 +238,7 @@ class QFunctionSelect(QtWidgets.QWidget):
     self.btn.setMaximumWidth(20)
     self.btn.clicked.connect(self.btn_clicked)
 
-    current_func = idaapi.get_func(idc.ScreenEA())
+    current_func = ida_funcs.get_func(idc.ScreenEA())
     if current_func:
       self.set_func(current_func)
 
@@ -261,8 +261,8 @@ class QFunctionSelect(QtWidgets.QWidget):
 
   def btn_clicked(self, checked):
     del checked
-    f = idaapi.choose_func("Choose function to match with database",
-                           self.func.startEA if self.func else 0)
+    f = ida_funcs.choose_func("Choose function to match with database",
+                              self.func.startEA if self.func else 0)
     if f:
       self.set_func(f)
       self.changed.emit()

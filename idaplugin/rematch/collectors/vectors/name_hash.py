@@ -1,4 +1,4 @@
-import idaapi
+import ida_name
 import idc
 
 import hashlib
@@ -12,7 +12,7 @@ class NameHashVector(vector.Vector):
 
   def include(self):
     name = idc.Name(self.offset)
-    return not idaapi.is_uname(name)
+    return not ida_name.is_uname(name)
 
   def _data(self):
     md5 = hashlib.md5()

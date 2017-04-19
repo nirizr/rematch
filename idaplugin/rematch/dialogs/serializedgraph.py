@@ -1,7 +1,7 @@
-import idaapi
+import ida_graph
 
 
-class SerializedGraphDialog(idaapi.GraphViewer):
+class SerializedGraphDialog(ida_graph.GraphViewer):
   def __init__(self, *args, **kwargs):
     title = "Remote Function"
     super(SerializedGraphDialog, self).__init__(title, *args, **kwargs)
