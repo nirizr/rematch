@@ -35,9 +35,12 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     return "<Action: {}, {}>".format(self.get_id(), self.ui_class)
 
   def __del__(self):
-    super(IDAAction, self).__del__()
-    if self._icon:
-      ida_kernwin.free_custom_icon(self._icon)
+    try:
+      super(IDAAction, self).__del__()
+      if self._icon:
+        ida_kernwin.free_custom_icon(self._icon)
+    except AttributeError:
+      pass
 
   def get_name(self):
     return self.name

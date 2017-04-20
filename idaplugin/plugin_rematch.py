@@ -1,4 +1,4 @@
-import rematch
+from . import rematch
 
 
 def PLUGIN_ENTRY():  # noqa: N802

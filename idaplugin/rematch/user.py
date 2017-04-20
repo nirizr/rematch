@@ -26,7 +26,9 @@ class User(dict):
         return
 
       if ('login' in config and 'username' in config['login'] and
-          'password' in config['login'] and 'server' in config['login']):
+          'password' in config['login'] and 'server' in config['login'] and
+          config['login']['username'] and config['login']['password'] and
+          config['login']['server']):
         self.login(config['login']['username'], config['login']['password'],
                    config['login']['server'])
     except exceptions.RematchException:

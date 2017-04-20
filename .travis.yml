@@ -8,8 +8,6 @@ matrix:
   include:
     - python: "2.7"
       env: PROJECT=idaplugin
-    - python: "3.5"
-      env: PROJECT=idaplugin
     - python: "2.7"
       env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.debug'
     - python: "3.5"
@@ -30,21 +28,24 @@ before_install:
     - git submodule update --init --recursive
 
 install:
+  - set +vx;
+    if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi;
+    bash ./miniconda.sh -b -p ${HOME}/miniconda;
+    export PATH=${HOME}/miniconda/bin:$PATH;
+    conda info -a;
+    conda update --yes conda;
   - if [ ${PROJECT} = "server" ]; then
-      set +vx;
-      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      fi;
-      bash ./miniconda.sh -b -p ${HOME}/miniconda;
-      export PATH=${HOME}/miniconda/bin:$PATH;
-      conda info -a;
-      conda update --yes conda;
       conda install --yes python=${TRAVIS_PYTHON_VERSION} atlas numpy scipy scikit-learn;
     fi;
+  - if [ ${PROJECT} = "idaplugin" ]; then
+      conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
+    fi;
   - if [ -f ${PROJECT}/requirements.txt ]; then pip install -r ${PROJECT}/requirements.txt ; fi
-  - if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt ; fi
+  - if [ -f tests/${PROJECT}/requirements.txt ]; then pip install -r tests/${PROJECT}/requirements.txt ; fi
   - pip install flake8
   - pip install pytest-cov coveralls
 
@@ -54,7 +55,7 @@ before_script:
 script:
   - flake8 ./${PROJECT} --show-source --statistics
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi
-  - if [ -d ./tests/${PROJECT} ]; then py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi
+  - if [ -d ./tests/${PROJECT} ]; then PYTHONPATH=. py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi
 
 after_script:
   - if [ -d ./tests/${PROJECT} ]; then coveralls ; fi
