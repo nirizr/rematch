@@ -102,6 +102,9 @@ def query(method, url, server=None, token=None, params=None, json=False):
     raise exceptions.QueryException()
 
   server_url = get_server(server)
+  if not server_url:
+    raise exceptions.QueryException()
+
   full_url = server_url + url
   headers = get_headers(token, json)
 
@@ -138,16 +141,14 @@ def get_server(server):
   """getting and finalzing server address"""
 
   try:
-   if not server:
-    if 'server' not in config and not config['login']['server']:
-      raise exceptions.QueryException()
-    server = config['login']['server']
-   if not (server.startswith("http://") or server.startswith("http://")):
-     server = "http://" + server
-   if not server.endswith("/"):
-     server = server + "/"
+    if not server and 'login' in config and config['login']['server']:
+      server = config['login']['server']
+    if not (server.startswith("http://") or server.startswith("http://")):
+      server = "http://" + server
+    if not server.endswith("/"):
+      server = server + "/"
   except Exception:
-    log('network').exception("Failed generating server aadress")
+    log('network').exception("Failed generating server address")
   return server
 
 
