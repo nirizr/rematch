@@ -62,11 +62,15 @@ install:
         pip install -r "${PROJECT}/requirements.txt" ;
       fi ;
     fi ;
-  - pip install flake8 coveralls pytest-cov ;
+  - pip install flake8
+  - pip install prospector "pylint!=1.7.0,!=1.7.1"
+  - pip install pytest-cov coveralls
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
+  - prospector ./${PROJECT} --profile ./landscape.yml --profile-path ./
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
+  - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./landscape.yml --profile-path ./ ; fi
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ;
