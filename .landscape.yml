@@ -10,7 +10,6 @@ python-targets:
   - 3
 
 requirements:
-  - setup.py
   - server/requirements.txt
 
 pylint:
