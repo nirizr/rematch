@@ -25,5 +25,5 @@ class PrototypeAnnotation(annotation.Annotation):
   def apply(cls, offset, data):
     prototype = data['prototype']
     if idc.SetType(offset, prototype) is None:
-      log('annotation_prototype').warn("Setting prototype failed at {} with {}"
-                                       "".format(offset, data))
+      log('annotation_prototype').warn("Setting prototype failed at %s with "
+                                       "%s", offset, data)
