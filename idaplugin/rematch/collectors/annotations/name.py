@@ -11,7 +11,7 @@ class NameAnnotation(annotation.Annotation):
     name = ida_name.get_name(offset)
     if ida_name.is_uname(name):
       # TODO: get flags here
-      return {'name': name}
+      return {'name': name, 'flags': 0}
     return None
 
   @classmethod
