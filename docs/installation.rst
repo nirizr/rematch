@@ -17,6 +17,12 @@ admin console.
   confidential data will be kept on servers only accessible to those with
   permission to access said data. See Privacy section for more details.
 
+.. tip:: Windows based server installtions are possible but not recommended.
+  Some packages (scikit-learn, numpy, scipy) are required by the server but are
+  more complicated to install on windows. Windows Subsystem for Linux may ease
+  the installation process. Using Anaconda for python package management may
+  also be helpful.
+
 Installing Rematch server docker container
 ++++++++++++++++++++++++++++++++++++++++++
 
