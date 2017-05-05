@@ -35,8 +35,15 @@ class NetNode(object):
            "\nclick Yes to bind current server. no to proceed as if file was "
            "never bound or once to proceed just once using current server."
            "".format(config['login']['server'], bound_server))
-    ida_kernwin.askbuttons_c("Yes", "No", "Once", 1, msg)
-    # TODO: ask user if server change is acceptable: Yes, No, Once
+    r = ida_kernwin.askbuttons_c("Yes", "No", "Once", ida_kernwin.ASKBTN_YES,
+                                 msg)
+    if r == ida_kernwin.ASKBTN_YES:
+      self.bind_server()
+      return True
+    elif r == ida_kernwin.ASKBTN_BTN3:
+      return True
+    elif r == ida_kernwin.ASKBTN_NO:
+      return False
 
   @bound_file_id.setter
   def bound_file_id(self, file_id):
