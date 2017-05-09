@@ -68,9 +68,9 @@ install:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
-  - prospector ./${PROJECT} --profile ./landscape.yml --profile-path ./
+  - prospector ./${PROJECT} --profile ./prospector.yml --profile-path ./
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
-  - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./landscape.yml --profile-path ./ ; fi
+  - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./prospector.yml --profile-path ./ ; fi
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ;

@@ -1,0 +1,23 @@
+uses:
+  - django
+  - celery
+
+python-targets:
+  - 2
+  - 3
+
+requirements:
+  - setup.py
+  - server/requirements.txt
+
+test-warnings: true
+
+pylint:
+  disable:
+    - bad-indentation
+    - import-error
+  options:
+    max-args: 8
+pep8:
+  disable:
+    - E114
