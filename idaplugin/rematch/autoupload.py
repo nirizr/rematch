@@ -1,26 +1,34 @@
-import idc
 import idaapi
 
-from . import network
 from . import actions
 
 
-class AddFileSilentUI(actions.base.Action):
-  pass
+def silent_ui(calls):
+  def silent(reject_handler=None, submit_handler=None, response_handler=None,
+             exception_handler=None):
+    for handler, kwargs in calls:
+      if handler == 'reject':
+        reject_handler(**kwargs)
+      elif handler == 'submit':
+        submit_handler(**kwargs)
+      elif handler == 'response':
+        response_handler(**kwargs)
+      elif handler == 'exception':
+        exception_handler(**kwargs)
 
-
-class MatchSilentUI(actions.base.Action):
-  pass
+  return silent
 
 
 def main():
   # add file
-  actions.project.AddFileAction(AddFileSilentUI)
+  add_file_silent = silent_ui([['submit', {}],
+                               ['response', {}]])
+  actions.project.AddFileAction(add_file_silent)
   description = "Automatically collected / uploaded by autoupload.py"
   ##############
 
   # upload data
-  actions.match.MatchAction(MatchSilentUI)
+  #actions.match.MatchAction(MatchSilentUI)
 
 
 if __name__ == "__main__":
