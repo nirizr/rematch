@@ -32,7 +32,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     self._icon = None
 
   def __repr__(self):
-    return "<Action: {}, {}>".format(self.get_id(), self.ui_class)
+    return "<{}: {}>".format(self.__class__.__name__, self.ui_class)
 
   def __del__(self):
     try:

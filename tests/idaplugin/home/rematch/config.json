@@ -1,0 +1,26 @@
+{
+    "debug": true,
+    "login": {
+        "password": "",
+        "server": "https://devnull-as-a-service.com/",
+        "username": ""
+    },
+    "network": {
+        "threadcount": 10
+    },
+    "pypi": {
+        "package": "rematch-idaplugin",
+        "server": "http://pypi.python.org"
+    },
+    "settings": {
+        "login": {
+            "autologin": true,
+            "autologout": false
+        },
+        "update": {
+            "autocheck": true,
+            "autoupdate": true,
+            "skipped": []
+        }
+    }
+}

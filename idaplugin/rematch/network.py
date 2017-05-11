@@ -143,7 +143,7 @@ def get_server(server):
   try:
     if not server and 'login' in config and config['login']['server']:
       server = config['login']['server']
-    if not (server.startswith("http://") or server.startswith("http://")):
+    if not (server.startswith("http://") or server.startswith("https://")):
       server = "http://" + server
     if not server.endswith("/"):
       server = server + "/"
