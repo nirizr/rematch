@@ -19,12 +19,17 @@ def silent_ui(calls):
   return silent
 
 
+class AddFileDialog(dialogs.silent.SilentDialog):
+  calls = [['submit', {}],
+           ['response', {}]]
+
+
 def main():
   # add file
   add_file_silent = silent_ui([['submit', {}],
                                ['response', {}]])
-  actions.project.AddFileAction(add_file_silent)
-  description = "Automatically collected / uploaded by autoupload.py"
+  actions.project.AddFileAction(add_file_silent).activate()
+  #description = "Automatically collected / uploaded by autoupload.py"
   ##############
 
   # upload data
