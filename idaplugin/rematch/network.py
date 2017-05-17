@@ -132,9 +132,7 @@ def query(method, url, server=None, token=None, params=None, json=False):
     log('network').info("[response] %s", return_obj)
     return return_obj
   except Exception as ex:
-    rematch_ex = exceptions.factory(ex)
-    log('network').exception(rematch_ex)
-    raise rematch_ex
+    exceptions.factory(ex)
 
 
 def get_server(server):
