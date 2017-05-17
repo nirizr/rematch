@@ -55,5 +55,6 @@ def test_action_creation(idapro_action_entry, idapro_app):
       action.activate(ctx)
       time.sleep(1)
       idapro_app.processEvents()
-  except idaplugin.rematch.exceptions.NotFoundException:
+  except (idaplugin.rematch.exceptions.NotFoundException,
+          idaplugin.rematch.exceptions.ConnectionException):
     pass
