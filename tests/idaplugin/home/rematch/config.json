@@ -10,7 +10,7 @@
     },
     "pypi": {
         "package": "rematch-idaplugin",
-        "server": "http://pypi.python.org"
+        "server": "http://testpypi.python.org"
     },
     "settings": {
         "login": {

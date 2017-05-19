@@ -1,6 +1,17 @@
 import time
 import sys
 import idaplugin
+import os
+
+
+original_getppluginbase = idaplugin.rematch.utils.getPluginBase
+
+
+def getpluginbase_mock(*path):
+  return os.path.join("./tests/idaplugin/home/idaplugin", *path)
+
+
+idaplugin.rematch.utils.getPluginBase = getpluginbase_mock
 
 
 class capture_exceptions(object):
@@ -58,3 +69,9 @@ def test_action_creation(idapro_action_entry, idapro_app):
   except (idaplugin.rematch.exceptions.NotFoundException,
           idaplugin.rematch.exceptions.ConnectionException):
     pass
+
+
+def test_update(idapro_app):
+  idaplugin.rematch.update.check_update()
+  time.sleep(1)
+  idapro_app.processEvents()

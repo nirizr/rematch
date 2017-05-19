@@ -31,7 +31,8 @@ def check_update():
 
 def handle_update(response):
   local_version = StrictVersion(__version__)
-  remote_version = StrictVersion(response['info']['version'])
+  raw_remote_version = response['info']['version']
+  remote_version = StrictVersion(raw_remote_version)
   log('update').info("local version: %s, latest version: %s", local_version,
                         remote_version)
 
@@ -63,7 +64,7 @@ def handle_update(response):
       return
 
   # get latest version's package url
-  new_release = response['releases'][str(remote_version)]
+  new_release = response['releases'][raw_remote_version]
   new_url = new_release[0]['url']
   update_version(new_url)
 
@@ -86,6 +87,9 @@ def update_version(url):
       source = os.path.join(temp_dir, *filename.split('/'))
       target_file_parts = filename.split(PACKAGE_PATH, 1)[1].split('/')
       target = utils.getPluginBase(*target_file_parts)
+      targetdir = os.path.dirname(target)
+      if not os.path.exists(targetdir):
+        os.makedirs(targetdir)
       shutil.move(source, target)
   finally:
     temp_zip.close()
