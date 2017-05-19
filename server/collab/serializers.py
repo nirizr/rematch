@@ -110,7 +110,7 @@ class InstanceVectorSerializer(InstanceSerializer):
 
     obj = self.Meta.model.objects.create(**validated_data)
     vectors = (Vector(instance=obj, file_version=file_version,
-                      file=file_version.file, **vector_data)
+                      **vector_data)
                for vector_data in vectors_data)
     Vector.objects.bulk_create(vectors)
     annotations = (Annotation(instance=obj, **annotation_data)
