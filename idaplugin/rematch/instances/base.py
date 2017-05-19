@@ -9,8 +9,8 @@ class BaseInstance(object):
     self.annotations = {collectors.annotations.NameAnnotation}
 
   def serialize(self):
-    vectors = list(collectors.collect(self.offset, self.vectors))
-    annotations = list(collectors.collect(self.offset, self.annotations))
+    vectors = list(collectors.collect(self.vectors, self.offset))
+    annotations = list(collectors.collect(self.annotations, self.offset))
 
     return {"file_version": self.file_version, "type": self.type,
             "offset": self.offset, "vectors": vectors,
