@@ -8,7 +8,7 @@ class NameAnnotation(annotation.Annotation):
 
   @classmethod
   def _data(cls, offset):
-    name = ida_name.get_name(offset)
+    name = ida_name.get_name(-1, offset)
     if ida_name.is_uname(name):
       # TODO: get flags here
       return {'name': name, 'flags': 0}
