@@ -9,7 +9,7 @@ class PrototypeAnnotation(annotation.Annotation):
   type = 'prototype'
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     t = ida_typeinf.idc_get_type(offset)
     # if failed getting type, there's no annotation here
     if t is None:

@@ -11,7 +11,7 @@ class MnemonicHistVector(vector.Vector):
   type_version = 0
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     instruction_hist = defaultdict(int)
 
     for ea in idautils.FuncItems(offset):

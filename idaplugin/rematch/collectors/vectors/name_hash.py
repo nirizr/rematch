@@ -11,7 +11,7 @@ class NameHashVector(vector.Vector):
   type_version = 0
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     name = idc.Name(offset)
     if ida_name.is_uname(name):
       return hashlib.md5(name).hexdigest()

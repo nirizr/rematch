@@ -11,7 +11,7 @@ class MnemonicHashVector(vector.Vector):
   type_version = 0
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     md5 = hashlib.md5()
     for ea in idautils.FuncItems(offset):
       mnem_line = idc.GetMnem(ea)

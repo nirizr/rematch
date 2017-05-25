@@ -22,7 +22,7 @@ class IdentityHashVector(vector.Vector):
     return h
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     h = cls.keleven
     for ea in idautils.FuncItems(offset):
       h = cls._cycle(h, idc.Byte(ea))

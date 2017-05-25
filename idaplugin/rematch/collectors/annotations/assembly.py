@@ -10,7 +10,7 @@ class AssemblyAnnotation(annotation.Annotation):
   type = 'assembly'
 
   @classmethod
-  def _data(cls, offset):
+  def data(cls, offset):
     flow_chart = ida_gdl.FlowChart(ida_funcs.get_func(offset))
 
     nodes = {}
