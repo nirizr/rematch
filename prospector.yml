@@ -1,3 +1,5 @@
+strictness: medium
+
 uses:
   - django
   - celery
