@@ -54,6 +54,20 @@ class NotFoundException(QueryException):
              "server error.")
 
 
+class InputErrorException(QueryException):
+  message = ("An input error detected by the server, please adjust provided "
+             "input and retry again. Please report a reproducable bug if "
+             "this issue persists.")
+
+  def __init__(self, response, code, **kwargs):
+    super(InputErrorException, self).__init__(**kwargs)
+    self._response = response
+    self._code = code
+
+  def errors(self):
+    return self._response.items()
+
+
 def factory(ex):
   if isinstance(ex, HTTPError):
     response_text = ex.read()
@@ -85,5 +99,6 @@ def handle_400(resp):
     for errors in resp.values():
       if any("Invalid pk" in error for error in errors):
         return UnknownObjectReferenceException
+    return InputErrorException
   else:
     return QueryException

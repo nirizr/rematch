@@ -81,9 +81,9 @@ class BaseDialog(QtWidgets.QDialog):
       self.accept()
 
   def exception_base(self, exception):
-    if hasattr(exception, 'response'):
+    if hasattr(exception, 'errors'):
       errors = ("{}: {}".format(k, ", ".join(v))
-                for k, v in exception.response.items())
+                for k, v in exception.errors())
       exception_string = "\t" + "\n\t".join(errors)
     elif hasattr(exception, 'message'):
       exception_string = exception.message
