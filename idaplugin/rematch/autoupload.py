@@ -1,6 +1,7 @@
 import idaapi
 
 from . import actions
+from . import dialogs
 
 
 def silent_ui(calls):
@@ -29,11 +30,7 @@ def main():
   add_file_silent = silent_ui([['submit', {}],
                                ['response', {}]])
   actions.project.AddFileAction(add_file_silent).activate()
-  #description = "Automatically collected / uploaded by autoupload.py"
-  ##############
-
-  # upload data
-  #actions.match.MatchAction(MatchSilentUI)
+  # description = "Automatically collected / uploaded by autoupload.py"
 
 
 if __name__ == "__main__":
