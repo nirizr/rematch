@@ -1,15 +1,15 @@
 from ..idasix import QtWidgets
 
-from . import base
+from . import gui, widgets
 from .. import netnode
 
 
-class MatchDialog(base.BaseDialog):
+class MatchDialog(gui.GuiDialog):
   def __init__(self, **kwargs):
     super(MatchDialog, self).__init__(title="Match", **kwargs)
 
-    self.source_single = base.QFunctionSelect()
-    self.source_range = base.QFunctionRangeSelect()
+    self.source_single = widgets.QFunctionSelect()
+    self.source_range = widgets.QFunctionRangeSelect()
     lbl = QtWidgets.QLabel("")
     lbl.setDisabled(True)
     lbl.setToolTip("Matching only user functions functionality is not "
@@ -19,21 +19,21 @@ class MatchDialog(base.BaseDialog):
                ("User functions", 'user', lbl),
                ("Single function", 'single', self.source_single),
                ("Range", 'range', self.source_range)]
-    self.sourceGrp = base.QRadioGroup("Match source", *choices)
+    self.sourceGrp = widgets.QRadioGroup("Match source", *choices)
     self.base_layout.addWidget(self.sourceGrp)
 
-    self.target_project = base.QItemSelect('projects', allow_none=False)
-    self.target_file = base.QItemSelect('files', allow_none=False,
-                                        exclude=[netnode.bound_file_id])
+    self.target_project = widgets.QItemSelect('projects', allow_none=False)
+    self.target_file = widgets.QItemSelect('files', allow_none=False,
+                                           exclude=[netnode.bound_file_id])
     choices = [("Entire DB", 'db', None),
                ("Project", 'project', self.target_project),
                ("Another file", 'file', self.target_file)]
-    self.targetGrp = base.QRadioGroup("Match target", *choices)
+    self.targetGrp = widgets.QRadioGroup("Match target", *choices)
     self.base_layout.addWidget(self.targetGrp)
 
-    self.matchers = base.QItemCheckBoxes(item='matches/matchers',
-                                         name_field='matcher_name',
-                                         id_field='match_type')
+    self.matchers = widgets.QItemCheckBoxes(item='matches/matchers',
+                                            name_field='matcher_name',
+                                            id_field='match_type')
 
     method_gbx = QtWidgets.QGroupBox("Match methods")
     method_gbx.setLayout(self.matchers)

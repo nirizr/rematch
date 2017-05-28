@@ -5,7 +5,7 @@ import json
 
 from .. idasix import QtGui, QtWidgets, QtCore
 
-from . import base
+from . import gui, widgets
 from .. import network
 from .. import exceptions
 
@@ -13,63 +13,7 @@ from . import resultscript
 from . import serializedgraph
 
 
-class MatchTreeWidgetItem(QtWidgets.QTreeWidgetItem):
-  def __init__(self, api_id, *args, **kwargs):
-    super(MatchTreeWidgetItem, self).__init__(*args, **kwargs)
-    self.api_id = api_id
-
-  def __lt__(self, other):
-    column = self.treeWidget().sortColumn()
-    if self.childCount() == 0 and other.childCount() == 0:
-      try:
-        return float(self.text(column)) < float(other.text(column))
-      except ValueError:
-        return self.text(column) < other.text(column)
-    elif self.childCount() == 0 and other.childCount() > 0:
-      return True
-    elif self.childCount() > 0 and other.childCount() == 0:
-      return False
-    else:
-      my_biggest_child = self.biggest_child()
-      other_biggest_child = other.biggest_child()
-      return my_biggest_child < other_biggest_child
-
-  def biggest_child(self):
-    return max(self.child(i) for i in range(self.childCount()))
-
-
-class SearchTreeWidget(QtWidgets.QTreeWidget):
-  def __init__(self, search_box, match_column, *args, **kwargs):
-    super(SearchTreeWidget, self).__init__(*args, **kwargs)
-    self.search_box = search_box
-    self.match_column = match_column
-    self.search_box.textEdited.connect(self.search)
-    self.search_box.returnPressed.connect(self.search)
-
-  def keyPressEvent(self, event):
-    if event.text():
-      self.search_box.keyPressEvent(event)
-    else:
-      super(SearchTreeWidget, self).keyPressEvent(event)
-
-  def search(self, _=None):
-    del _
-
-    text = self.search_box.text().lower()
-    start = self.currentItem()
-    it = QtWidgets.QTreeWidgetItemIterator(self.currentItem())
-    it += 1
-    while it.value() != start:
-      if it.value() is None:
-        it = QtWidgets.QTreeWidgetItemIterator(self.topLevelItem(0))
-      if text in it.value().text(self.match_column).lower():
-        self.setCurrentItem(it.value())
-        self.scrollToItem(it.value())
-        return
-      it += 1
-
-
-class MatchResultDialog(base.BaseDialog):
+class MatchResultDialog(gui.GuiDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
@@ -122,8 +66,8 @@ class MatchResultDialog(base.BaseDialog):
 
     # matches tree
     self.search_box = QtWidgets.QLineEdit()
-    self.tree = SearchTreeWidget(search_box=self.search_box,
-                                 match_column=self.MATCH_NAME_COLUMN)
+    self.tree = widgets.SearchTreeWidget(search_box=self.search_box,
+                                         match_column=self.MATCH_NAME_COLUMN)
 
     # tree columns
     self.tree.setHeaderLabels(("Function", "Score", "Doc. Score", "Engine"))
@@ -349,7 +293,7 @@ class MatchResultDialog(base.BaseDialog):
     item_id = item_obj['id']
     item_name = item_obj['name']
 
-    tree_item = MatchTreeWidgetItem(item_id, parent_item)
+    tree_item = widgets.MatchTreeWidgetItem(item_id, parent_item)
     item_flags = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
     if match_obj:
       item_flags |= QtCore.Qt.ItemIsUserCheckable

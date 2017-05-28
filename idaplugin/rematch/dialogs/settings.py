@@ -1,10 +1,10 @@
 from ..idasix import QtWidgets
 
-from . import base
+from . import gui
 from .. import config
 
 
-class SettingsDialog(base.BaseDialog):
+class SettingsDialog(gui.GuiDialog):
   def __init__(self, **kwargs):
     super(SettingsDialog, self).__init__(title="Settings", **kwargs)
 

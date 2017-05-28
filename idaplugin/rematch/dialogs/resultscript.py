@@ -2,11 +2,11 @@ import os
 
 from ..idasix import QtWidgets
 
-from . import base
+from . import gui
 from .. import utils
 
 
-class ResultScriptDialog(base.BaseDialog):
+class ResultScriptDialog(gui.GuiDialog):
   def __init__(self, *args, **kwargs):
     super(ResultScriptDialog, self).__init__("Result script", *args, **kwargs)
 

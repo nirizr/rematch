@@ -2,11 +2,11 @@ from ..idasix import QtWidgets
 
 import idc
 
-from . import base
+from . import gui, widgets
 from .. import netnode
 
 
-class AddProjectDialog(base.BaseDialog):
+class AddProjectDialog(gui.GuiDialog):
   def __init__(self, **kwargs):
     super(AddProjectDialog, self).__init__(title="Add Project", **kwargs)
 
@@ -39,7 +39,7 @@ class AddProjectDialog(base.BaseDialog):
             'bind_current': self.bindCurrentCkb.isChecked()}
 
 
-class AddFileDialog(base.BaseDialog):
+class AddFileDialog(gui.GuiDialog):
   def __init__(self, **kwargs):
     super(AddFileDialog, self).__init__(title="Add File", **kwargs)
 
@@ -53,7 +53,7 @@ class AddFileDialog(base.BaseDialog):
     gridLyt.addWidget(QtWidgets.QLabel("Description:"), 2, 0)
     gridLyt.addWidget(QtWidgets.QLabel("MD5 hash:"), 3, 0)
 
-    self.projectCbb = base.QItemSelect('projects')
+    self.projectCbb = widgets.QItemSelect('projects')
     gridLyt.addWidget(self.projectCbb, 0, 1)
 
     self.nameTxt = QtWidgets.QLineEdit()
