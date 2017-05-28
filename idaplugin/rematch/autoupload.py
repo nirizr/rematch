@@ -1,19 +1,34 @@
 import idaapi
 
-from . import actions
-from . import dialogs
+try:
+  import rematch.actions as actions
+  import rematch.dialogs as dialogs
+except ImportError:
+  from . import actions
+  from . import dialogs
 
 
 def main():
   # add file
-  add_file_silent = dialogs.silent.SilentDialog([['submit', {}],
-                                                 ['response', {}]])
-  actions.project.AddFileAction(add_file_silent).activate(None)
   description = "Automatically collected / uploaded by autoupload.py"
-  ##############
+  calls = [('submit', {'project': -1, 'name': "filename", 'md5hash': "hash",
+                       'description': description, 'shareidb': True})]
+  add_file_silent = dialogs.silent.SilentDialog(calls)
+  actions.project.AddFileAction(add_file_silent).activate(None)
 
-  # upload data
-  # actions.match.MatchAction(MatchSilentUI)
+  ##############
+  # skipped: add a project for file
+  calls = [('submit', {'name': "proj_name", 'description': description,
+                       'private': False, 'bind_current': True})]
+  add_file_silent = dialogs.silent.SilentDialog(calls)
+
+  # upload data and start matching
+  calls = [('submit', {'source': 'idb', 'source_single': None,
+                       'source_range': None, 'target': 'db',
+                       'target_project': None, 'target_file': None,
+                       'matchers': None})]
+  match_silent = dialogs.silent.SilentDialog(calls)
+  actions.match.MatchAction(match_silent).activate(None)
 
 
 if __name__ == "__main__":
