@@ -1,3 +1,4 @@
+from .. import log
 from .base import BaseDialog
 
 
@@ -14,15 +15,22 @@ class SilentDialog(BaseDialog):
 
   def show(self):
     for handler, kws in self.calls:
+      response = None
+      log('silent_dialog').info("dispatching silent dialog action %s: %s",
+                                handler, kws)
       if handler == 'reject':
-        self.reject_base(**kws)
+        response = self.reject_base(**kws)
       elif handler == 'submit':
         self.data_value = kws
-        self.submit_base()
+        response = self.submit_base()
       elif handler == 'response':
-        self.response_base(**kws)
+        response = self.response_base(**kws)
       elif handler == 'exception':
-        self.exception_base(**kws)
+        response = self.exception_base(**kws)
+      else:
+        log('silent_dialog').error("failed resolving handler")
+
+      log('silent_dialog').info("response: %s", response)
 
   def data(self):
     return self.data_value
