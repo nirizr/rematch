@@ -25,8 +25,10 @@ Goal of REmatch
 
 The goal of REmatch is to act as a maintained, extendable, open source tool
 for advanced assembly function-level binary comparison and matching. 
-Hopefully, this will be a completely open source and free (as in speech) 
-community-driven tool.
+Rematch will be a completely open source and free (as in speech) 
+community-driven tool. We support buttom-up organizational methods and desire
+Rematch to be heavily influenced by it's users (both in decision making and
+development).
 
 We've noticed that although there are more than several existing binary
 matching tools, there's no one tool that provides all of the following:
