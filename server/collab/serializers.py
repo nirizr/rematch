@@ -76,11 +76,20 @@ class SimpleInstanceSerializer(serializers.ModelSerializer):
 class InstanceSerializer(serializers.ModelSerializer):
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
+  name = serializers.SerializerMethodField()
 
   class Meta:
     model = Instance
-    fields = ('id', 'owner', 'file', 'file_version', 'type', 'offset',
+    fields = ('id', 'owner', 'file', 'file_version', 'type', 'name', 'offset',
               'vectors', 'annotations')
+
+  @staticmethod
+  def get_name(instance):
+    try:
+      annotation = Annotation.objects.values_list('data')
+      return annotation.get(instance=instance, type='name')[0]
+    except Annotation.DoesNotExist:
+      return "sub_{:X}".format(instance.offset)
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
