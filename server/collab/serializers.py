@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
                            Annotation, Match)
+import json
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -68,7 +69,9 @@ class SimpleInstanceSerializer(serializers.ModelSerializer):
   def get_name(instance):
     try:
       annotation = Annotation.objects.values_list('data')
-      return annotation.get(instance=instance, type='name')[0]
+      annotation_data = annotation.get(instance=instance, type='name')[0]
+      name = json.loads(annotation_data)['name']
+      return name
     except Annotation.DoesNotExist:
       return "sub_{:X}".format(instance.offset)
 
@@ -87,7 +90,9 @@ class InstanceSerializer(serializers.ModelSerializer):
   def get_name(instance):
     try:
       annotation = Annotation.objects.values_list('data')
-      return annotation.get(instance=instance, type='name')[0]
+      annotation_data = annotation.get(instance=instance, type='name')[0]
+      name = json.loads(annotation_data)['name']
+      return name
     except Annotation.DoesNotExist:
       return "sub_{:X}".format(instance.offset)
 
