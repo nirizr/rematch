@@ -128,9 +128,11 @@ def query(method, url, server=None, token=None, params=None, json=False):
     response = opener.open(request)
 
     # return response
-    return_obj = loads(response.read()) if json else response.read()
-    log('network').info("[response] %s", return_obj)
-    return return_obj
+    response_obj = response.read()
+    log('network').info("[response] %s", response_obj)
+    if json:
+      response_obj = loads(response_obj)
+    return response_obj
   except Exception as ex:
     exceptions.factory(ex)
 
