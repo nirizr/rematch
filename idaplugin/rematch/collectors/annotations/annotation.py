@@ -1,8 +1,12 @@
-from .. import collector
+import json
 
 
-class Annotation(collector.Collector):
+class Annotation(object):
   @classmethod
   def collect(cls, offset, instance_id=None):
-    return {"instance": instance_id, "type": cls.type,
-            "data": cls.data(offset)}
+    data = cls.data(offset)
+    if not data:
+      return None
+
+    data = json.dumps(data)
+    return {"instance": instance_id, "type": cls.type, "data": data}

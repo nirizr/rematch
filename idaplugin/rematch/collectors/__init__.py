@@ -1,4 +1,3 @@
-from .collector import Collector
 from . import vectors
 from . import annotations
 from .. import log
@@ -21,4 +20,4 @@ def apply(collectors, offset, data):
       collector.apply(offset, data)
 
 
-__all__ = ["collect", "apply", "Collector", "vectors", "annotations"]
+__all__ = ["collect", "apply", "vectors", "annotations"]
