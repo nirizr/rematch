@@ -3,10 +3,13 @@ from .assembly_hash import AssemblyHashMatcher
 from .mnemonic_hash import MnemonicHashMatcher
 from .name_hash import NameHashMatcher
 from .mnemonic_hist import MnemonicHistogramMatcher
+from .fnv_hash import FnvHashMatcher
 
 
 matchers_list = [IdentityHashMatcher, NameHashMatcher, AssemblyHashMatcher,
-                 MnemonicHashMatcher, MnemonicHistogramMatcher]
+                 MnemonicHashMatcher, MnemonicHistogramMatcher,
+                 FnvHashMatcher, ]
 
 __all__ = ['IdentityHashMatcher', 'AssemblyHashMatcher', 'MnemonicHashMatcher',
-           'NameHashMatcher', 'MnemonicHistogramMatcher', 'matchers_list']
+           'NameHashMatcher', 'MnemonicHistogramMatcher', 'matchers_list',
+           'FnvHashMatcher', ]
