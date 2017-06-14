@@ -11,10 +11,9 @@ class MDIndexVector(vector.Vector):
 
   @classmethod
   def data(cls, offset):
-    # we're assuming offset is actually a function
-    # which has boundaries
-    # this goes to every other Hashing Vector
-    # so this assumption is reasonable.
+    # we're assuming offset is actually a function which has boundaries,
+    # this assumption is reasonable as we assume the underlying framework
+    # (IDA, Binja, r2), iterates only over functions.
     fn = idaapi.get_func(offset)
     bbs = ida_gdl.FlowChart(fn)
 
