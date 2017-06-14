@@ -105,7 +105,8 @@ class RematchPlugin(ida_idaapi.plugin_t):
       self.statusbar_timer.stop()
       self.statusbar_timer = None
 
-    if config['settings']['login']['autologout']:
+    if ('token' in config['login'] and
+        config['settings']['login']['autologout']):
       del config['login']['token']
     config.save()
 
