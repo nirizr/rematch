@@ -4,7 +4,8 @@ from .name_hash import NameHashVector
 from .assembly_hash import AssemblyHashVector
 from .mnemonic_hash import MnemonicHashVector
 from .mnemonic_hist import MnemonicHistVector
-
+from .fnv import FnvHashVector
 
 __all__ = ["Vector", "IdentityHashVector", "NameHashVector",
-           "AssemblyHashVector", "MnemonicHashVector", "MnemonicHistVector"]
+           "AssemblyHashVector", "MnemonicHashVector", "MnemonicHistVector",
+           "FnvHashVector", ]
