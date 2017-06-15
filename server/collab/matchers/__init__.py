@@ -5,6 +5,7 @@ from .name_hash import NameHashMatcher
 from .mnemonic_hist import MnemonicHistogramMatcher
 from .fnv_hash import FnvHashMatcher
 from .apidom_hash import ApiDominatorMatcher
+from .fuzzy_hash import FuzzyHashMatcher
 
 
 matchers_list = [IdentityHashMatcher, NameHashMatcher, AssemblyHashMatcher,
@@ -13,4 +14,4 @@ matchers_list = [IdentityHashMatcher, NameHashMatcher, AssemblyHashMatcher,
 
 __all__ = ['IdentityHashMatcher', 'AssemblyHashMatcher', 'MnemonicHashMatcher',
            'NameHashMatcher', 'MnemonicHistogramMatcher', 'matchers_list',
-           'FnvHashMatcher', 'ApiDominatorMatcher', ]
+           'FnvHashMatcher', 'ApiDominatorMatcher', 'FuzzyHashMatcher', ]
