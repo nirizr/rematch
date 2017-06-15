@@ -19,5 +19,5 @@ class FunctionInstance(EmptyFunctionInstance):
                      collectors.vectors.AssemblyHashVector,
                      collectors.vectors.MnemonicHashVector,
                      collectors.vectors.MnemonicHistVector,
-                     collectors.vectors.FnvHhashVector, }
+                     collectors.vectors.FnvHashVector, }
     self.annotations |= {collectors.annotations.AssemblyAnnotation}
