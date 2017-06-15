@@ -19,12 +19,12 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
 
     # create nodes
     local_ids = {}
-    for node in self.nodes.values():
+    for node in self.nodes:
       node_text = "\n".join(node['assembly'])
       local_id = self.AddNode((str(node_text), 0xffffff))
       local_ids[node['id']] = local_id
 
-    for node in self.nodes.values():
+    for node in self.nodes:
       local_id = local_ids[node['id']]
       for succ in node['successive']:
         successive_id = local_ids[succ]
