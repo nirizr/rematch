@@ -58,24 +58,6 @@ class TaskEditSerializer(TaskSerializer):
   matchers = serializers.ReadOnlyField()
 
 
-class SimpleInstanceSerializer(serializers.ModelSerializer):
-  name = serializers.SerializerMethodField()
-
-  class Meta:
-    model = Instance
-    fields = ('id', 'file_version', 'type', 'name', 'offset')
-
-  @staticmethod
-  def get_name(instance):
-    try:
-      annotation = Annotation.objects.values_list('data')
-      annotation_data = annotation.get(instance=instance, type='name')[0]
-      name = json.loads(annotation_data)['name']
-      return name
-    except Annotation.DoesNotExist:
-      return "sub_{:X}".format(instance.offset)
-
-
 class InstanceSerializer(serializers.ModelSerializer):
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
@@ -104,6 +86,10 @@ class AnnotationSerializer(serializers.ModelSerializer):
 
 
 class InstanceVectorSerializer(InstanceSerializer):
+  owner = serializers.ReadOnlyField(source='owner.username')
+  file = serializers.ReadOnlyField(source='file_version.file_id')
+  name = serializers.SerializerMethodField()
+
   class NestedVectorSerializer(serializers.ModelSerializer):
     class Meta:
       model = Vector
@@ -131,6 +117,14 @@ class InstanceVectorSerializer(InstanceSerializer):
                    for annotation_data in annotations_data)
     Annotation.objects.bulk_create(annotations)
     return obj
+
+  @staticmethod
+  def get_name(instance):
+    try:
+      annotation = Annotation.objects.values_list('data')
+      return annotation.get(instance=instance, type='name')[0]
+    except Annotation.DoesNotExist:
+      return "sub_{:X}".format(instance.offset)
 
 
 class VectorSerializer(serializers.ModelSerializer):

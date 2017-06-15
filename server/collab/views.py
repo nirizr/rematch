@@ -6,7 +6,7 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
-                                SimpleInstanceSerializer, AnnotationSerializer,
+                                InstanceSerializer, AnnotationSerializer,
                                 MatcherSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
@@ -106,10 +106,10 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # pagination code
     page = self.paginate_queryset(queryset)
     if page is not None:
-      serializer = SimpleInstanceSerializer(page, many=True)
+      serializer = InstanceSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)
     else:
-      serializer = SimpleInstanceSerializer(queryset, many=True)
+      serializer = InstanceSerializer(queryset, many=True)
       return response.Response(serializer.data)
 
   @decorators.detail_route(url_path="remotes")
@@ -126,10 +126,10 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # pagination code
     page = self.paginate_queryset(queryset)
     if page is not None:
-      serializer = SimpleInstanceSerializer(page, many=True)
+      serializer = InstanceVectorSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)
     else:
-      serializer = SimpleInstanceSerializer(queryset, many=True)
+      serializer = InstanceVectorSerializer(queryset, many=True)
       return response.Response(serializer.data)
 
   @decorators.detail_route(url_path="matches")
