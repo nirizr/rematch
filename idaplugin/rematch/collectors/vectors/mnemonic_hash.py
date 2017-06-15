@@ -12,10 +12,10 @@ class MnemonicHashVector(vector.Vector):
 
   @classmethod
   def data(cls, offset):
-    md5 = hashlib.md5()
-    if len(list(idautils.FuncItems(offset))) < 3:
+    if cls.inst_count(offset) < 3:
       return None
 
+    md5 = hashlib.md5()
     for ea in idautils.FuncItems(offset):
       mnem_line = idc.GetMnem(ea)
       mnem_line = mnem_line.strip()
