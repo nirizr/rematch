@@ -34,6 +34,8 @@ class ApiDomintorHashVector(vector.Vector):
 
         if is_call_insn(curr_ea):
           bbcall[start].append(bbinsn)
+          bbinsn = []
 
         curr_ea = NextHead(curr_ea)  # noqa: F821
+
     return bbcall
