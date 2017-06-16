@@ -1,0 +1,58 @@
+version: '2'
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: rabbit
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    expose:
+      - 5672
+      - 15672
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql
+    hostname: db
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=qwe123
+      - MYSQL_DATABASE=rematch
+      - MYSQL_REMATCH_HOST=db
+      - MYSQL_REMATCH_PORT=3306
+    expose:
+     - 3306
+    restart: always
+
+  web:
+    hostname: web
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    command: bash -c "/rematch_server/start_docker.sh"
+    volumes:
+      - /home/deb/rematch/
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    environment:
+      - IN_DOCKER=1
+      - USERNAME=magic
+      - PASSWORD="qwe123QWE!@#"
+      - EMAIL="admin@rema.ch"
+      - MYSQL_REMATCH_HOST=db
+      - MYSQL_REMATCH_PORT=3306
+      - MYSQL_ROOT_PASSWORD=qwe123
+      - MYSQL_DATABASE=rematch
+      - MYSQL_USER=root
+      - DJANGO_SETTINGS_MODULE=rematch.settings.docker
+    links:
+      - "db:db"
+      - "rabbitmq:rabbitmq"
+    depends_on:
+      - db
+      - rabbitmq
+    restart: always
