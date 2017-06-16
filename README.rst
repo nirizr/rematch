@@ -3,7 +3,7 @@
 rematch
 =======
 
-REmatch, a simple binary diffing utility that just works. 
+REmatch, a simple binary diffing utility that just works.
 
 At least, we hope it will be. Rematch is still a work in progress and is not
 fully functional at the moment.  We're currently working on bringing up basic
@@ -24,8 +24,8 @@ Goal of REmatch
 ===============
 
 The goal of REmatch is to act as a maintained, extendable, open source tool
-for advanced assembly function-level binary comparison and matching. 
-Rematch will be a completely open source and free (as in speech) 
+for advanced assembly function-level binary comparison and matching.
+Rematch will be a completely open source and free (as in speech)
 community-driven tool. We support buttom-up organizational methods and desire
 Rematch to be heavily influenced by it's users (both in decision making and
 development).
@@ -60,15 +60,16 @@ Current available annoations include only function names and function
 prototypes, however this is easily extendable by adding `Annotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/annotation.py>`_ classes, with only two functions. `NameAnnotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/name.py>`_ is such an example.  
 
 Some smaller improvements include:
-1. Documented small portions of the project (mostly installation and basic usage).
-2. Some match results quality and performance improvements.
-3. Some tests for the IDAPython plugin (using pytest-idapro).
-4. Bug fixes along the way.
+
+#. Documented small portions of the project (mostly installation and basic usage).
+#. Some match results quality and performance improvements.
+#. Some tests for the IDAPython plugin (using pytest-idapro).
+#. Bug fixes along the way.
 
 Next goals/improvements are going to be:
 
-1. Adding more matching engines.
-2. Adding some automation abilities to let us batch-scan IDBs and test match engines on large sets of files.
+#. Adding more matching engines.
+#. Adding some automation abilities to let us batch-scan IDBs and test match engines on large sets of files.
 
 Old statuses
 ------------
