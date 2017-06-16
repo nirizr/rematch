@@ -1,4 +1,4 @@
-|Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
+|Read The Docs| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
 
 rematch
 =======
@@ -107,6 +107,9 @@ the server. Basic plugin settings, project hierarchy and user authentication.
 We have a skeleton for the match results dialog (which supports some basic
 python scripting! :D).
 
+.. |Read The Docs| image:: https://readthedocs.org/projects/rematch/badge/?version=latest
+   :alt: Read The Docs
+   :target: http://rematch.readthedocs.io/en/latest/?badge=latest
 .. |Build Status| image:: https://travis-ci.org/nirizr/rematch.svg?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/nirizr/rematch
