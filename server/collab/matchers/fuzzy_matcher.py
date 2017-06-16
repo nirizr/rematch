@@ -1,21 +1,40 @@
-import collections
+import itertools
+import json
+from operator import xor as xorred_fn
+
+import numpy as np
+import sklearn as skl
+import sklearn.metrics  # noqa flake8 importing as a different name
+import sklearn.feature_extraction  # noqa flake8 importing as a different name
+
 from . import matcher
 
 
 class FuzzyHashMatcher(matcher.Matcher):
   @classmethod
   def match(cls, source, target):
-    flipped_rest = collections.defaultdict(list)
-    # TODO: could be optimized by enumerating all identity matches together
-    target_values = target.values_list('id', 'instance_id', 'data').iterator()
-    for target_id, target_instance_id, target_data in target_values:
-      # TODO: could be optimized by uncommenting next line as most 'target'
-      # values won't be present in 'source' list
-      # if v in unique_values:
-      flipped_rest[target_data].append((target_id, target_instance_id))
-    source_values = source.values_list('instance_id', 'data').iterator()
-    for source_instance_id, source_data in source_values:
-      matches = flipped_rest.get(source_data, ())
+    target_values = itertools.izip(*source.value_list('instance_id', 'data'))
+    source_values = itertools.izip(*target.value_list('instance_id', 'data'))
 
-      for target_id, target_instance_id in matches:
-        yield (source_instance_id, target_instance_id, 70)
+    source_instance_ids, source_data = source_values
+    target_instance_ids, target_data = target_values
+
+    source_list = [json.loads(d) for d in source_data]
+    target_list = [json.loads(d) for d in target_data]
+
+    dictvect = skl.feature_extraction.DictVectorizer()
+    source_matrix = dictvect.fit_transform(source_list)
+    target_matrix = dictvect.transform(target_list)
+
+    distance_matrix = skl.metric.pairwise_distances(source_matrix,
+                                                    target_matrix,
+                                                    xorred_fn)
+    max_distance = distance_matrix.max()
+    score_matrix = (1 - (distance_matrix / max_distance)) * 100
+
+    for source_i, target_i in np.ndindex(*distance_matrix.shape):
+      source_instance_id = source_instance_ids[source_i]
+      target_instance_id = target_instance_ids[target_i]
+
+      score = score_matrix[source_i][target_i]
+      yield (source_instance_id, target_instance_id, score)
