@@ -46,8 +46,37 @@ Status updates
 We'll try to occasionally update here about what's going on in the project
 and briefly describe advancements we've had.
 
-Current status (March 1st, 2017)
+Current status (June 16th, 2017)
 -----------------------------------
+
+Docker server deployment is now available, which is a milestone for us as it
+makes running a rematch setup easier (and also makes sure everyone can run
+their own server). Although good matches are not quite ready yet, this makes
+rematch quite usable in the sense of users being able to use it.
+
+Another important framework enhancement is the ability to apply annotations
+collected form previous work, so successful matches are actually actionable.
+Current available annoations include only function names and function
+prototypes, however this is easily extendable by adding `Annotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/annotation.py>`_ classes, with only two functions. `NameAnnotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/name.py>`_ is such an example.  
+
+Some smaller improvements include:
+1. Documented small portions of the project (mostly installation and basic usage).
+2. Some match results quality and performance improvements.
+3. Some tests for the IDAPython plugin (using pytest-idapro).
+4. Bug fixes along the way.
+
+Next goals/improvements are going to be:
+
+1. Adding more matching engines.
+2. Adding some automation abilities to let us batch-scan IDBs and test match engines on large sets of files.
+
+Old statuses
+------------
+
+Old status paragraphs will be pushed here.
+
+(March 1st, 2017)
++++++++++++++++++
 
 We recently got another big PR in, `Match results dialog
 <https://github.com/nirizr/rematch/pull/17>`_, that ended up being more then
@@ -70,11 +99,6 @@ And will optionally have:
 
 #. Web interface for the server.
 #. An achievements / score system. Yay gamification!
-
-Old statuses
-------------
-
-Old status paragraphs will be pushed here.
 
 (November 9th, 2016)
 ++++++++++++++++++++
