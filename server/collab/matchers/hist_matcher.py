@@ -3,8 +3,7 @@ import json
 
 import numpy as np
 import sklearn as skl
-import sklearn.metrics  # noqa flake8 importing as a different name
-import sklearn.preprocessing  # noqa flake8 importing as a different name
+import sklearn.metrics
 import sklearn.feature_extraction  # noqa flake8 importing as a different name
 
 from . import matcher
