@@ -71,11 +71,9 @@ before_script:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
-  - if [ -d ./tests/${PROJECT} ]; then
-      flake8 ./tests/${PROJECT} --show-source ;
-      if [ ${ENV} = "conda" ]; then PYTHONPATH=. py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi ;
-      if [ ${ENV} = "docker" ]; then docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ; fi ;
-    fi;
+  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
+  - if [ -d ./tests/${PROJECT} ] && [ ${ENV} = "conda" ]; then PYTHONPATH=. py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ; fi ;
+  - if [ -d ./tests/${PROJECT} ] && [ ${ENV} = "docker" ]; then docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ; fi ;
 
 after_script:
   - if [ -d ./tests/${PROJECT} ]; then
