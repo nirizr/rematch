@@ -9,9 +9,9 @@ class FlatGraphVector(Vector):
 
   def __init__(self, *args, **kwargs):
     super(FlatGraphVector, self).__init__(*args, **kwargs)
-    self.flow_chart = idaapi.FlowChart(idaapi.get_func(self.offset))
+    self.flow_chart = None
     self.visited = set()
-    self.items = list[self.flow_chart.size]
+    self.items = list()
 
   def _bb_size(self, bb):
     if bb.endEA > bb.startEA:
@@ -22,7 +22,8 @@ class FlatGraphVector(Vector):
 
   def _bb_value(self, bb):
     # TODO: this should be something that's uncorellated with the order of
-    #  basic blocks
+    # basic blocks and describes basic blocks well
+    # Some kind of hash for mnemonics could be used
     return self._bb_size(bb)
 
   def _append_bbs(self, *bbs):
@@ -45,7 +46,7 @@ class FlatGraphVector(Vector):
 
   def _recurse_bb(self, bb):
     if bb in self.visited:
-      return []
+      return
 
     self.visited.add(bb)
     siblings = self._sort_siblings(bb.succs())
@@ -54,7 +55,9 @@ class FlatGraphVector(Vector):
     for sibling in siblings:
       self._recurse_siblings(sibling)
 
-  def _data(self):
+  def data(self, offset):
+    self.flow_chart = idaapi.FlowChart(idaapi.get_func(offset))
+    self.items.append(self.flow_chart.size)
     head = self._find_head()
     self._recurse_bb(head)
     return self.items
