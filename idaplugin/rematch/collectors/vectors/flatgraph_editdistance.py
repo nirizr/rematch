@@ -3,12 +3,12 @@ import idaapi
 from .vector import Vector
 
 
-class FlatGraphVector(Vector):
+class FlatGraphEditDistanceVector(Vector):
   type = 'flatgraph_editdistance'
   type_version = 0
 
   def __init__(self, *args, **kwargs):
-    super(FlatGraphVector, self).__init__(*args, **kwargs)
+    super(FlatGraphEditDistanceVector, self).__init__(*args, **kwargs)
     self.flow_chart = None
     self.visited = set()
     self.items = list()

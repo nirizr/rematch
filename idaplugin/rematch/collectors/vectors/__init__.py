@@ -5,9 +5,9 @@ from .name_hash import NameHashVector
 from .assembly_hash import AssemblyHashVector
 from .mnemonic_hash import MnemonicHashVector
 from .mnemonic_hist import MnemonicHistVector
-from .flat_graph import FlatGraphVector
+from .flatgraph_editdistance import FlatGraphEditDistanceVector
 
 
 __all__ = ["Vector", "InstructionHashVector", "IdentityHashVector",
            "NameHashVector", "AssemblyHashVector", "MnemonicHashVector",
-           "MnemonicHistVector", "FlatGraphVector"]
+           "MnemonicHistVector", "FlatGraphEditDistanceVector"]
