@@ -31,6 +31,15 @@ nginx, mysql, rabbitmq and celery micro components. This makes server
 deployment a lot easier however a docker installation and roughly 1 GB of free
 space is required.
 
+The docker container is not in the docker hub, but the the following docker-compose
+command can be used to build docker inside the rematch repository:
+
+.. code-block:: console
+
+   $ service docker start ;
+   $ docker-compose -f ./server/docker-compose.yml build ;
+   $ docker-compose -f ./server/docker-compose.yml up -d ;
+
 Installing the Rematch IDA Plugin
 ---------------------------------
 

@@ -7,6 +7,8 @@ from celery import shared_task
 
 import json
 
+from itertools import islice, chain
+
 
 @shared_task
 def match(task_id):
@@ -35,16 +37,16 @@ def match(task_id):
       source_filter['instance__offset__gte'] = source_start
     if source_end:
       source_filter['instance__offset__lte'] = source_end
-    base_source_vectors = Vector.objects.filter(**source_filter)
+    source_vectors = Vector.objects.filter(**source_filter)
 
     target_filter = {}
     if target_project:
       target_filter = {'file_version__file__project_id': target_project}
     elif target_file:
       target_filter = {'file_version__file': target_file}
-    base_target_vectors = Vector.objects.filter(**target_filter)
+    target_vectors = Vector.objects.filter(**target_filter)
     self_exclude = {'file_version__file': source_file}
-    base_target_vectors = base_target_vectors.exclude(**self_exclude)
+    target_vectors = target_vectors.exclude(**self_exclude)
 
     print("Running task {}".format(match.request.id))
     # TODO: order might be important here
@@ -53,23 +55,7 @@ def match(task_id):
         continue
       requested_matchers.remove(matcher.match_type)
 
-      start = now()
-      source_vectors = base_source_vectors.filter(type=matcher.vector_type)
-      target_vectors = base_target_vectors.filter(type=matcher.vector_type)
-
-      source_count = source_vectors.count()
-      target_count = target_vectors.count()
-      if source_count and target_count:
-        match_objs = list(gen_match_objs(task_id, matcher, source_vectors,
-                                         target_vectors))
-        print("Matching {} local vectors to {} remote vectors by {} yielded "
-              "{} matches".format(source_count, target_count, matcher,
-                                  len(match_objs)))
-        Match.objects.bulk_create(match_objs, batch_size=10000)
-      else:
-        print("Skipped matcher {} with {} local vectors and {} remote vectors"
-              "".format(matcher, source_count, target_count))
-      print("\tTook: {}".format(now() - start))
+      match_by_matcher(task_id, matcher, source_vectors, target_vectors)
 
       task.update(progress=F('progress') + 1)
 
@@ -81,6 +67,41 @@ def match(task_id):
     raise
 
   task.update(status=Task.STATUS_DONE, finished=now())
+
+
+# Django bulk_create converts `objs` to a list, rendering any generator
+# useless. This batch method is used to implement `batch_size` functionality
+# outside of `bulk_create`.
+# For more info and status see:
+# https://code.djangoproject.com/ticket/28231
+def batch(iterable, size):
+    sourceiter = iter(iterable)
+    while True:
+        batchiter = islice(sourceiter, size)
+        yield chain([batchiter.next()], batchiter)
+
+
+def match_by_matcher(task_id, matcher, source_vectors, target_vectors):
+  start = now()
+  source_vectors = source_vectors.filter(type=matcher.vector_type)
+  target_vectors = target_vectors.filter(type=matcher.vector_type)
+
+  source_count = source_vectors.count()
+  target_count = target_vectors.count()
+  if source_count and target_count:
+    print("Matching {} local vectors to {} remote vectors by {}"
+          "".format(source_count, target_count, matcher))
+    match_objs = gen_match_objs(task_id, matcher, source_vectors,
+                                target_vectors)
+    for b in batch(match_objs, 10000):
+      Match.objects.bulk_create(b)
+    matches = Match.objects.filter(task_id=task_id,
+                                   type=matcher.match_type).count()
+    print("Resulted in {} match objects".format(matches))
+  else:
+    print("Skipped matcher {} with {} local vectors and {} remote vectors"
+          "".format(matcher, source_count, target_count))
+  print("\tTook: {}".format(now() - start))
 
 
 def gen_match_objs(task_id, matcher, source_vectors, target_vectors):

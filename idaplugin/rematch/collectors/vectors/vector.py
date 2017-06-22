@@ -1,3 +1,5 @@
+import idautils
+
 import json
 
 
@@ -11,3 +13,7 @@ class Vector(object):
     data = json.dumps(data)
     return {"instance": instance_id, "type": cls.type,
             "type_version": cls.type_version, "data": data}
+
+  @staticmethod
+  def inst_count(offset):
+    return len(list(idautils.FuncItems(offset)))

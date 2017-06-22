@@ -9,6 +9,8 @@ from . import gui, widgets
 from .. import network
 from .. import exceptions
 
+from .. import collectors
+
 from . import resultscript
 from . import serializedgraph
 
@@ -164,10 +166,8 @@ class MatchResultDialog(gui.GuiDialog):
       return
 
     self.blockSignals(True)
-    item_index = parent.indexOfChild(item)
-    for i in range(parent.childCount()):
-      if i != item_index:
-        curr_child = parent.child(i)
+    for curr_child in self.enumerate_children(parent):
+      if item != curr_child:
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
     self.blockSignals(False)
 
@@ -185,39 +185,48 @@ class MatchResultDialog(gui.GuiDialog):
     self.tree.clear()
     self.populate_tree()
 
+  def enumerate_children(self, root=None):
+    if not root:
+      root = self.tree.invisibleRootItem()
+    for child_index in range(root.childCount()):
+      yield root.child(child_index)
+
+  def enumerate_items(self):
+    for local_item in self.enumerate_children():
+      for remote_item in self.enumerate_children(local_item):
+        yield local_item, remote_item
+
+  def items_count(self):
+    return sum(1 for _ in self.enumerate_items())
+
   def apply_matches(self):
-    root = self.tree.invisibleRootItem()
-    apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0, root.childCount())
-    for local_index in range(root.childCount()):
-      local_item = root.child(local_index)
-      for remote_index in range(local_item.childCount()):
-        remote_item = local_item.child(remote_index)
-        if remote_item.checkState(self.CHECKBOX_COLUMN):
-          # TODO: apply metches
-          # item_obj = self.documentation[remote_item.api_id]
-          # remote_docs = item_obj["documentation"]
-          # apply_documentation(local_item.ea, remote_docs)
-          break
+    apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0,
+                                           self.items_count())
+    for local_item, remote_item in self.enumerate_items():
       apply_pbar.setValue(apply_pbar.value() + 1)
 
+      if remote_item.checkState(self.CHECKBOX_COLUMN):
+        self.apply_match(local_item, remote_item)
+
     # refresh ida's views
-    # ida_kernwin.refresh_idaview_anyway()
+    ida_kernwin.refresh_idaview_anyway()
+
+  def apply_match(self, local_item, remote_item):
+    remote_id = remote_item.api_id
+    annotations_data = self.remotes[remote_id]['annotations']
+    local_id = local_item.api_id
+    local_offset = self.locals[local_id]['offset']
+    collectors.apply(local_offset, annotations_data)
 
   def clear_checks(self):
-    root = self.tree.invisibleRootItem()
-    for local_index in range(root.childCount()):
-      local_item = root.child(local_index)
-      for remote_index in range(local_item.childCount()):
-        remote_item = local_item.child(remote_index)
-        remote_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
+    for _, remote_item in self.enumerate_items():
+      del _
+      remote_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
 
   def set_checks(self):
-    root = self.tree.invisibleRootItem()
-    for local_index in range(root.childCount()):
-      local_item = root.child(local_index)
+    for local_item in self.enumerate_children():
       checked = False
-      for remote_index in range(local_item.childCount()):
-        remote_item = local_item.child(remote_index)
+      for remote_item in self.enumerate_children(local_item):
         if remote_item.checkState(self.CHECKBOX_COLUMN):
           checked = True
           break

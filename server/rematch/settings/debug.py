@@ -8,5 +8,6 @@ DEBUG = True
 # running in debug mode. for more details see
 # https://docs.djangoproject.com/en/1.10/ref/settings/
 # for security implications see
-# https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
+# https://docs.djangoproject.com/en/1.10/topics/security/ \
+# #host-headers-virtual-hosting
 ALLOWED_HOSTS = ['*']

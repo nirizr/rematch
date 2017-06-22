@@ -12,6 +12,9 @@ class AssemblyHashVector(vector.Vector):
 
   @classmethod
   def data(cls, offset):
+    if cls.inst_count(offset) < 3:
+      return None
+
     md5 = hashlib.md5()
     for ea in idautils.FuncItems(offset):
       asm_line = idc.GetDisasmEx(ea, idc.GENDSM_MULTI_LINE)

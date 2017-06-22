@@ -1,5 +1,3 @@
 #!/bin/bash
-
-tmux new-session -s rematch -d ./start_web.sh
-tmux new-window -t rematch -d ./start_celery.sh
-tmux new-window -t rematch
+./start_web.sh 0.0.0.0:8000 &
+./start_celery.sh

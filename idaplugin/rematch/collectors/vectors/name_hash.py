@@ -14,5 +14,6 @@ class NameHashVector(vector.Vector):
   def data(cls, offset):
     name = idc.Name(offset)
     if ida_name.is_uname(name):
-      return hashlib.md5(name).hexdigest()
-    return None
+      return None
+
+    return hashlib.md5(name).hexdigest()

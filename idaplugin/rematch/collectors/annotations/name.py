@@ -16,7 +16,7 @@ class NameAnnotation(annotation.Annotation):
 
   @classmethod
   def apply(cls, offset, data):
-    name = data['name']
+    name = str(data['name'])
     # TODO: flags should be abstructed away from thier enum values to support
     # changes between versions
     flags = data['flags']

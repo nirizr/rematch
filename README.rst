@@ -1,9 +1,9 @@
-|Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
+|Read The Docs| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
 
 rematch
 =======
 
-REmatch, a simple binary diffing utility that just works. 
+REmatch, a simple binary diffing utility that just works.
 
 At least, we hope it will be. Rematch is still a work in progress and is not
 fully functional at the moment.  We're currently working on bringing up basic
@@ -24,8 +24,8 @@ Goal of REmatch
 ===============
 
 The goal of REmatch is to act as a maintained, extendable, open source tool
-for advanced assembly function-level binary comparison and matching. 
-Rematch will be a completely open source and free (as in speech) 
+for advanced assembly function-level binary comparison and matching.
+Rematch will be a completely open source and free (as in speech)
 community-driven tool. We support buttom-up organizational methods and desire
 Rematch to be heavily influenced by it's users (both in decision making and
 development).
@@ -46,8 +46,38 @@ Status updates
 We'll try to occasionally update here about what's going on in the project
 and briefly describe advancements we've had.
 
-Current status (March 1st, 2017)
+Current status (June 16th, 2017)
 -----------------------------------
+
+Docker server deployment is now available, which is a milestone for us as it
+makes running a rematch setup easier (and also makes sure everyone can run
+their own server). Although good matches are not quite ready yet, this makes
+rematch quite usable in the sense of users being able to use it.
+
+Another important framework enhancement is the ability to apply annotations
+collected form previous work, so successful matches are actually actionable.
+Current available annoations include only function names and function
+prototypes, however this is easily extendable by adding `Annotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/annotation.py>`_ classes, with only two functions. `NameAnnotation <https://github.com/nirizr/rematch/blob/master/idaplugin/rematch/collectors/annotations/name.py>`_ is such an example.  
+
+Some smaller improvements include:
+
+#. Documented small portions of the project (mostly installation and basic usage).
+#. Some match results quality and performance improvements.
+#. Some tests for the IDAPython plugin (using pytest-idapro).
+#. Bug fixes along the way.
+
+Next goals/improvements are going to be:
+
+#. Adding more matching engines.
+#. Adding some automation abilities to let us batch-scan IDBs and test match engines on large sets of files.
+
+Old statuses
+------------
+
+Old status paragraphs will be pushed here.
+
+(March 1st, 2017)
++++++++++++++++++
 
 We recently got another big PR in, `Match results dialog
 <https://github.com/nirizr/rematch/pull/17>`_, that ended up being more then
@@ -70,11 +100,6 @@ And will optionally have:
 
 #. Web interface for the server.
 #. An achievements / score system. Yay gamification!
-
-Old statuses
-------------
-
-Old status paragraphs will be pushed here.
 
 (November 9th, 2016)
 ++++++++++++++++++++
@@ -107,6 +132,9 @@ the server. Basic plugin settings, project hierarchy and user authentication.
 We have a skeleton for the match results dialog (which supports some basic
 python scripting! :D).
 
+.. |Read The Docs| image:: https://readthedocs.org/projects/rematch/badge/?version=latest
+   :alt: Read The Docs
+   :target: http://rematch.readthedocs.io/en/latest/?badge=latest
 .. |Build Status| image:: https://travis-ci.org/nirizr/rematch.svg?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/nirizr/rematch
