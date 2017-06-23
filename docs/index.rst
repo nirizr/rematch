@@ -11,7 +11,7 @@ Rematch, a simple binary diffing framework that just works.
 .. note::
   At least, we hope it will be. Rematch is still a work in progress and is not
   fully functional at the moment. We're currently working on bringing up basic
-  functionality. Check us out again soon, or watch for updates!
+  functionality. Check us out again soon or watch for updates!
 
 Rematch is intended to be used by reverse engineers for revealing and
 identifying previously reverse engineered similar functions, and then
