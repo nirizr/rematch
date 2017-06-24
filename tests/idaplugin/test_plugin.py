@@ -1,17 +1,6 @@
 import time
 import sys
 import idaplugin
-import os
-
-
-original_getppluginbase = idaplugin.rematch.utils.getPluginBase
-
-
-def getpluginbase_mock(*path):
-  return os.path.join("./tests/idaplugin/home/idaplugin", *path)
-
-
-idaplugin.rematch.utils.getPluginBase = getpluginbase_mock
 
 
 class capture_exceptions(object):
