@@ -12,9 +12,56 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     self.Refresh()
 
   def OnGetText(self, node_id):
+    """
+    Triggered when the graph viewer wants the text and color for a given node.
+    This callback is triggered one time for a given node (the value will be
+    cached and used later without calling Python). When you call refresh then
+    again this callback will be called for each node.
+
+    This callback is mandatory.
+
+    @return: Return a string to describe the node text or return a tuple
+    (node_text, node_color) to describe both text and color
+    """
     return self[node_id]
 
+  @staticmethod
+  def OnSelect(node_id):
+    """
+    Triggered when a node is being selected
+    @return: Return True to allow the node to be selected or False to disallow
+             node selection change
+    """
+    del node_id
+    return True
+
+  @staticmethod
+  def OnClick(node_id):
+    """
+    Triggered when a node is clicked
+    @return: False to ignore the click and True otherwise
+    """
+    del node_id
+    return True
+
+  @staticmethod
+  def OnDblClick(node_id):
+    """
+    Triggerd when a node is double-clicked.
+    @return: False to ignore the click and True otherwise
+    """
+    del node_id
+    return True
+
   def OnRefresh(self):
+    """
+    Event called when the graph is refreshed or first created.
+    From this event you are supposed to create nodes and edges.
+    This callback is mandatory.
+    @note: ***It is important to clear previous nodes before adding nodes.***
+    @return: Returning True tells the graph viewer to use the items. Otherwise
+    old items will be used.
+    """
     self.Clear()
 
     # create nodes
