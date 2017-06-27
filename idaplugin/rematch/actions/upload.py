@@ -64,15 +64,6 @@ class UploadAction(base.BoundFileAction):
 
     self.functions = set(idautils.Functions())
 
-    self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
-                           "please avoid making any ground-breaking changes.")
-    self.pbar.setRange(0, len(self.functions))
-    self.pbar.setValue(0)
-    self.pbar.accepted.connect(self.accept)
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
-    self.pbar.show()
-
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.perform_upload)
     self.timer.start(0)
