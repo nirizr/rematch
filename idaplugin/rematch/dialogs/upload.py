@@ -18,3 +18,11 @@ class UploadDialog(QtWidgets.QProgressDialog, base.BaseDialog):
                       "please avoid making any ground-breaking changes.")
     self.setRange(0, 0)
     self.setValue(0)
+
+  @staticmethod
+  def data():
+    return {}
+
+  def show(self, *args, **kwargs):
+    super(UploadDialog, self).show(*args, **kwargs)
+    self.submit_base()
