@@ -19,6 +19,13 @@ class UploadDialog(QtWidgets.QProgressDialog, base.BaseDialog):
     self.setRange(0, 0)
     self.setValue(0)
 
+  def advance(self, increase=1):
+    new_value = self.value() + increase
+    if new_value >= self.maximum():
+      self.accept()
+    else:
+      self.setValue(new_value)
+
   @staticmethod
   def data():
     return {}

@@ -53,22 +53,22 @@ class UploadAction(base.BoundFileAction):
     self.file_version_id = file_version['id']
 
     if file_version['newly_created']:
-      self.start_upload()
+      return self.start_upload()
     else:
       print("TODO: version up to date, nothing to do here")
-
-    return True
+      return True
 
   def start_upload(self):
     log('upload_action').info("Data upload started")
 
     self.functions = set(idautils.Functions())
+    self.ui.setRange(0, len(self.functions))
 
     self.timer = QtCore.QTimer()
     self.timer.timeout.connect(self.perform_upload)
     self.timer.start(0)
 
-    return True
+    return False
 
   def perform_upload(self):
     if not self.functions:
@@ -86,16 +86,12 @@ class UploadAction(base.BoundFileAction):
                               params=self.instance_set, json=True)
       q.start(self.progress_advance)
       self.instance_set = []
-      self.pbar.setMaximum(self.pbar.maximum() + 1)
+      self.ui.setMaximum(self.ui.maximum() + 1)
     self.progress_advance()
 
   def progress_advance(self, result=None):
     del result
-    new_value = self.pbar.value() + 1
-    if new_value >= self.pbar.maximum():
-      self.pbar.accept()
-    else:
-      self.pbar.setValue(new_value)
+    self.ui.advance()
 
   def accept(self):
     log('upload_action').info("Data upload completed successfully")
