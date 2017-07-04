@@ -13,6 +13,7 @@ from .. import exceptions
 class UploadDialog(QtWidgets.QProgressDialog, base.BaseDialog):
   def __init__(self, *args, **kwargs):
     super(UploadDialog, self).__init__(*args, **kwargs)
+    self.canceled.connect(self.reject_base)
 
     self.setLabelText("Processing IDB... You may continue working,\nbut "
                       "please avoid making any ground-breaking changes.")

@@ -19,17 +19,8 @@ class UploadAction(base.BoundFileAction):
     self.functions = None
     self.file_version_id = None
     self.instance_set = []
-
     self.timer = None
-
-  def clean(self):
-    if self.timer:
-      self.timer.stop()
-    self.timer = None
-
-  def cancel(self):
-    log('upload_action').info("upload action cancelled")
-    self.clean()
+    self.delayed_queries = []
 
   @staticmethod
   def calc_file_version_hash():
@@ -84,6 +75,7 @@ class UploadAction(base.BoundFileAction):
     if len(self.instance_set) >= 100 or not self.functions:
       q = network.QueryWorker("POST", "collab/instances/",
                               params=self.instance_set, json=True)
+      self.delayed_queries.append(q)
       q.start(self.progress_advance)
       self.instance_set = []
       self.ui.setMaximum(self.ui.maximum() + 1)
@@ -93,8 +85,24 @@ class UploadAction(base.BoundFileAction):
     del result
     self.ui.advance()
 
-  def accept(self):
-    log('upload_action').info("Data upload completed successfully")
-    self.clean()
+  def finish_handler(self):
+    log('upload_action').info("Data upload completed")
+    self.reset()
 
-    print("TODO: upload completed successfully")
+  def accept_handler(self):
+    print("TODO: upload action completed succesfully")
+
+  def reject_handler(self):
+    log('upload_action').info("upload action cancelled")
+    self.reset()
+
+  def reset(self):
+    for delayed in self.delayed_queries:
+      log('upload_action').info("async task cancelled: %s", repr(delayed))
+      delayed.cancel()
+    self.delayed_queries = []
+
+    if self.timer:
+      self.timer.stop()
+    self.timer = None
+
