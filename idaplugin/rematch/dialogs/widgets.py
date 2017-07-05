@@ -66,6 +66,8 @@ class QItemCheckBoxes(QtWidgets.QGridLayout):
 
     self.checkboxes = []
     for i, obj in enumerate(response):
+      if not obj:
+        continue
       item_name = obj[self.name_field]
       item_id = obj[self.id_field]
 
