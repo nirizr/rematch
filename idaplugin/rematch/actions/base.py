@@ -6,6 +6,7 @@ import idc
 
 class Action(object):
   reject_handler = None
+  accept_handler = None
   finish_handler = None
   submit_handler = None
   response_handler = None
@@ -124,21 +125,29 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
       return
 
     if callable(self.ui_class):
-      self.ui = self.ui_class(reject_handler=self.reject_handler,
+      self.ui = self.ui_class(accept_handler=self.accept_handler,
+                              reject_handler=self.reject_handler,
+                              finish_handler=self.finish_handler,
                               submit_handler=self.submit_handler,
                               response_handler=self.response_handler,
                               exception_handler=self.exception_handler)
-      if self.finish_handler:
-        self.ui.finished.connect(self.finish_handler)
       self.ui.finished.connect(self.close_dialog)
-      self.ui.finished.connect(self.force_update)
       self.ui.show()
     else:
       log('actions').warn("%s: no activation", self.__class__)
 
   def close_dialog(self):
+    """Destruction and cleanup of dialog bound to action on activation
+
+    This is called when dialog is finished for whatever reason, It is
+    guerenteed to be called after `self.finish_handler` due to slot execution
+    order since Qt4.6"""
+    log('action_base').info("Action finished: %s", self)
+
     del self.ui
     self.ui = None
+
+    self.force_update()
 
   @staticmethod
   def force_update():

@@ -1,16 +1,30 @@
 class BaseDialog(object):
-  def __init__(self, reject_handler=None, submit_handler=None,
-               response_handler=None, exception_handler=None, **kwargs):
+  def __init__(self, accept_handler=None, reject_handler=None,
+               finish_handler=None, submit_handler=None, response_handler=None,
+               exception_handler=None, **kwargs):
     super(BaseDialog, self).__init__(**kwargs)
+    self.accept_handler = accept_handler
     self.reject_handler = reject_handler
+    self.finish_handler = finish_handler
     self.submit_handler = submit_handler
     self.response_handler = response_handler
     self.exception_handler = exception_handler
 
+    self.rejected.connect(self.reject_base)
+    self.accepted.connect(self.accept_base)
+    self.finished.connect(self.finish_base)
+
+  def accept_base(self):
+    if self.accept_handler:
+      self.accept_handler()
+
   def reject_base(self):
     if self.reject_handler:
       self.reject_handler()
-    self.reject()
+
+  def finish_base(self):
+    if self.finish_handler:
+      self.finish_handler()
 
   def submit_base(self):
     # if no submit_handler, assume dialog is finished
