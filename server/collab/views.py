@@ -160,6 +160,8 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   @decorators.list_route()
   def matchers(request):
     del request
+    if any((m.is_abstract() for m in matchers_list)):
+      raise Exception("Abstract matcher in list")
     serializer = MatcherSerializer(matchers_list, many=True)
     return response.Response(serializer.data)
 
