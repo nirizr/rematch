@@ -1,3 +1,6 @@
+from .matcher import Matcher
+from .hash_matcher import HashMatcher
+from .hist_matcher import HistogramMatcher
 from .identity_hash import IdentityHashMatcher
 from .assembly_hash import AssemblyHashMatcher
 from .mnemonic_hash import MnemonicHashMatcher
@@ -8,5 +11,6 @@ from .mnemonic_hist import MnemonicHistogramMatcher
 matchers_list = [IdentityHashMatcher, NameHashMatcher, AssemblyHashMatcher,
                  MnemonicHashMatcher, MnemonicHistogramMatcher]
 
-__all__ = ['IdentityHashMatcher', 'AssemblyHashMatcher', 'MnemonicHashMatcher',
-           'NameHashMatcher', 'MnemonicHistogramMatcher', 'matchers_list']
+__all__ = ['Matcher', 'HashMatcher', 'HistogramMatcher', 'IdentityHashMatcher',
+           'AssemblyHashMatcher', 'MnemonicHashMatcher', 'NameHashMatcher',
+           'MnemonicHistogramMatcher', 'matchers_list']

@@ -6,6 +6,6 @@ class Matcher:
 
   @classmethod
   def is_abstract(cls):
-    return not (getattr(cls, 'vector_type') and
-                getattr(cls, 'match_type') and
-                getattr(cls, 'matcher_name'))
+    return not (hasattr(cls, 'vector_type') and
+                hasattr(cls, 'match_type') and
+                hasattr(cls, 'matcher_name'))
