@@ -31,7 +31,7 @@ class GuiDialog(BaseDialog, QtWidgets.QDialog):
     self.base_layout.addLayout(button_lyt)
 
     ok_btn.clicked.connect(self.submit_base)
-    cancel_btn.clicked.connect(self.reject_base)
+    cancel_btn.clicked.connect(self.reject)
 
   def exception_base(self, exception):
     super(GuiDialog, self).exception_base(exception)
