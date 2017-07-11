@@ -161,7 +161,9 @@ def assert_eq(a, b):
 def assert_response(response, status, data=None):
   print(response.content)
   assert response.status_code == status
-  if isinstance(data, (list, dict)):
+  if data is None:
+    pass
+  elif isinstance(data, (list, dict)):
     if 'results' in response.data:
       assert_eq(response.data['results'], data)
     else:
@@ -172,9 +174,17 @@ def assert_response(response, status, data=None):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_empty_lists(api_client, model_name):
+def test_model_guest_list_empty(api_client, model_name):
   response = api_client.get('/collab/{}/'.format(model_name),
                             HTTP_ACCEPT='application/json')
+  assert_response(response, status.HTTP_401_UNAUTHORIZED)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('model_name', collab_models.keys())
+def test_model_list_empty(admin_api_client, model_name):
+  response = admin_api_client.get('/collab/{}/'.format(model_name),
+                                  HTTP_ACCEPT='application/json')
   assert_response(response, status.HTTP_200_OK, [])
 
 
@@ -187,6 +197,18 @@ def test_model_guest_list(api_client, admin_user, model_name):
 
   response = api_client.get('/collab/{}/'.format(model_name),
                             HTTP_ACCEPT="application/json")
+  assert_response(response, status.HTTP_401_UNAUTHORIZED)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('model_name', collab_models.keys())
+def test_model_list(admin_api_client, admin_user, model_name):
+  # setup objects
+  obj = create_model(model_name, admin_user)
+  obj.save()
+
+  response = admin_api_client.get('/collab/{}/'.format(model_name),
+                                  HTTP_ACCEPT="application/json")
   assert_response(response, status.HTTP_200_OK, [obj])
 
 
@@ -203,7 +225,7 @@ def test_model_guest_creation(api_client, admin_user, model_name):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('model_name', collab_models.keys())
-def test_model_creation(api_client, admin_api_client, admin_user, model_name):
+def test_model_creation(admin_api_client, admin_user, model_name):
   model_data = setup_model(model_name, admin_user)
 
   response = admin_api_client.post('/collab/{}/'.format(model_name),
@@ -213,8 +235,8 @@ def test_model_creation(api_client, admin_api_client, admin_user, model_name):
   assert_response(response, status.HTTP_201_CREATED)
   projects_created = [response.json()]
 
-  response = api_client.get('/collab/{}/'.format(model_name),
-                            HTTP_ACCEPT="application/json")
+  response = admin_api_client.get('/collab/{}/'.format(model_name),
+                                  HTTP_ACCEPT="application/json")
   assert_eq(response.json(), projects_created)
 
 

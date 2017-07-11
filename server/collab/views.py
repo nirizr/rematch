@@ -14,8 +14,7 @@ from collab.matchers import matchers_list
 
 
 class ViewSetOwnerMixin(object):
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                        IsOwnerOrReadOnly)
+  permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
 
   def perform_create(self, serializer):
     serializer.save(owner=self.request.user)
@@ -35,14 +34,12 @@ class ViewSetManyAllowedMixin(object):
 class ProjectViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Project.objects.all()
   serializer_class = ProjectSerializer
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
   filter_fields = ('created', 'owner', 'name', 'description', 'private')
 
 
 class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = File.objects.all()
   serializer_class = FileSerializer
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
   filter_fields = ('created', 'owner', 'project', 'name', 'description',
                    'md5hash')
 
@@ -70,7 +67,7 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
 class FileVersionViewSet(viewsets.ModelViewSet):
   queryset = FileVersion.objects.all()
   serializer_class = FileVersionSerializer
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+  permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('id', 'file', 'md5hash')
 
 
@@ -78,8 +75,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                   mixins.DestroyModelMixin, mixins.ListModelMixin,
                   viewsets.GenericViewSet):
   queryset = Task.objects.all()
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                        IsOwnerOrReadOnly)
+  permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
   filter_fields = ('task_id', 'created', 'finished', 'owner', 'status')
 
   def perform_create(self, serializer):
@@ -176,7 +172,7 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Vector.objects.all()
   serializer_class = VectorSerializer
-  permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+  permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('instance', 'file_version', 'type', 'type_version')
 
   @staticmethod
