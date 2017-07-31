@@ -97,6 +97,20 @@ def default_exception_callback(exception):
   raise exception
 
 
+def build_params(method, params):
+  """Convert params format based on request paramters."""
+  if not params:
+    return ""
+
+  if not isinstance(params, dict):
+    return params
+
+  if method == "POST":
+    return dumps(params)
+  else:
+    return urllib.urlencode(params, doseq=True)
+
+
 def query(method, url, server=None, token=None, params=None, json=False):
   if method not in ("GET", "POST"):
     raise exceptions.QueryException()
@@ -112,17 +126,11 @@ def query(method, url, server=None, token=None, params=None, json=False):
 
   # issue request
   try:
+    params = build_params(method, params)
+
     if method == "GET":
-      if params:
-        if isinstance(params, dict):
-          params = urllib.urlencode(params)
-        full_url += "?" + params
-      request = urllib2.Request(full_url, headers=headers)
+      request = urllib2.Request(full_url + "?" + params, headers=headers)
     elif method == "POST":
-      if not params:
-        params = ""
-      elif json:
-        params = dumps(params)
       request = urllib2.Request(full_url, data=params, headers=headers)
 
     response = opener.open(request)
@@ -138,7 +146,7 @@ def query(method, url, server=None, token=None, params=None, json=False):
 
 
 def get_server(server):
-  """getting and finalzing server address"""
+  """getting and finalzing server address."""
 
   try:
     if not server and 'login' in config and config['login']['server']:
@@ -153,7 +161,7 @@ def get_server(server):
 
 
 def get_headers(token, json):
-  """Setting up headers"""
+  """Setting up headers."""
 
   headers = {}
   if json:
