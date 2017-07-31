@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-from rematch.settings.base import *  # NOQA: F401, F403
+from rematch.settings.base import *  # noqa
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
