@@ -25,9 +25,22 @@ class WorkerSignals(QtCore.QObject):
 
 
 class QueryWorker(QtCore.QRunnable):
+  SPLIT = 900
+
   def __init__(self, method, url, server=None, token=None, params=None,
-               json=False, paginate=False):
+               json=False, pageable=False, splittable=None):
     super(QueryWorker, self).__init__()
+
+    if pageable and splittable:
+      raise ValueError("QueryWorker can only be one of splittable and"
+                       "pageable, not both.")
+
+    if (pageable or splittable) and not isinstance(params, dict):
+      raise ValueError("QueryWorker can only be pageable or splittable when"
+                       "params is a dictionary.")
+
+    if pageable and not json:
+      raise Exception("pageable=True must accompany json=True")
 
     self.method = method
     self.url = url
@@ -35,18 +48,21 @@ class QueryWorker(QtCore.QRunnable):
     self.token = token
     self.params = params
     self.json = json
-    self.paginate = paginate
-    self.running = True
+    self.pageable = pageable
+    self.splittable = splittable
+    if self.splittable:
+      self.splittable_values = self.params[self.splittable]
+    else:
+        self.splittable_values = None
+    self.running = False
     self.started = False
-
-    if self.paginate and not self.json:
-      raise Exception("paginate=True must accompany json=True")
 
     self.signals = WorkerSignals()
 
   def start(self, callback=None, exception_callback=None):
     if self.started:
       raise Exception("query worker already started")
+    self.running = True
     self.started = True
 
     if callback:
@@ -61,11 +77,40 @@ class QueryWorker(QtCore.QRunnable):
   def cancel(self):
     self.running = False
 
+  def run_query(self):
+    while self.running:
+      # if we're running a splittable query, only send SPLIT parameters for the
+      # splittable variable
+      if self.splittable:
+        self.params[self.splittable] = self.splittable_values[:self.SPLIT]
+        self.splittable_values = self.splittable_values[self.SPLIT:]
+
+      response = query(self.method, self.url, self.server, self.token,
+                       self.params, self.json)
+
+      yield response
+
+      # if request is pageabled and was successful, automatically request
+      # next page if specified. otherwise, break out of the loop
+      if self.pageable:
+        if not isinstance(response, dict):
+          raise ValueError("pageabled response object is not a json dict")
+
+        if 'next' in response and response['next']:
+          url_obj = urlparse(response['next'])
+          self.params = url_obj.query
+          continue
+      elif self.splittable and self.splittable_values:
+        continue
+
+      # by default, only perform this loop once, unless there was a reason to
+      # continue
+      break
+
   def run(self):
     try:
-      while self.running:
-        response = query(self.method, self.url, self.server, self.token,
-                         self.params, self.json)
+      for response in self.run_query():
+        # make sure QueryWorker wasn't cancelled while query was blocking
         if not self.running:
           break
 
@@ -75,20 +120,6 @@ class QueryWorker(QtCore.QRunnable):
           self.signals.result_list.emit(response)
         elif isinstance(response, str):
           self.signals.result_str.emit(response)
-
-        # if request is paginated and was successful, automatically request
-        # next page if specified. otherwise, break out of the loop
-        if not self.paginate:
-          break
-
-        if not isinstance(response, dict):
-          raise ValueError("Paginated response object is not a json dict")
-
-        if 'next' not in response or not response['next']:
-          break
-
-        url_obj = urlparse(response['next'])
-        self.params = url_obj.query
     except Exception as ex:
       self.signals.result_exception.emit(ex)
 

@@ -229,19 +229,19 @@ class MatchAction(base.BoundFileAction):
 
     log('match_action').info("Result download started")
     locals_url = "collab/tasks/{}/locals/".format(self.task_id)
-    q = network.QueryWorker("GET", locals_url, json=True, paginate=True,
+    q = network.QueryWorker("GET", locals_url, json=True, pageable=True,
                             params={'limit': 100})
     q.start(self.handle_locals)
     self.delayed_queries.append(q)
 
     remotes_url = "collab/tasks/{}/remotes/".format(self.task_id)
-    q = network.QueryWorker("GET", remotes_url, json=True, paginate=True,
+    q = network.QueryWorker("GET", remotes_url, json=True, pageable=True,
                             params={'limit': 100})
     q.start(self.handle_remotes)
     self.delayed_queries.append(q)
 
     matches_url = "collab/tasks/{}/matches/".format(self.task_id)
-    q = network.QueryWorker("GET", matches_url, json=True, paginate=True,
+    q = network.QueryWorker("GET", matches_url, json=True, pageable=True,
                             params={'limit': 100})
     q.start(self.handle_matches)
     self.delayed_queries.append(q)
