@@ -1,13 +1,6 @@
-import idaapi
-import idc
-
-import json
-
-from .. idasix import QtGui, QtWidgets, QtCore
+from .. idasix import QtGui, QtWidgets
 
 from . import base
-from .. import network
-from .. import exceptions
 
 
 class UploadDialog(QtWidgets.QProgressDialog, base.BaseDialog):
