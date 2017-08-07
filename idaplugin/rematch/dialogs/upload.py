@@ -1,4 +1,4 @@
-from .. idasix import QtGui, QtWidgets
+from .. idasix import QtWidgets
 
 from . import base
 

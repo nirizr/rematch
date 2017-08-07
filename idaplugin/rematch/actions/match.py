@@ -66,25 +66,6 @@ class MatchAction(base.BoundFileAction):
     self.target_file = target_file if target == 'file' else None
     self.matchers = matchers
 
-    uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
-                                                    file_version_hash)
-    return network.QueryWorker("POST", uri, json=True)
-
-  def response_handler(self, file_version):
-    self.file_version_id = file_version['id']
-
-    self.pbar = QtWidgets.QProgressDialog()
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
-
-    if file_version['newly_created']:
-      self.start_upload()
-    else:
-      self.start_task()
-
-    return True
-
-  def start_task(self):
     if self.source == 'idb':
       self.source_range = [None, None]
     elif self.source == 'single':
@@ -141,74 +122,3 @@ class MatchAction(base.BoundFileAction):
 
     self.clean()
     self.delayed_queries = []
-
-    self.start_results()
-
-  def start_results(self):
-    self.pbar.setLabelText("Receiving match results...")
-    self.pbar.setRange(0, 0)
-    self.pbar.setValue(0)
-    self.pbar.accepted.connect(self.accept_results)
-    self.pbar.show()
-
-    self.ui.finished.connect(self.close_dialog)
-
-    log('match_action').info("Result download started")
-    locals_url = "collab/tasks/{}/locals/".format(self.task_id)
-    q = network.QueryWorker("GET", locals_url, json=True, pageable=True,
-                            params={'limit': 100})
-    q.start(self.handle_locals)
-    self.delayed_queries.append(q)
-
-    remotes_url = "collab/tasks/{}/remotes/".format(self.task_id)
-    q = network.QueryWorker("GET", remotes_url, json=True, pageable=True,
-                            params={'limit': 100})
-    q.start(self.handle_remotes)
-    self.delayed_queries.append(q)
-
-    matches_url = "collab/tasks/{}/matches/".format(self.task_id)
-    q = network.QueryWorker("GET", matches_url, json=True, pageable=True,
-                            params={'limit': 100})
-    q.start(self.handle_matches)
-    self.delayed_queries.append(q)
-
-  def handle_locals(self, response):
-    new_locals = {obj['id']: obj for obj in response['results']}
-    self.results.add_locals(new_locals)
-
-    self.handle_page(response)
-
-  def handle_remotes(self, response):
-    new_remotes = {obj['id']: obj for obj in response['results']}
-    self.results.add_remotes(new_remotes)
-
-    self.handle_page(response)
-
-  def handle_matches(self, response):
-    def rename(o):
-      o['local_id'] = o.pop('from_instance')
-      o['remote_id'] = o.pop('to_instance')
-      return o
-
-    new_matches = map(rename, response['results'])
-    self.results.add_matches(new_matches)
-
-    self.handle_page(response)
-
-  def handle_page(self, response):
-    if 'previous' not in response or not response['previous']:
-      self.pbar.setMaximum(self.pbar.maximum() + response['count'])
-
-    new_value = max(self.pbar.value(), 0) + len(response['results'])
-    if new_value >= self.pbar.maximum():
-      self.pbar.accept()
-    else:
-      self.pbar.setValue(new_value)
-
-  def accept_results(self):
-    log('match_action').info("Result download completed successfully")
-
-    self.clean()
-    self.delayed_queries = []
-
-    self.results.show()
