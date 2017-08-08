@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.fields import files
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-from collab.validators import IdbValidator
+from collab.validators import idb_validator
 
 
 class Project(models.Model):
@@ -29,7 +29,7 @@ class File(models.Model):
   md5hash = models.CharField(max_length=32, db_index=True,
                              validators=[MinLengthValidator(32)])
   file = files.FileField(upload_to="tasks", null=True,
-                         validators=[IdbValidator])
+                         validators=[idb_validator])
 
   def __unicode__(self):
     return "File {}".format(self.name)

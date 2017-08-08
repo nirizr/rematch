@@ -10,7 +10,7 @@ class ResultScriptDialog(gui.GuiDialog):
   def __init__(self, *args, **kwargs):
     super(ResultScriptDialog, self).__init__("Result script", *args, **kwargs)
 
-    self.scripts_path = utils.getPluginPath('scripts')
+    self.scripts_path = utils.get_plugin_path('scripts')
 
     self.script_txt = QtWidgets.QTextEdit()
     self.status_lbl = QtWidgets.QLabel()

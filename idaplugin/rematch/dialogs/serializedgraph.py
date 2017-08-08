@@ -7,11 +7,11 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     super(SerializedGraphDialog, self).__init__(title, *args, **kwargs)
     self.nodes = {}
 
-  def SetNodes(self, nodes):
+  def SetNodes(self, nodes):  # noqa: N802
     self.nodes = nodes
     self.Refresh()
 
-  def OnGetText(self, node_id):
+  def OnGetText(self, node_id):  # noqa: N802
     """
     Triggered when the graph viewer wants the text and color for a given node.
     This callback is triggered one time for a given node (the value will be
@@ -53,7 +53,7 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     del node_id
     return True
 
-  def OnRefresh(self):
+  def OnRefresh(self):  # noqa: N802
     """
     Event called when the graph is refreshed or first created.
     From this event you are supposed to create nodes and edges.

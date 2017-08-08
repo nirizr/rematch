@@ -69,7 +69,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
 
   def get_icon(self):
     if not self._icon:
-      image_path = utils.getPluginPath('images', self.get_id() + ".png")
+      image_path = utils.get_plugin_path('images', self.get_id() + ".png")
       self._icon = ida_kernwin.py_load_custom_icon_fn(image_path)
     return self._icon
 
