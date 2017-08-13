@@ -1,9 +1,5 @@
 strictness: medium
 
-uses:
-  - django
-  - celery
-
 python-targets:
   - 2
   - 3
@@ -19,7 +15,8 @@ pylint:
     - bad-indentation
     - import-error
   options:
-    max-args: 8
+    max-args: 10
 pep8:
   disable:
     - E114
+    - E129

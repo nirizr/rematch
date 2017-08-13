@@ -68,7 +68,7 @@ install:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
-  - prospector ./${PROJECT} --profile ./prospector.yml --profile-path ./
+  - prospector ./${PROJECT} --profile ./prospector.yml --profile-path ./ --die-on-tool-error
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./prospector.yml --profile-path ./ ; fi
   - if [ -d ./tests/${PROJECT} ]; then
