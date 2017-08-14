@@ -7,7 +7,7 @@ from cookielib import CookieJar
 from json import loads, dumps
 
 import exceptions
-from . import config, log
+from . import config, log, utils
 
 # building opener
 cookiejar = CookieJar()
@@ -59,11 +59,23 @@ class QueryWorker(QtCore.QRunnable):
 
     self.signals = WorkerSignals()
 
-  def start(self, callback=None, exception_callback=None):
+  def start(self, callback=None, exception_callback=None, requeue=None):
     if self.started:
       raise Exception("query worker already started")
+
+    if requeue and not callback:
+      raise Exception("cannot requeue without a callable")
+
+    if requeue not in (None, 'read', 'write'):
+      raise Exception("requeue possible values are: None, 'read' or 'write', "
+                      "got: {}".format(requeue))
+
     self.running = True
     self.started = True
+
+    if requeue:
+      requeue = requeue == 'write'
+      callback = utils.ida_kernel_queue(write=requeue)(callback)
 
     if callback:
       self.signals.result_dict.connect(callback)
