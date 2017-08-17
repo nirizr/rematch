@@ -116,8 +116,8 @@ class MatchResultDialog(gui.GuiDialog):
     self.finalize_matches()
     self.populate_tree()
     self.set_checks()
-    super(MatchResultDialog, self).show(*args, **kwargs)
     self.graph_dialog.Show()
+    super(MatchResultDialog, self).show(*args, **kwargs)
 
   def get_obj(self, obj_id):
     if obj_id in self.locals:
@@ -141,6 +141,8 @@ class MatchResultDialog(gui.GuiDialog):
 
     if local_item:
       ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
+      self.graph_dialog.Show()
+      self.activateWindow()
 
     if remote_item:
       # TODO: change graph to a "loading..." message
@@ -155,7 +157,6 @@ class MatchResultDialog(gui.GuiDialog):
 
     nodes = json.loads(response[0]['data'])
     self.graph_dialog.SetNodes(nodes)
-    self.graph_dialog.Show()
 
   def item_changed(self, item, column):
     if not column == self.CHECKBOX_COLUMN:
