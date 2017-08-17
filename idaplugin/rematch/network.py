@@ -145,13 +145,12 @@ def build_params(method, params):
   if not params:
     return ""
 
-  if not isinstance(params, dict):
-    return params
-
-  if method == "POST":
+  if method == "POST" and isinstance(params, (list, dict)):
     return dumps(params)
-  else:
+  elif method == "GET" and isinstance(params, dict):
     return urllib.urlencode(params, doseq=True)
+
+  return params
 
 
 def query(method, url, server=None, token=None, params=None, json=False):
@@ -165,7 +164,7 @@ def query(method, url, server=None, token=None, params=None, json=False):
   full_url = server_url + url
   headers = get_headers(token, json)
 
-  log('network').info("[query] %s%s%s", full_url, headers, params)
+  log('network').info("[query] %s %s%s%s", method, full_url, headers, params)
 
   # issue request
   try:
