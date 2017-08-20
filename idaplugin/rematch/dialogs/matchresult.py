@@ -35,6 +35,8 @@ class MatchResultDialog(gui.GuiDialog):
     self.locals = {}
     self.remotes = {}
     self.matches = []
+    self.apply_pbar = None
+    self.matched_map = {}
 
     self.script_code = None
     self.script_compile = None
@@ -201,23 +203,35 @@ class MatchResultDialog(gui.GuiDialog):
     return sum(1 for _ in self.enumerate_items())
 
   def apply_matches(self):
-    apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0,
-                                           self.items_count())
+    self.matched_map = {}
+
     for local_item, remote_item in self.enumerate_items():
-      apply_pbar.setValue(apply_pbar.value() + 1)
-
       if remote_item.checkState(self.CHECKBOX_COLUMN):
-        self.apply_match(local_item, remote_item)
+        local_offset = self.get_obj(local_item.api_id)['offset']
+        if remote_item.api_id in self.matched_map:
+          self.matched_map[remote_item.api_id].append(local_offset)
+        else:
+          self.matched_map[remote_item.api_id] = [local_offset]
 
-    # refresh ida's views
-    ida_kernwin.refresh_idaview_anyway()
+    item_count = sum(len(m) for m in self.matched_map.values())
+    if not item_count:
+      return
 
-  def apply_match(self, local_item, remote_item):
-    remote_id = remote_item.api_id
-    annotations_data = self.remotes[remote_id]['annotations']
-    local_id = local_item.api_id
-    local_offset = self.locals[local_id]['offset']
-    collectors.apply(local_offset, annotations_data)
+    self.apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0, item_count)
+
+    q = network.QueryWorker("GET", "collab/annotations/", json=True,
+                            params={"instance": self.matched_map.keys()},
+                            splittable="instance")
+    q.start(self.handle_apply_matches, requeue='write')
+
+  def handle_apply_matches(self, response):
+    for annotation in response:
+      remote_id = annotation['instance']
+      local_offsets = self.matched_map[remote_id]
+
+      for local_offset in local_offsets:
+        collectors.apply(local_offset, annotation)
+        self.apply_pbar.setValue(self.apply_pbar.value() + 1)
 
   def clear_checks(self):
     for _, remote_item in self.enumerate_items():

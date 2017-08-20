@@ -13,25 +13,21 @@ def collect(collectors, offset, instance_id=None):
       yield r
 
 
-def apply(offset, data):
-  for _, annotation in inspect.getmembers(annotations):
-    if not (inspect.isclass(annotation) and hasattr(annotation, 'type')):
+def apply(offset, annotation):
+  for _, annotation_cls in inspect.getmembers(annotations):
+    if not (inspect.isclass(annotation_cls) and
+            hasattr(annotation_cls, 'type') and
+            annotation_cls.type == annotation['type']):
       continue
-    annotation_type = annotation.type
 
-    annotation_data = [_d for _d in data if _d['type'] == annotation_type]
-    if len(annotation_data) == 0:
-      continue
-    elif len(annotation_data) > 1:
-      raise ValueError("Found more then one annotation fitting type")
-    annotation_data = json.loads(annotation_data[0]['data'])
+    annotation_data = json.loads(annotation['data'])
 
-    if annotation.data(offset) == annotation_data:
+    if annotation_cls.data(offset) == annotation_data:
       log('annotation_apply').info("Setting annotation %s skipped at %s with "
                                    "%s because value is already set",
-                                   annotation, offset, annotation_data)
+                                   annotation_cls, offset, annotation_data)
     else:
-      annotation.apply(offset, annotation_data)
+      annotation_cls.apply(offset, annotation_data)
 
 
 __all__ = ["collect", "apply", "vectors", "annotations"]
