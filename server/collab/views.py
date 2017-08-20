@@ -47,13 +47,13 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
                            methods=['GET', 'POST'])
   def file_version(self, request, pk, md5hash):
     del pk
-    file = self.get_object()
+    file_obj = self.get_object()
 
     if request.method == 'POST':
       file_version, created = \
-        FileVersion.objects.get_or_create(md5hash=md5hash, file=file)
+        FileVersion.objects.get_or_create(md5hash=md5hash, file=file_obj)
     else:
-      file_version = FileVersion.objects.get(md5hash=md5hash, file=file)
+      file_version = FileVersion.objects.get(md5hash=md5hash, file=file_obj)
       created = False
 
     serializer = FileVersionSerializer(file_version)
@@ -104,9 +104,9 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     if page is not None:
       serializer = SlimInstanceSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)
-    else:
-      serializer = SlimInstanceSerializer(queryset, many=True)
-      return response.Response(serializer.data)
+
+    serializer = SlimInstanceSerializer(queryset, many=True)
+    return response.Response(serializer.data)
 
   @decorators.detail_route(url_path="remotes")
   def remotes(self, request, pk):
@@ -124,9 +124,9 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     if page is not None:
       serializer = SlimInstanceSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)
-    else:
-      serializer = SlimInstanceSerializer(queryset, many=True)
-      return response.Response(serializer.data)
+
+    serializer = SlimInstanceSerializer(queryset, many=True)
+    return response.Response(serializer.data)
 
   @decorators.detail_route(url_path="matches")
   def matches(self, request, pk):
@@ -142,9 +142,9 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     if page is not None:
       serializer = MatchSerializer(page, many=True)
       return self.get_paginated_response(serializer.data)
-    else:
-      serializer = MatchSerializer(queryset, many=True)
-      return response.Response(serializer.data)
+
+    serializer = MatchSerializer(queryset, many=True)
+    return response.Response(serializer.data)
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):

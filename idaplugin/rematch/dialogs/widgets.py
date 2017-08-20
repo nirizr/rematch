@@ -242,7 +242,7 @@ class SearchTreeWidget(QtWidgets.QTreeWidget):
     self.search_box.textEdited.connect(self.search)
     self.search_box.returnPressed.connect(self.search)
 
-  def keyPressEvent(self, event):
+  def keyPressEvent(self, event):  # noqa: N802
     if event.text():
       self.search_box.keyPressEvent(event)
     else:

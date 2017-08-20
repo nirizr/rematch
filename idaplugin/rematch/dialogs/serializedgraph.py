@@ -26,7 +26,7 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     return self[node_id]
 
   @staticmethod
-  def OnSelect(node_id):
+  def OnSelect(node_id):  # noqa: N802
     """
     Triggered when a node is being selected
     @return: Return True to allow the node to be selected or False to disallow
@@ -36,7 +36,7 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     return True
 
   @staticmethod
-  def OnClick(node_id):
+  def OnClick(node_id):  # noqa: N802
     """
     Triggered when a node is clicked
     @return: False to ignore the click and True otherwise
@@ -45,7 +45,7 @@ class SerializedGraphDialog(ida_graph.GraphViewer):
     return True
 
   @staticmethod
-  def OnDblClick(node_id):
+  def OnDblClick(node_id):  # noqa: N802
     """
     Triggerd when a node is double-clicked.
     @return: False to ignore the click and True otherwise

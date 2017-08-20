@@ -1,7 +1,7 @@
 from django.utils.timezone import now
 from django.db.models import F
 from collab.models import Task, Vector, Match
-from collab import matchers
+from collab.matchers import matchers_list
 
 from celery import shared_task
 
@@ -16,57 +16,61 @@ def match(task_id):
     task = Task.objects.filter(id=task_id)
 
     # get input parameters
-    task_values = task.values_list('id', 'source_file_version__file_id',
+    task_values = task.values_list('source_file_version__file_id',
                                    'source_start', 'source_end',
                                    'source_file_version_id',
                                    'target_project_id', 'target_file_id',
                                    'matchers').get()
     print(task_values)
-    (task_id, source_file, source_start, source_end, source_file_version,
-     target_project, target_file, requested_matchers) = task_values
-
-    requested_matchers = set(json.loads(requested_matchers))
+    (source_vectors, target_vectors, matchers) = build_filters(*task_values)
 
     # recording the task has started
     task.update(status=Task.STATUS_STARTED, progress=0,
-                progress_max=len(requested_matchers), task_id=match.request.id)
-
-    source_filter = {'file_version__file': source_file,
-                     'file_version_id': source_file_version}
-    if source_start:
-      source_filter['instance__offset__gte'] = source_start
-    if source_end:
-      source_filter['instance__offset__lte'] = source_end
-    source_vectors = Vector.objects.filter(**source_filter)
-
-    target_filter = {}
-    if target_project:
-      target_filter = {'file_version__file__project_id': target_project}
-    elif target_file:
-      target_filter = {'file_version__file': target_file}
-    target_vectors = Vector.objects.filter(**target_filter)
-    self_exclude = {'file_version__file': source_file}
-    target_vectors = target_vectors.exclude(**self_exclude)
+                progress_max=len(matchers), task_id=match.request.id)
 
     print("Running task {}".format(match.request.id))
     # TODO: order might be important here
-    for matcher in matchers.matchers_list:
-      if matcher.match_type not in requested_matchers:
+    for matcher in matchers_list:
+      if matcher.match_type not in matchers:
         continue
-      requested_matchers.remove(matcher.match_type)
+      matchers.remove(matcher.match_type)
 
       match_by_matcher(task_id, matcher, source_vectors, target_vectors)
 
       task.update(progress=F('progress') + 1)
 
-    if requested_matchers:
-      msg = "Unfamiliar matchers were requested: {}".format(requested_matchers)
+    if matchers:
+      msg = "Unfamiliar matchers were requested: {}".format(matchers)
       raise ValueError(msg)
   except Exception:
     task.update(status=Task.STATUS_FAILED, finished=now())
     raise
 
   task.update(status=Task.STATUS_DONE, finished=now())
+
+
+def build_filters(source_file, source_start, source_end, source_file_version,
+                  target_project, target_file, matchers):
+  source_filter = {'file_version__file': source_file,
+                   'file_version_id': source_file_version}
+  if source_start:
+    source_filter['instance__offset__gte'] = source_start
+  if source_end:
+    source_filter['instance__offset__lte'] = source_end
+  source_vectors = Vector.objects.filter(**source_filter)
+
+  target_filter = {}
+  if target_project:
+    target_filter = {'file_version__file__project_id': target_project}
+  elif target_file:
+    target_filter = {'file_version__file': target_file}
+  target_vectors = Vector.objects.filter(**target_filter)
+  self_exclude = {'file_version__file': source_file}
+  target_vectors = target_vectors.exclude(**self_exclude)
+
+  matchers = set(json.loads(matchers))
+
+  return (source_vectors, target_vectors, matchers)
 
 
 # Django bulk_create converts `objs` to a list, rendering any generator

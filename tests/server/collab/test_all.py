@@ -247,18 +247,18 @@ def test_template(admin_client):
 
 @pytest.mark.django_db
 def test_file_fileversion(admin_client, admin_user):
-  file = create_model('files', admin_user)
-  file.save()
+  file_obj = create_model('files', admin_user)
+  file_obj.save()
 
   file_version = rand_hash(32)
-  url = '/collab/files/{}/file_version/{}/'.format(file.id, file_version)
+  url = '/collab/files/{}/file_version/{}/'.format(file_obj.id, file_version)
 
   response = admin_client.post(url, content_type="application/json")
-  obj = {'newly_created': True, 'md5hash': file_version, 'file': file.id}
+  obj = {'newly_created': True, 'md5hash': file_version, 'file': file_obj.id}
   assert_response(response, status.HTTP_201_CREATED, obj)
 
   response = admin_client.get(url, content_type="application/json")
-  obj = {'newly_created': False, 'md5hash': file_version, 'file': file.id}
+  obj = {'newly_created': False, 'md5hash': file_version, 'file': file_obj.id}
   assert_response(response, status.HTTP_200_OK, obj)
 
 

@@ -16,7 +16,7 @@ class Project(models.Model):
     return "Project: {}".format(self.name)
   __str__ = __unicode__
 
-  class Meta:
+  class Meta(object):
     ordering = ('created',)
 
 
@@ -42,7 +42,7 @@ class FileVersion(models.Model):
   md5hash = models.CharField(max_length=32,
                              validators=[MinLengthValidator(32)])
 
-  class Meta:
+  class Meta(object):
     unique_together = (('file', 'md5hash'),)
 
   def __unicode__(self):

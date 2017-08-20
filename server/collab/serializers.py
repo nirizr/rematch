@@ -8,7 +8,7 @@ class ProjectSerializer(serializers.ModelSerializer):
   owner = serializers.ReadOnlyField(source='owner.username')
   created = serializers.ReadOnlyField()
 
-  class Meta:
+  class Meta(object):
     model = Project
     fields = ('id', 'created', 'owner', 'name', 'description', 'private',
               'files')
@@ -18,14 +18,14 @@ class FileSerializer(serializers.ModelSerializer):
   owner = serializers.ReadOnlyField(source='owner.username')
   created = serializers.ReadOnlyField()
 
-  class Meta:
+  class Meta(object):
     model = File
     fields = ('id', 'created', 'owner', 'project', 'name', 'description',
               'md5hash', 'file')
 
 
 class FileVersionSerializer(serializers.ModelSerializer):
-  class Meta:
+  class Meta(object):
     model = FileVersion
     fields = ('id', 'created', 'file', 'md5hash')
 
@@ -40,7 +40,7 @@ class TaskSerializer(serializers.ModelSerializer):
   progress = serializers.ReadOnlyField()
   progress_max = serializers.ReadOnlyField()
 
-  class Meta:
+  class Meta(object):
     model = Task
     fields = ('id', 'task_id', 'created', 'finished', 'owner', 'status',
               'target_project', 'target_file', 'source_file',
@@ -61,7 +61,7 @@ class TaskEditSerializer(TaskSerializer):
 class SlimInstanceSerializer(serializers.ModelSerializer):
   name = serializers.SerializerMethodField()
 
-  class Meta:
+  class Meta(object):
     model = Instance
     fields = ('id', 'type', 'name', 'offset')
 
@@ -77,19 +77,19 @@ class SlimInstanceSerializer(serializers.ModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-  class Meta:
+  class Meta(object):
     model = Annotation
     fields = ('id', 'instance', 'type', 'data')
 
 
 class InstanceVectorSerializer(serializers.ModelSerializer):
   class NestedVectorSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
       model = Vector
       fields = ('id', 'type', 'type_version', 'data')
 
   class NestedAnnotationSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
       model = Annotation
       fields = ('id', 'type', 'data')
 
@@ -131,14 +131,14 @@ class InstanceVectorSerializer(serializers.ModelSerializer):
 class VectorSerializer(serializers.ModelSerializer):
   file = serializers.ReadOnlyField(source='file_version.file_id')
 
-  class Meta:
+  class Meta(object):
     model = Vector
     fields = ('id', 'file', 'file_version', 'instance', 'type', 'type_version',
               'data')
 
 
 class MatchSerializer(serializers.ModelSerializer):
-  class Meta:
+  class Meta(object):
     model = Match
     fields = ('from_instance', 'to_instance', 'task', 'type', 'score')
 

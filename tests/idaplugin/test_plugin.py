@@ -3,7 +3,7 @@ import sys
 import idaplugin
 
 
-class capture_exceptions(object):
+class CaptureExceptions(object):
   def __init__(self):
     self.exceptions_caught = []
     self.excepthook = None
@@ -51,7 +51,7 @@ def test_action_creation(idapro_action_entry, idapro_app):
     idapro_app.processEvents()
 
   try:
-    with capture_exceptions():
+    with CaptureExceptions():
       action.activate(ctx)
       time.sleep(1)
       idapro_app.processEvents()
