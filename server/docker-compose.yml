@@ -42,7 +42,7 @@ services:
       - IN_DOCKER=1
       - USERNAME=magic
       - PASSWORD="qwe123QWE!@#"
-      - EMAIL="admin@rema.ch"
+      - EMAIL="nirizr@gmail.com"
       - MYSQL_REMATCH_HOST=db
       - MYSQL_REMATCH_PORT=3306
       - MYSQL_ROOT_PASSWORD=qwe123

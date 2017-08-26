@@ -5,6 +5,10 @@ then
   python manage.py makemigrations collab
   python manage.py migrate
 fi
-./start_celery.sh &
+
+echo "Waiting for database to start..."
+while ! nc -z db 3306 ; do sleep 2; done
+
+celery -A rematch.celery_docker worker -l info &
 uwsgi --socket :8001 --module rematch.wsgi &
-./start_nginx.sh
+nginx -g 'daemon off;'
