@@ -147,3 +147,4 @@ class MatcherSerializer(serializers.Serializer):
   match_type = serializers.ReadOnlyField()
   vector_type = serializers.ReadOnlyField()
   matcher_name = serializers.ReadOnlyField()
+  matcher_description = serializers.ReadOnlyField()

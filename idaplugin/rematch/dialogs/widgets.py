@@ -49,12 +49,13 @@ class QItemSelect(QtWidgets.QComboBox):
 
 
 class QItemCheckBoxes(QtWidgets.QGridLayout):
-  def __init__(self, item, name_field='name', id_field='id', exclude=None,
-               columns=3):
+  def __init__(self, item, name_field='name', id_field='id',
+               description_field='description', exclude=None, columns=3):
     super(QItemCheckBoxes, self).__init__()
     self.item = item
     self.name_field = name_field
     self.id_field = id_field
+    self.description_field = description_field
     self.exclude = exclude
     self.columns = columns
     self.checkboxes = []
@@ -69,6 +70,7 @@ class QItemCheckBoxes(QtWidgets.QGridLayout):
       if not obj:
         continue
       item_name = obj[self.name_field]
+      item_description = obj[self.description_field]
       item_id = obj[self.id_field]
 
       if self.exclude and (item_name in self.exclude or
@@ -76,6 +78,8 @@ class QItemCheckBoxes(QtWidgets.QGridLayout):
         continue
 
       checkbox_widget = QtWidgets.QCheckBox(item_name)
+      if item_description:
+        checkbox_widget.setToolTip(item_description)
       checkbox_widget.id = item_id
       checkbox_widget.setChecked(True)
       self.addWidget(checkbox_widget, i / self.columns, i % self.columns)

@@ -8,4 +8,5 @@ class Matcher(object):
   def is_abstract(cls):
     return not (hasattr(cls, 'vector_type') and
                 hasattr(cls, 'match_type') and
+                hasattr(cls, 'matcher_description') and
                 hasattr(cls, 'matcher_name'))
