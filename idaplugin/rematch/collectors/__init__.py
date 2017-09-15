@@ -8,9 +8,13 @@ import json
 
 def collect(collectors, offset, instance_id=None):
   for collector in collectors:
-    r = collector.collect(offset, instance_id)
-    if r:
-      yield r
+    try:
+      r = collector.collect(offset, instance_id)
+      if r:
+        yield r
+    except UnicodeDecodeError:
+      log('annotation').error("Unicode decoding error during serializion of "
+                              "type %s at offset %x", collector.type, offset)
 
 
 def apply(offset, annotation):
