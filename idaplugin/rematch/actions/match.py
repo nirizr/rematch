@@ -47,10 +47,14 @@ class MatchAction(base.BoundFileAction):
       self.timer.timeout.disconnect()
     except TypeError:
       pass
+
+    if not self.pbar.wasCanceled():
+      self.pbar.cancel()
     try:
       self.pbar.accepted.disconnect()
     except TypeError:
       pass
+    self.pbar = None
 
   def cancel_delayed(self):
     for delayed in self.delayed_queries:
@@ -197,7 +201,7 @@ class MatchAction(base.BoundFileAction):
       progress = int(r['progress'])
       status = r['status']
       if status == 'failed':
-        self.pbar.cancel()
+        self.cancel()
       elif progress_max:
         self.pbar.setMaximum(progress_max)
         if progress >= progress_max:
