@@ -62,7 +62,7 @@ class Instance(models.Model):
 
   owner = models.ForeignKey(User, db_index=True)
   file_version = models.ForeignKey(FileVersion, related_name='instances')
-  type = models.CharField(max_length=16, choices=TYPE_CHOICES)
+  type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   offset = models.BigIntegerField()
 
   matches = models.ManyToManyField('self', symmetrical=False, through='Match',
@@ -88,7 +88,7 @@ class Vector(models.Model):
 
   instance = models.ForeignKey(Instance, related_name='vectors')
   file_version = models.ForeignKey(FileVersion, related_name='vectors')
-  type = models.CharField(max_length=16, choices=TYPE_CHOICES)
+  type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   type_version = models.IntegerField()
   data = models.TextField()
 
@@ -117,7 +117,7 @@ class Task(models.Model):
   finished = models.DateTimeField(null=True)
 
   owner = models.ForeignKey(User, db_index=True)
-  status = models.CharField(default=STATUS_PENDING, max_length=16,
+  status = models.CharField(default=STATUS_PENDING, max_length=64,
                             choices=STATUS_CHOICES)
 
   source_file_version = models.ForeignKey(FileVersion,
@@ -140,7 +140,7 @@ class Match(models.Model):
 
   task = models.ForeignKey(Task, db_index=True, related_name='matches')
 
-  type = models.CharField(max_length=16, choices=Vector.TYPE_CHOICES)
+  type = models.CharField(max_length=64, choices=Vector.TYPE_CHOICES)
   score = models.FloatField()
 
 
@@ -153,5 +153,5 @@ class Annotation(models.Model):
                   (TYPE_PROTOTYPE, "Prototype"))
 
   instance = models.ForeignKey(Instance, related_name='annotations')
-  type = models.CharField(max_length=16, choices=TYPE_CHOICES)
+  type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   data = models.TextField()
