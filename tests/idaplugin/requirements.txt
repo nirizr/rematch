@@ -1,2 +1,2 @@
 pytest
-pytest-idapro>=0.1.14
+pytest-idapro>=0.1.16

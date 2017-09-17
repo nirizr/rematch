@@ -10,10 +10,6 @@ class BaseDialog(object):
     self.response_handler = response_handler
     self.exception_handler = exception_handler
 
-    self.rejected.connect(self.reject_base)
-    self.accepted.connect(self.accept_base)
-    self.finished.connect(self.finish_base)
-
   def accept_base(self):
     if self.accept_handler:
       self.accept_handler()

@@ -134,7 +134,8 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
       self.ui.finished.connect(self.close_dialog)
       self.ui.show()
     else:
-      log('actions').warn("%s: no activation", self.__class__)
+      raise NotImplementedError("activation called on an action class with no "
+                                "ui_class defined")
 
   def close_dialog(self):
     """Destruction and cleanup of dialog bound to action on activation

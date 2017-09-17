@@ -14,6 +14,10 @@ class GuiDialog(BaseDialog, QtWidgets.QDialog):
     self.base_layout = QtWidgets.QVBoxLayout()
     self.setLayout(self.base_layout)
 
+    self.rejected.connect(self.reject_base)
+    self.accepted.connect(self.accept_base)
+    self.finished.connect(self.finish_base)
+
   def bottom_layout(self, ok_text="&Ok", cencel_text="&Cancel"):
     self.statusLbl = QtWidgets.QLabel()
     self.base_layout.addWidget(self.statusLbl)

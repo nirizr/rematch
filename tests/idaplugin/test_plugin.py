@@ -1,6 +1,7 @@
 import time
 import sys
 import idaplugin
+import pytest
 
 
 class CaptureExceptions(object):
@@ -50,14 +51,14 @@ def test_action_creation(idapro_action_entry, idapro_app):
     action.update(ctx)
     idapro_app.processEvents()
 
-  try:
+  with pytest.raises(Exception) as exc:
     with CaptureExceptions():
       action.activate(ctx)
       time.sleep(1)
       idapro_app.processEvents()
-  except (idaplugin.rematch.exceptions.NotFoundException,
-          idaplugin.rematch.exceptions.ConnectionException):
-    pass
+    assert isinstance(exc, (NotImplementedError,
+                            idaplugin.rematch.exceptions.NotFoundException,
+                            idaplugin.rematch.exceptions.ConnectionException))
 
 
 def test_update(idapro_app):
