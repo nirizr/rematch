@@ -4,15 +4,14 @@ import json
 import numpy as np
 import sklearn as skl
 import sklearn.metrics  # noqa flake8 importing as a different name
-import sklearn.preprocessing  # noqa flake8 importing as a different name
 import sklearn.feature_extraction  # noqa flake8 importing as a different name
 
 from . import matcher
 
 
-class HistogramMatcher(matcher.Matcher):
-  @staticmethod
-  def match(source, target):
+class DictionaryMatcher(matcher.Matcher):
+  @classmethod
+  def match(cls, source, target):
     source_values = itertools.izip(*source.values_list('instance_id', 'data'))
     target_values = itertools.izip(*target.values_list('instance_id', 'data'))
 
@@ -28,8 +27,7 @@ class HistogramMatcher(matcher.Matcher):
     print("source matrix: {}, target matrix: {}".format(source_matrix.shape,
                                                         target_matrix.shape))
 
-    distance_matrix = skl.metrics.pairwise.euclidean_distances(source_matrix,
-                                                               target_matrix)
+    distance_matrix = cls.cmp_fn(source_matrix, target_matrix)
     print("min, max dist: {}, {}".format(distance_matrix.min(),
                                          distance_matrix.max()))
 
