@@ -35,7 +35,10 @@ class MatchAction(base.BoundFileAction):
 
     self.delayed_queries = []
 
-    self.pbar = None
+    self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.hide()
+    self.pbar.canceled.connect(self.cancel)
+    self.pbar.rejected.connect(self.cancel)
     self.timer = QtCore.QTimer()
 
   def running(self):
@@ -54,7 +57,7 @@ class MatchAction(base.BoundFileAction):
       self.pbar.accepted.disconnect()
     except TypeError:
       pass
-    self.pbar = None
+    self.pbar.hide()
 
   def cancel_delayed(self):
     for delayed in self.delayed_queries:
@@ -97,10 +100,6 @@ class MatchAction(base.BoundFileAction):
 
   def response_handler(self, file_version):
     self.file_version_id = file_version['id']
-
-    self.pbar = QtWidgets.QProgressDialog()
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
 
     if file_version['newly_created']:
       self.start_upload()
