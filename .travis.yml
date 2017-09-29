@@ -43,7 +43,6 @@ install:
       bash ./miniconda.sh -b -p ${HOME}/miniconda;
       export PATH=${HOME}/miniconda/bin:$PATH;
       conda info -a;
-      conda update --yes conda;
 
       if [ ${PROJECT} = "server" ]; then
         conda install --yes python=${TRAVIS_PYTHON_VERSION} atlas numpy scipy scikit-learn;
