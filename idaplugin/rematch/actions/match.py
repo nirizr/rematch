@@ -32,6 +32,7 @@ class MatchAction(base.BoundFileAction):
     self.target_project = None
     self.target_file = None
     self.matchers = None
+    self.recieved = None
 
     self.delayed_queries = []
 
@@ -234,6 +235,8 @@ class MatchAction(base.BoundFileAction):
     self.results = MatchResultDialog(self.task_id)
     self.results.finished.connect(self.close_dialog)
 
+    self.recieved = set()
+
     log('match_action').info("Result download started")
     locals_url = "collab/tasks/{}/locals/".format(self.task_id)
     q = network.QueryWorker("GET", locals_url, json=True, pageable=True,
@@ -257,11 +260,15 @@ class MatchAction(base.BoundFileAction):
     new_locals = {obj['id']: obj for obj in response['results']}
     self.results.add_locals(new_locals)
 
+    self.recieved.add('locals')
+
     self.handle_page(response)
 
   def handle_remotes(self, response):
     new_remotes = {obj['id']: obj for obj in response['results']}
     self.results.add_remotes(new_remotes)
+
+    self.recieved.add('remotes')
 
     self.handle_page(response)
 
@@ -274,6 +281,8 @@ class MatchAction(base.BoundFileAction):
     new_matches = map(rename, response['results'])
     self.results.add_matches(new_matches)
 
+    self.recieved.add('matches')
+
     self.handle_page(response)
 
   def handle_page(self, response):
@@ -281,7 +290,7 @@ class MatchAction(base.BoundFileAction):
       self.pbar.setMaximum(self.pbar.maximum() + response['count'])
 
     new_value = max(self.pbar.value(), 0) + len(response['results'])
-    if new_value >= self.pbar.maximum():
+    if new_value >= self.pbar.maximum() and len(self.recieved) >= 3:
       self.pbar.accept()
     else:
       self.pbar.setValue(new_value)
