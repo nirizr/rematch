@@ -35,10 +35,7 @@ class MatchAction(base.BoundFileAction):
 
     self.delayed_queries = []
 
-    self.pbar = QtWidgets.QProgressDialog()
-    self.pbar.hide()
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
+    self.pbar = None
     self.timer = QtCore.QTimer()
 
   def running(self):
@@ -51,13 +48,11 @@ class MatchAction(base.BoundFileAction):
     except TypeError:
       pass
 
-    if not self.pbar.wasCanceled():
-      self.pbar.cancel()
     try:
       self.pbar.accepted.disconnect()
     except TypeError:
       pass
-    self.pbar.hide()
+    self.pbar = None
 
   def cancel_delayed(self):
     for delayed in self.delayed_queries:
@@ -113,6 +108,9 @@ class MatchAction(base.BoundFileAction):
 
     self.functions = set(idautils.Functions())
 
+    self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.canceled.connect(self.cancel)
+    self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
                            "please avoid making any ground-breaking changes.")
     self.pbar.setRange(0, len(self.functions))
@@ -181,6 +179,9 @@ class MatchAction(base.BoundFileAction):
     r = network.query("POST", "collab/tasks/", params=params, json=True)
     self.task_id = r['id']
 
+    self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.canceled.connect(self.cancel)
+    self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Waiting for remote matching... You may continue "
                            "working without any limitations.")
     self.pbar.setRange(0, int(r['progress_max']) if r['progress_max'] else 0)
@@ -221,6 +222,9 @@ class MatchAction(base.BoundFileAction):
     self.start_results()
 
   def start_results(self):
+    self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.canceled.connect(self.cancel)
+    self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Receiving match results...")
     self.pbar.setRange(0, 0)
     self.pbar.setValue(0)
