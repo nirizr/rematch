@@ -75,12 +75,14 @@ class Instance(models.Model):
 
 
 class Vector(models.Model):
+  TYPE_INSTRUCTION_HASH = 'instruction_hash'
   TYPE_IDENTITY_HASH = 'identity_hash'
   TYPE_NAME_HASH = 'name_hash'
   TYPE_ASSEMBLY_HASH = 'assembly_hash'
   TYPE_MNEMONIC_HASH = 'mnemonic_hash'
   TYPE_MNEMONIC_HIST = 'mnemonic_hist'
-  TYPE_CHOICES = [(TYPE_IDENTITY_HASH, "Identity Hash"),
+  TYPE_CHOICES = [(TYPE_INSTRUCTION_HASH, "Instruction Hash"),
+                  (TYPE_IDENTITY_HASH, "Identity Hash"),
                   (TYPE_NAME_HASH, "Name Hash"),
                   (TYPE_ASSEMBLY_HASH, "Assembly Hash"),
                   (TYPE_MNEMONIC_HASH, "Mnemonic Hash"),

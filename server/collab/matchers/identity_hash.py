@@ -6,4 +6,4 @@ class IdentityHashMatcher(hash_matcher.HashMatcher):
   match_type = 'identity_hash'
   matcher_name = "Identity Hash"
   matcher_description = ("Exact matches for functions with identical binary "
-                         "listings.")
+                         "representation, mostly offset values are ignored.")

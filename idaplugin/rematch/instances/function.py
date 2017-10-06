@@ -15,7 +15,8 @@ class FunctionInstance(EmptyFunctionInstance):
 
   def __init__(self, *args, **kwargs):
     super(FunctionInstance, self).__init__(*args, **kwargs)
-    self.vectors |= {collectors.vectors.IdentityHashVector,
+    self.vectors |= {collectors.vectors.InstructionHashVector,
+                     collectors.vectors.IdentityHashVector,
                      collectors.vectors.AssemblyHashVector,
                      collectors.vectors.MnemonicHashVector,
                      collectors.vectors.MnemonicHistVector}
