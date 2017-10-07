@@ -1,6 +1,8 @@
 from . import base
 from .. import collectors
 
+import idautils
+
 
 class EmptyFunctionInstance(base.BaseInstance):
   type = 'empty_function'
@@ -21,3 +23,8 @@ class FunctionInstance(EmptyFunctionInstance):
                      collectors.vectors.MnemonicHashVector,
                      collectors.vectors.MnemonicHistVector}
     self.annotations |= {collectors.annotations.AssemblyAnnotation}
+
+  def size(self):
+    """return the overall size of function by adding sizes of all indevidual
+    chunks"""
+    return sum([chunk[1] - chunk[0] for chunk in idautils.Chunks(self.offset)])

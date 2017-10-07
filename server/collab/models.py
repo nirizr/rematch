@@ -64,6 +64,7 @@ class Instance(models.Model):
   file_version = models.ForeignKey(FileVersion, related_name='instances')
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   offset = models.BigIntegerField()
+  size = models.BigIntegerField()
 
   matches = models.ManyToManyField('self', symmetrical=False, through='Match',
                                    related_name='related_to+')
