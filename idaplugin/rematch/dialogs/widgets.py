@@ -1,6 +1,7 @@
 from ..idasix import QtWidgets, QtCore
 
 import ida_funcs
+import ida_kernwin
 import idc
 
 from .. import network
@@ -170,8 +171,8 @@ class QFunctionSelect(QtWidgets.QWidget):
 
   def btn_clicked(self, checked):
     del checked
-    f = ida_funcs.choose_func("Choose function to match with database",
-                              self.func.startEA if self.func else 0)
+    f = ida_kernwin.choose_func("Choose function to match with database",
+                                self.func.startEA if self.func else 0)
     if f:
       self.set_func(f)
       self.changed.emit()
