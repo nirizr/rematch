@@ -67,13 +67,6 @@ DATABASES = {
 STATIC_URL = '/static/'
 
 
-# Celery configuration
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-
-
 # docker conf
 RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq')
 
@@ -97,33 +90,3 @@ if not BROKER_URL:
 
 BROKER_POOL_LIMIT = 1
 BROKER_CONNECTION_TIMEOUT = 10
-
-# Celery configuration
-
-# configure queues, currently we have only one
-# CELERY_DEFAULT_QUEUE = 'default'
-# CELERY_QUEUES = (
-#    Queue('default', Exchange('default'), routing_key='default'),
-# )
-
-# Sensible settings for celery
-CELERY_ALWAYS_EAGER = False
-CELERY_ACKS_LATE = True
-CELERY_TASK_PUBLISH_RETRY = True
-CELERY_DISABLE_RATE_LIMITS = False
-
-# By default we will ignore result
-# If you want to see results and try out tasks interactively,
-# change it to False
-# Or change this setting on tasks level
-CELERY_IGNORE_RESULT = True
-CELERY_SEND_TASK_ERROR_EMAILS = False
-CELERY_TASK_RESULT_EXPIRES = 600
-
-# Don't use pickle as serializer, json is much safer
-CELERY_TASK_SERIALIZER = "json"
-CELERY_ACCEPT_CONTENT = ['application/json']
-
-CELERYD_HIJACK_ROOT_LOGGER = False
-CELERYD_PREFETCH_MULTIPLIER = 1
-CELERYD_MAX_TASKS_PER_CHILD = 1000
