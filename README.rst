@@ -1,4 +1,4 @@
-|Read The Docs| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
+|Read The Docs| |Gitter Chat| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
 
 rematch
 =======
@@ -135,6 +135,9 @@ python scripting! :D).
 .. |Read The Docs| image:: https://readthedocs.org/projects/rematch/badge/?version=latest
    :alt: Read The Docs
    :target: http://rematch.readthedocs.io/en/latest/?badge=latest
+.. |Gitter Chat| image:: https://img.shields.io/gitter/room/rematch/rematch.js.svg
+   :alt: Gitter Chat
+   :target: https://gitter.im/rematch/rematch
 .. |Build Status| image:: https://travis-ci.org/nirizr/rematch.svg?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/nirizr/rematch
