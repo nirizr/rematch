@@ -22,7 +22,8 @@ class DictionaryMatcher(matcher.Matcher):
     target_data = [json.loads(d) for d in target_data]
 
     dictvect = skl.feature_extraction.DictVectorizer()
-    source_matrix = dictvect.fit_transform(source_data)
+    source_matrix = dictvect.fit(source_data + target_data)
+    source_matrix = dictvect.transform(source_data)
     target_matrix = dictvect.transform(target_data)
     print("source matrix: {}, target matrix: {}".format(source_matrix.shape,
                                                         target_matrix.shape))
