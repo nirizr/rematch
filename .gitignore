@@ -96,3 +96,6 @@ server/db.sqlite3
 Thumbs.db
 *.un~
 *.swp
+
+# server private key file
+server/rematch/.rematch_secret.key
