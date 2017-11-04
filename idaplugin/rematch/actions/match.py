@@ -290,6 +290,9 @@ class MatchAction(base.BoundFileAction):
       self.pbar.setMaximum(self.pbar.maximum() + response['count'])
 
     new_value = max(self.pbar.value(), 0) + len(response['results'])
+    log('match_action').info("result download progress: {} / {} with {}"
+                             "".format(new_value, self.pbar.maximum(),
+                                       self.recieved))
     if new_value >= self.pbar.maximum() and len(self.recieved) >= 3:
       self.pbar.accept()
     else:
