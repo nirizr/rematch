@@ -224,6 +224,7 @@ class MatchAction(base.BoundFileAction):
 
   def start_results(self):
     self.pbar = QtWidgets.QProgressDialog()
+    self.pbar.setAutoReset(False)
     self.pbar.canceled.connect(self.cancel)
     self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Receiving match results...")
