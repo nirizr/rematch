@@ -1,10 +1,12 @@
-Django >= 1.8 # celery 4.0 requires django 1.8
+Django >=1.8, <2.0 ; python_version < '3.0' # celery 4.0 requires django 1.8
+                                            # django2 does not support python2
+Django ; python_version >= '3.0'            # install any django version on python3
 numpy
 scipy
 scikit-learn
 django-registration-redux
 djangorestframework
-django-rest-auth >= 0.8.2
-celery >= 4 # celery 4 broke backwards compatibility
+django-rest-auth >=0.8.2
+celery >=4 # celery 4 broke backwards compatibility, we moved to using it
 django-filter
 mysqlclient # this requires package installed libmysqlclient-dev

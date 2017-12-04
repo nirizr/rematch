@@ -1,5 +1,6 @@
 import pytest
 from rest_framework import status
+import json
 
 from utils import (rand_hash, create_model, setup_model, assert_eq,
                    assert_response, collab_models_keys)
@@ -66,16 +67,30 @@ def test_model_creation(admin_api_client, admin_user, model_name):
                                    HTTP_ACCEPT='application/json')
 
   assert_response(response, status.HTTP_201_CREATED)
-  projects_created = [response.json()]
+  projects_created = [response.data]
 
   response = admin_api_client.get('/collab/{}/'.format(model_name),
                                   HTTP_ACCEPT="application/json")
-  assert_eq(response.json(), projects_created)
+  assert_eq(response.data, projects_created)
 
 
+# TODO: move to its own file
 def test_template(admin_client):
   response = admin_client.get('/accounts/profile/')
   assert_response(response, status.HTTP_200_OK)
+
+  user_data = json.loads(response.data)
+  assert 'id' in user_data
+  assert 'username' in user_data
+  assert 'email' in user_data
+  assert 'is_authenticated' in user_data
+  assert user_data['is_authenticated'] is True
+  assert 'is_active' in user_data
+  assert user_data['is_active'] is True
+  assert 'is_staff' in user_data
+  assert user_data['is_staff'] is True
+  assert 'is_superuser' in user_data
+  assert user_data['is_superuser'] is True
 
 
 @pytest.mark.django_db
