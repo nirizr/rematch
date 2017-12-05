@@ -25,7 +25,7 @@ def get_requirements(fname):
   return open(fname).readlines()
 
 
-def build_setup(name, package_name, version_path, package_base,
+def build_setup(package_base, package_name, version_path,
                 package_data=None, script_args=None):
   if package_data is None:
     package_data = {}
@@ -35,13 +35,14 @@ def build_setup(name, package_name, version_path, package_base,
   requirements_path = os.path.join(base_path, package_base, "requirements.txt")
   if os.path.exists(requirements_path):
     install_requires = get_requirements(requirements_path)
+    # include requirementst.txt as part of package
     if package_base not in package_data:
       package_data[package_base] = []
     package_data[package_base].append('requirements.txt')
   else:
     install_requires = []
 
-  test_requirements_path = os.path.join(base_path, "tests", name,
+  test_requirements_path = os.path.join(base_path, "tests", package_base,
                                         "requirements.txt")
   extras_require = {}
   if os.path.exists(test_requirements_path):
@@ -73,19 +74,17 @@ def build_setup(name, package_name, version_path, package_base,
 
 
 def build_setup_server(script_args=None):
-  build_setup(name='server',
+  build_setup(package_base='server',
               package_name='rematch-server',
               version_path='./',
-              package_base='server',
               script_args=script_args)
 
 
 def build_setup_idaplugin(script_args=None):
   package_data = {'idaplugin/rematch': ['images/*']}
-  build_setup(name='idaplugin',
+  build_setup(package_base='idaplugin',
               package_name='rematch-idaplugin',
               version_path='rematch',
-              package_base='idaplugin',
               package_data=package_data,
               script_args=script_args)
 
