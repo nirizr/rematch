@@ -120,7 +120,8 @@ def assert_eq(a, b):
     for a_item, b_item in zip(a, b):
       assert_eq(a_item, b_item)
   elif isinstance(a, dict) and isinstance(b, dict):
-    for k in b:
+    # intentionally only iterate over keys from b
+    for k in b.keys():
       assert_eq(a[k], b[k])
   elif isinstance(b, dict) and (isinstance(a, models.Model) or
                                 inspect.isclass(a)):
