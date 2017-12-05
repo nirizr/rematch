@@ -64,9 +64,6 @@ install:
     fi ;
   - pip install flake8 coveralls pytest-cov ;
 
-before_script:
-  - if [ ${PROJECT} = "server" ]; then mysql -e 'SHOW VARIABLES LIKE "%version%";' ; fi ;
-
 script:
   - flake8 ./${PROJECT} --show-source --statistics
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
