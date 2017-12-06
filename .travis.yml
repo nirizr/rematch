@@ -37,7 +37,7 @@ before_install:
 install:
   - set +vx;
   - pip install --upgrade pip setuptools wheel
-  - if [ ${ENV} = "docker" ]; then
+  - if [ "${ENV}" = "docker" ]; then
       service docker start ;
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
@@ -45,9 +45,9 @@ install:
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/requirements.txt ;
       fi ;
     else
-      if [ ${PROJECT} = "idaplugin" ]; then
+      if [ "${PROJECT}" = "idaplugin" ]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-        bash ./miniconda.sh -b -p ${HOME}/miniconda;
+        bash ./miniconda.sh -b -p "${HOME}/miniconda";
         export PATH=${HOME}/miniconda/bin:$PATH;
         conda info -a;
         conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
@@ -58,8 +58,8 @@ install:
       if [ -f tests/${PROJECT}/requirements.txt ]; then
         pip install -r tests/${PROJECT}/requirements.txt ;
       fi ;
-      if [ -f ${PROJECT}/requirements.txt ]; then
-        pip install -r ${PROJECT}/requirements.txt ;
+      if [ -f "${PROJECT}/requirements.txt" ]; then
+        pip install -r "${PROJECT}/requirements.txt" ;
       fi ;
     fi ;
   - pip install flake8 coveralls pytest-cov ;
@@ -74,8 +74,10 @@ script:
         PYTHONPATH=. py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ;
       fi ;
     fi ;
-  - if [ ${PROJECT} = "setup.py" ]; then python ./setup.py server install ; fi ;
-  - if [ ${PROJECT} = "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
+  - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py server install ; fi ;
+  - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
 
 after_script:
-  - if [ -d ./tests/${PROJECT} ] && [ ${ENV} != "docker" ]; then coveralls ; echo "./tests/${PROJECT}" ; fi ;
+  - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" != "docker" ]; then
+      coveralls ;
+    fi ;
