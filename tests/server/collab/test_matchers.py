@@ -19,3 +19,5 @@ def test_matchers_abstract(admin_client):
     admin_client.get('/collab/matches/matchers/',
                      content_type="application/json")
   assert ex.value.args[0] == "Abstract matcher in list"
+
+  matchers.matchers_list.remove(matchers.Matcher)

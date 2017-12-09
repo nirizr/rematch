@@ -108,23 +108,3 @@ def test_file_fileversion(admin_client, admin_user):
   response = admin_client.get(url, content_type="application/json")
   obj = {'newly_created': False, 'md5hash': file_version, 'file': file_obj.id}
   assert_response(response, status.HTTP_200_OK, obj)
-
-
-@pytest.mark.parametrize('limit', [None, 10])
-@pytest.mark.parametrize('resource', ['locals', 'remotes', 'matches'])
-def test_task_resource_empty(resource, limit, admin_client, admin_user):
-  task = create_model('tasks', admin_user)
-  task.save()
-
-  data = {'limit': limit} if limit else {}
-  response = admin_client.get('/collab/tasks/{}/{}/'.format(task.id, resource),
-                              data=data, content_type="application/json")
-  assert_response(response, status.HTTP_200_OK, [])
-
-
-def test_task(admin_user):
-  task = create_model('tasks', admin_user)
-  task.save()
-
-  from collab.tasks import match
-  match(task.id)

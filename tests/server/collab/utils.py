@@ -73,7 +73,7 @@ def resolve_reqs(model_name, user):
     yield req_field, obj
 
 
-def create_model(model_name, user, base_obj=None):
+def create_model(model_name, user, base_obj=None, **additional_fields):
   if base_obj is None:
     base_obj = collab_model_objects[model_name]()
 
@@ -82,6 +82,12 @@ def create_model(model_name, user, base_obj=None):
 
     for req_field, obj in resolve_reqs(model_name, user):
       base_obj.__setattr__(req_field, obj)
+
+  for field, value in additional_fields.items():
+    if isinstance(value, str) and value in collab_models:
+      value = create_model(value, user)
+      value.save()
+    base_obj.__setattr__(field, value)
 
   print("base_obj", base_obj)
   return base_obj
