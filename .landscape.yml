@@ -1,3 +1,6 @@
+strictness: veryhigh
+test-warnings: true
+
 uses:
   - django
   - celery
@@ -10,8 +13,6 @@ requirements:
   - setup.py
   - server/requirements.txt
 
-test-warnings: true
-
 pylint:
   disable:
     - bad-indentation
@@ -19,5 +20,10 @@ pylint:
     max-args: 10
 pep8:
   disable:
+    - E111
+    - E113
     - E114
+    - E121
+    - E125
+    - E127
     - E129

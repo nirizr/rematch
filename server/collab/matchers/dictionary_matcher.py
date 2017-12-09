@@ -11,15 +11,26 @@ from . import matcher
 
 class DictionaryMatcher(matcher.Matcher):
   @classmethod
-  def match(cls, source, target):
-    source_values = itertools.izip(*source.values_list('instance_id', 'data'))
-    target_values = itertools.izip(*target.values_list('instance_id', 'data'))
+  def format_data(cls, source, target):
+    source_rows = itertools.izip(*source.values_list('instance_id', 'data'))
+    target_rows = itertools.izip(*target.values_list('instance_id', 'data'))
 
+    source_instance_ids, source_json = source_rows
+    target_instance_ids, target_json = target_rows
+
+    source_data = [json.loads(d) for d in source_json]
+    target_data = [json.loads(d) for d in target_json]
+
+    source_values = source_instance_ids, source_data
+    target_values = target_instance_ids, target_data
+
+    return source_values, target_values
+
+  @classmethod
+  def match(cls, source, target):
+    source_values, target_values = cls.format_data(source, target)
     source_instance_ids, source_data = source_values
     target_instance_ids, target_data = target_values
-
-    source_data = [json.loads(d) for d in source_data]
-    target_data = [json.loads(d) for d in target_data]
 
     dictvect = skl.feature_extraction.DictVectorizer()
     source_matrix = dictvect.fit(source_data + target_data)

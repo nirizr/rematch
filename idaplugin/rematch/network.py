@@ -75,7 +75,7 @@ class QueryWorker(QtCore.QRunnable):
 
     if requeue:
       requeue = requeue == 'write'
-      callback = utils.ida_kernel_queue(write=requeue)(callback)
+      callback = utils.IdaKernelQueue(write=requeue)(callback)
 
     if callback:
       self.signals.result_dict.connect(callback)

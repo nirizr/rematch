@@ -1,5 +1,5 @@
 from . import config
-from utils import ida_kernel_queue
+from utils import IdaKernelQueue
 
 import ida_netnode
 import ida_kernwin
@@ -11,7 +11,7 @@ class NetNode(object):
     return ida_netnode.netnode("$rematch", 0, True)
 
   @property
-  @ida_kernel_queue(wait=True)
+  @IdaKernelQueue(wait=True)
   def bound_file_id(self):
     bound_file_id = self._nn.hashstr('bound_file_id')
     if not bound_file_id:
@@ -22,7 +22,7 @@ class NetNode(object):
 
     return int(bound_file_id)
 
-  @ida_kernel_queue(wait=True)
+  @IdaKernelQueue(wait=True)
   def validate_bound_server(self):
     bound_server = self._nn.hashstr('bound_server')
     if not bound_server:
@@ -49,19 +49,19 @@ class NetNode(object):
       return False
 
   @bound_file_id.setter
-  @ida_kernel_queue(write=True, wait=True)
+  @IdaKernelQueue(write=True, wait=True)
   def bound_file_id(self, file_id):
     r = self._nn.hashset("bound_file_id", str(file_id))
     if r:
       self.bind_server()
     return r
 
-  @ida_kernel_queue(write=True, wait=True)
+  @IdaKernelQueue(write=True, wait=True)
   def bind_server(self):
     self._nn.hashset("bound_server", str(config['login']['server']))
 
   @bound_file_id.deleter
-  @ida_kernel_queue(write=True, wait=True)
+  @IdaKernelQueue(write=True, wait=True)
   def bound_file_id(self):
     return self._nn.hashdel("bound_file_id")
 

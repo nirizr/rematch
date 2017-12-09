@@ -13,7 +13,7 @@ def get_plugin_path(*path):
   return get_plugin_base("rematch", *path)
 
 
-class ida_kernel_queue(object):
+class IdaKernelQueue(object):
   """Force functions to run in IDA's main thread.
 
   Access to IDA's IDB database is not thread-safe, so access should only be
@@ -21,7 +21,7 @@ class ida_kernel_queue(object):
   occour.
 
   This decorator is used to transparently force functions to run in IDA's main
-  thread. If a function decorated by `ida_kernel_queue` is called from within
+  thread. If a function decorated by `IdaKernelQueue` is called from within
   IDA's main thread, it will simply be executed immidiately by
   `ida_kernwin.execute_sync`. Otherwise it'll be queued into IDA's main thread
   work queue, and will either block or return immidiately depending on the

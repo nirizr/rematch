@@ -99,7 +99,7 @@ class InstanceVectorSerializer(serializers.ModelSerializer):
   vectors = NestedVectorSerializer(many=True, required=True)
   annotations = NestedAnnotationSerializer(many=True, required=True)
 
-  class Meta:
+  class Meta(object):
     model = Instance
     fields = ('id', 'owner', 'file', 'file_version', 'type', 'name', 'offset',
               'size', 'vectors', 'annotations')
