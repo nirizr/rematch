@@ -31,5 +31,4 @@ def test_dialog(dialog_entry, idapro_app):
     if dialog_entry.__name__ in known_failing_dialogs:
       pytest.xfail("Dialog {} which was expected to fail failed with "
                    "exception {}".format(dialog_entry.__name__, str(ex)))
-    else:
-      raise
+    raise
