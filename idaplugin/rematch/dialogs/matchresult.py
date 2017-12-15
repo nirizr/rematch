@@ -15,7 +15,7 @@ from . import resultscript
 from . import serializedgraph
 
 
-class MatchResultDialog(gui.GuiDialog):
+class MatchResultDialog(gui.DockableDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
@@ -27,8 +27,6 @@ class MatchResultDialog(gui.GuiDialog):
   REMOTE_ELEMENT_TOOLTIP = "Remote function"
 
   def __init__(self, task_id, *args, **kwargs):
-    if 'model' not in kwargs:
-      kwargs['modal'] = False
     super(MatchResultDialog, self).__init__(*args, **kwargs)
 
     self.task_id = task_id
