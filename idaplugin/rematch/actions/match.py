@@ -234,7 +234,6 @@ class MatchAction(base.BoundFileAction):
     self.pbar.show()
 
     self.results = MatchResultDialog(self.task_id)
-    self.results.finished.connect(self.close_dialog)
 
     self.recieved = set()
 
