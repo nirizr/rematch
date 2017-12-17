@@ -62,7 +62,7 @@ install:
         pip install -r "${PROJECT}/requirements.txt" ;
       fi ;
     fi ;
-  - pip install flake8
+  - pip install flake8 "pycodestyle>=2.3.0"
   - pip install prospector "pylint>=1.7.4"
   - pip install pytest-cov coveralls
 
