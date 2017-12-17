@@ -2,7 +2,8 @@ from django.db import models
 from django.db.models.fields import files
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-from collab.validators import idb_validator
+from .validators import idb_validator
+from .strategies import strategy_choices
 
 
 class Project(models.Model):
@@ -136,6 +137,8 @@ class Task(models.Model):
   target_file = models.ForeignKey(File, models.CASCADE, null=True)
   target_project = models.ForeignKey(Project, models.CASCADE, null=True)
   matchers = models.TextField(default='[]')
+  strategy = models.CharField(choices=strategy_choices(), max_length=256,
+                              default='all_strategy')
 
   progress = models.PositiveSmallIntegerField(default=0)
   progress_max = models.PositiveSmallIntegerField(null=True)

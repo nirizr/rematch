@@ -49,24 +49,22 @@ class QItemSelect(QtWidgets.QComboBox):
       self.setEnabled(False)
 
 
-class QItemCheckBoxes(QtWidgets.QGridLayout):
-  def __init__(self, item, name_field='name', id_field='id',
-               description_field='description', exclude=None, columns=3):
-    super(QItemCheckBoxes, self).__init__()
+class QItem(object):
+  def __init__(self, item, name_field, id_field, description_field,
+               exclude=None, columns=3, **kwargs):
+    super(QItem, self).__init__(**kwargs)
     self.item = item
     self.name_field = name_field
     self.id_field = id_field
     self.description_field = description_field
     self.exclude = exclude
     self.columns = columns
-    self.checkboxes = []
 
-    self.refresh()
+    self.load()
 
-  def refresh(self):
+  def load(self):
     response = network.query("GET", "collab/{}/".format(self.item), json=True)
 
-    self.checkboxes = []
     for i, obj in enumerate(response):
       if not obj:
         continue
@@ -78,58 +76,96 @@ class QItemCheckBoxes(QtWidgets.QGridLayout):
                            item_id in self.exclude):
         continue
 
-      checkbox_widget = QtWidgets.QCheckBox(item_name)
-      if item_description:
-        checkbox_widget.setToolTip(item_description)
-      checkbox_widget.id = item_id
-      checkbox_widget.setChecked(True)
-      self.addWidget(checkbox_widget, i / self.columns, i % self.columns)
-      self.checkboxes.append(checkbox_widget)
+      item = self.create_item(i=i, item_name=item_name, item_id=item_id,
+                              item_description=item_description)
+      self.addWidget(item, i / self.columns, i % self.columns)
+
+
+class QItemCheckBoxes(QItem, QtWidgets.QGridLayout):
+  def __init__(self, *args, **kwargs):
+    self.checkboxes = []
+    super(QItemCheckBoxes, self).__init__(*args, **kwargs)
+
+  def create_item(self, item_name, item_id, item_description, **kwargs):
+    del kwargs
+    widget = QtWidgets.QCheckBox(item_name)
+    widget.id = item_id
+    widget.setChecked(True)
+    if item_description:
+      widget.setToolTip(item_description)
+    self.checkboxes.append(widget)
+    return widget
 
   def get_result(self):
     return [cb.id for cb in self.checkboxes if cb.isChecked()]
 
 
-class QRadioGroup(QtWidgets.QGroupBox):
-  def __init__(self, title, *radios, **kwargs):
-    checked = kwargs.pop('checked', None)
+class QRadioLayout(QtWidgets.QGridLayout):
+  def __init__(self, *radios, **kwargs):
+    self.checked = kwargs.pop('checked', None)
 
-    super(QRadioGroup, self).__init__(title, **kwargs)
+    super(QRadioLayout, self).__init__(**kwargs)
 
     self.radiogroup = QtWidgets.QButtonGroup()
-    layout = QtWidgets.QGridLayout()
-    layout.setColumnStretch(1, 1)
+    self.setColumnStretch(1, 1)
+    self.create_items(radios)
 
+  def create_items(self, radios):
     for i, radio in enumerate(radios):
-      radio_name, radio_id, radio_extra_controls = radio
-      radio_widget = QtWidgets.QRadioButton(radio_name)
-      radio_widget.setObjectName(radio_id)
+      item_name, item_id = radio
+      item_widget = self.create_item(i=i, item_name=item_name,
+                                     item_id=item_id)
+      self.addWidget(item_widget, i, 0, QtCore.Qt.AlignTop)
 
-      self.radiogroup.addButton(radio_widget, i)
-      layout.addWidget(radio_widget, i, 0, QtCore.Qt.AlignTop)
-      if radio_extra_controls is not None:
-        layout.addWidget(radio_extra_controls, i, 1, QtCore.Qt.AlignTop)
-        # if extra controller comes disabled, make sure it stays that way
-        # and also make the radio box disabled
-        if radio_extra_controls.isEnabled():
-          radio_widget.toggled.connect(radio_extra_controls.setEnabled)
-          radio_extra_controls.setEnabled(False)
-        else:
-          radio_widget.setEnabled(False)
-        # if extra controller comes with a tooltip, copy that tooltip to
-        # radio button itself
-        if radio_extra_controls.toolTip():
-          radio_widget.setToolTip(radio_extra_controls.toolTip())
+  def create_item(self, i, item_name, item_id, **kwargs):
+    del kwargs
+    item_widget = QtWidgets.QRadioButton(item_name)
+    item_widget.setObjectName(item_id)
 
-      # if checked is supplied, set correct radio as checked
-      # else set first radio as checked`
-      if (checked is None and i == 0) or checked == radio_id:
-        radio_widget.setChecked(True)
+    self.radiogroup.addButton(item_widget, i)
 
-    self.setLayout(layout)
+    # if checked is supplied, set correct radio as checked
+    # else set first radio as checked`
+    if (self.checked is None and i == 0) or self.checked == item_id:
+      item_widget.setChecked(True)
+
+    return item_widget
 
   def get_result(self):
     return self.radiogroup.checkedButton().objectName()
+
+
+class QRadioExtraLayout(QRadioLayout):
+  def create_items(self, radios):
+    for i, radio in enumerate(radios):
+      item_name, item_id, item_extra = radio
+      item_widget = self.create_item(i=i, item_name=item_name,
+                                     item_id=item_id)
+      self.addWidget(item_widget, i, 0, QtCore.Qt.AlignTop)
+      if item_extra:
+        self.update_item_extra(item_widget, item_extra)
+        self.addWidget(item_extra, i, 1, QtCore.Qt.AlignTop)
+
+  @staticmethod
+  def update_item_extra(item_widget, item_extra):
+    # if extra controller comes disabled, make sure it stays that way
+    # and also make the radio box disabled
+    if item_extra.isEnabled():
+      item_widget.toggled.connect(item_extra.setEnabled)
+      item_extra.setEnabled(False)
+    else:
+      item_widget.setEnabled(False)
+    # if item_extra controller comes with a tooltip, copy that tooltip to
+    # radio button itself
+    if item_extra.toolTip():
+      item_widget.setToolTip(item_extra.toolTip())
+
+
+class QItemRadioGroup(QItem, QRadioLayout):
+  # TODO: cehck the multi inheritence
+  # TODO: check the extra param passed to create_item from load()
+  # TODO: make sure this is reasonavble and working
+  pass
 
 
 class QFunctionSelect(QtWidgets.QWidget):

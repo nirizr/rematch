@@ -14,6 +14,7 @@ matchers_list = [InstructionHashMatcher, IdentityHashMatcher, NameHashMatcher,
                  AssemblyHashMatcher, MnemonicHashMatcher,
                  MnemonicEuclideanMatcher]
 
+
 __all__ = ['Matcher', 'HashMatcher', 'EuclideanDictionaryMatcher',
            'InstructionHashMatcher', 'IdentityHashMatcher',
            'AssemblyHashMatcher', 'MnemonicHashMatcher', 'NameHashMatcher',

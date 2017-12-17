@@ -45,7 +45,7 @@ class TaskSerializer(serializers.ModelSerializer):
     fields = ('id', 'task_id', 'created', 'finished', 'owner', 'status',
               'target_project', 'target_file', 'source_file',
               'source_file_version', 'source_start', 'source_end', 'matchers',
-              'progress', 'progress_max')
+              'progress', 'progress_max', 'strategy')
 
 
 class TaskEditSerializer(TaskSerializer):
@@ -56,6 +56,7 @@ class TaskEditSerializer(TaskSerializer):
   source_start = serializers.ReadOnlyField()
   source_end = serializers.ReadOnlyField()
   matchers = serializers.ReadOnlyField()
+  strategy = serializers.ReadOnlyField()
 
 
 class SlimInstanceSerializer(serializers.ModelSerializer):
@@ -148,3 +149,9 @@ class MatcherSerializer(serializers.Serializer):
   vector_type = serializers.ReadOnlyField()
   matcher_name = serializers.ReadOnlyField()
   matcher_description = serializers.ReadOnlyField()
+
+
+class StrategySerializer(serializers.Serializer):
+  strategy_type = serializers.ReadOnlyField()
+  strategy_name = serializers.ReadOnlyField()
+  strategy_description = serializers.ReadOnlyField()

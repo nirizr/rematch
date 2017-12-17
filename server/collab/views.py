@@ -7,10 +7,11 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
                                 SlimInstanceSerializer, AnnotationSerializer,
-                                MatcherSerializer)
+                                MatcherSerializer, StrategySerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
+from collab.strategies import strategies_list
 
 
 class ViewSetOwnerMixin(object):
@@ -159,6 +160,15 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
     if any((m.is_abstract() for m in matchers_list)):
       raise Exception("Abstract matcher in list")
     serializer = MatcherSerializer(matchers_list, many=True)
+    return response.Response(serializer.data)
+
+  @staticmethod
+  @decorators.list_route()
+  def strategies(request):
+    del request
+    if any((s.is_abstract() for s in strategies_list)):
+      raise Exception("Abstract strategy in list")
+    serializer = StrategySerializer(strategies_list, many=True)
     return response.Response(serializer.data)
 
 

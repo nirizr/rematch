@@ -19,8 +19,10 @@ class MatchDialog(gui.GuiDialog):
                ("User functions", 'user', lbl),
                ("Single function", 'single', self.source_single),
                ("Range", 'range', self.source_range)]
-    self.sourceGrp = widgets.QRadioGroup("Match source", *choices)
-    self.base_layout.addWidget(self.sourceGrp)
+    self.source = widgets.QRadioExtraLayout(*choices)
+    self.source_gbx = QtWidgets.QGroupBox("Match source")
+    self.source_gbx.setLayout(self.source)
+    self.base_layout.addWidget(self.source_gbx)
 
     self.target_project = widgets.QItemSelect('projects', allow_none=False)
     self.target_file = widgets.QItemSelect('files', allow_none=False,
@@ -28,8 +30,17 @@ class MatchDialog(gui.GuiDialog):
     choices = [("Entire DB", 'db', None),
                ("Project", 'project', self.target_project),
                ("Another file", 'file', self.target_file)]
-    self.targetGrp = widgets.QRadioGroup("Match target", *choices)
-    self.base_layout.addWidget(self.targetGrp)
+    self.target = widgets.QRadioExtraLayout(*choices)
+    self.target_gbx = QtWidgets.QGroupBox("Match target")
+    self.target_gbx.setLayout(self.target)
+    self.base_layout.addWidget(self.target_gbx)
+
+    self.strategy = widgets.QItemRadioGroup('matches/strategies',
+                                            'strategy_name', 'strategy_type',
+                                            'strategy_description')
+    strategy_gbx = QtWidgets.QGroupBox("Match Strategies")
+    strategy_gbx.setLayout(self.strategy)
+    self.base_layout.addWidget(strategy_gbx)
 
     self.matchers = widgets.QItemCheckBoxes('matches/matchers', 'matcher_name',
                                             'match_type',
@@ -42,10 +53,11 @@ class MatchDialog(gui.GuiDialog):
     self.bottom_layout("&Start matching")
 
   def data(self):
-    return {'source': self.sourceGrp.get_result(),
+    return {'source': self.source.get_result(),
             'source_single': self.source_single.get_result(),
             'source_range': self.source_range.get_result(),
-            'target': self.targetGrp.get_result(),
+            'target': self.target.get_result(),
             'target_project': self.target_project.currentData(),
             'target_file': self.target_file.currentData(),
+            'strategy': self.strategy.get_result(),
             'matchers': self.matchers.get_result()}

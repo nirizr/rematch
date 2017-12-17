@@ -53,3 +53,43 @@ same IDB file will share their File databsse objects.
 
 File Version
 ++++++++++++
+
+.. todo:: Document the file version concept
+
+Matching Process
+----------------
+
+Matches are made using three entity types defined throughout the rematch
+project:
+
+* :term:`Vectors <Vector>`
+* :term:`Matchers <Matcher>`
+* :term:`Strategies <Strategy>`
+
+Vectors
+-------
+
+.. todo:: explain what vectors are
+
+.. todo:: document existing vectors
+
+Matcher / Matching Engines
+--------------------------
+
+.. todo:: explain what matchers are
+
+.. todo:: document existing engines
+
+Strategies
+----------
+Strategies control the way multiple :term:`Matchers <Matcher>` are used
+together, which :term:`Instances <Instance>` are matched against which and
+other similar logical decisions that may have significant implications on the
+overall outcome of the matching process. For example, one could wish to match
+all instances against all other instances, in an "All VS All" kind of way. This
+is the "All" Strategy.  However when comparing big databases, one may point out
+matching a 5 byte long and a 1000 byte long functions to each-other is
+redundant, as those are highly unlikely to match. Therefore, "Binning"
+functions and only matching the bins might speed up the matching process
+without causing a decrease in match accuracy, as it may reduce a lot of
+unnecessary matches. This is called the "Binning  strategy".

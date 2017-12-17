@@ -16,12 +16,13 @@ def test_task_resource_empty(resource, limit, admin_client, admin_user):
   assert_response(response, status.HTTP_200_OK, [])
 
 
-@pytest.mark.parametrize('additional_fields', [{},
-                                               {'source_start': 1000},
-                                               {'source_end': 1000},
-                                               {'target_file': 'files'}])
-def test_task(admin_user, additional_fields):
-  task = create_model('tasks', admin_user, **additional_fields)
+@pytest.mark.parametrize('params', [{},
+                                    {'source_start': 1000},
+                                    {'source_end': 1000},
+                                    {'target_file': 'files'},
+                                    {'strategy': 'binning_strategy'}])
+def test_task(admin_user, params):
+  task = create_model('tasks', admin_user, **params)
   task.save()
 
   from collab.tasks import match

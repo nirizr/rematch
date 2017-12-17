@@ -6,15 +6,15 @@ Sorted alphabetically
 .. glossary::
 
    Annotation
-     A piece of information describing an :term:`Instance` in more detail, often
-     created by the user while reverse engineering as part of the reverse
+     A piece of information describing an :term:`Instance` in more detail,
+     often created by the user while reverse engineering as part of the reverse
      engineering process. Annotations help the reverse engineer and therefore
      there's an advantage in applying annotations to matched :term:`Instances
      <Instance>`.
 
    Engine
      .. todo:: TODO
- 
+
    File
      .. todo:: TODO
 
@@ -29,18 +29,24 @@ Sorted alphabetically
      #. A function imported into a binary file from another binary.
      #. A stream of initialised data or structure.
      #. A stream of uninitialised data or structure.
-  
+
    Project
      .. todo:: TODO
 
    Vector
-      Raw data used to describe an :term:`Instance` in a way that facilitates and
-      enables matching. Those are also occasionally called features in data-
-      science and machine learning circles.
- 
+      Raw data used to describe an :term:`Instance` in a way that facilitates
+      and enables matching. Those are also occasionally called features in
+      data-science and machine learning circles.
+
    Matcher
       Matchers implement the logic of matching :term:`Instances <Instance>`
       together using thier :term:`Vectors <Vector>`.
 
    Match Task
       .. todo:: TODO
+
+   Strategy
+      Strategies control the way multiple :term:`Matchers <Matcher>` are used
+      together, which :term:`Instances <Instance>` are matched against which
+      and other similar logical decisions that may have significant
+      implications on the overall outcome of the matching process.
