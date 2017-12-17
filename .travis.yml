@@ -3,20 +3,28 @@ language: python
 matrix:
   include:
     - python: "2.7"
-      env: PROJECT=idaplugin
+      env: PROJECT=idaplugin ENV=CONDA
     - python: "2.7"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.debug'
       services:
         - mysql
         - rabbitmq
     - python: "3.5"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.production'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.production'
       services:
         - mysql
         - rabbitmq
     - python: "2.7"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.docker' ENV=docker
+      env: PROJECT=server ENV=docker DJANGO_SETTINGS_MODULE='rematch.settings.docker'
       services: docker
+    - python: "2.7"
+      env: PROJECT=idaplugin ENV=prospector
+    - python: "3.6"
+      env: PROJECT=idaplugin ENV=prospector
+    - python: "2.7"
+      env: PROJECT=server ENV=prospector
+    - python: "3.6"
+      env: PROJECT=server ENV=prospector
     - python: "2.7"
       env: PROJECT=setup.py
     - python: "3.6"
@@ -44,31 +52,36 @@ install:
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/requirements.txt ;
       fi ;
-    else
-      if [ "${PROJECT}" = "idaplugin" ]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-        bash ./miniconda.sh -b -p "${HOME}/miniconda";
-        export PATH=${HOME}/miniconda/bin:$PATH;
-        conda info -a;
-        conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
-      else
-        pip install --only-binary=numpy,scipy numpy scipy ;
-      fi ;
-
-      if [ -f tests/${PROJECT}/requirements.txt ]; then
-        pip install -r tests/${PROJECT}/requirements.txt ;
-      fi ;
-      if [ -f "${PROJECT}/requirements.txt" ]; then
-        pip install -r "${PROJECT}/requirements.txt" ;
-      fi ;
+      pip install flake8
     fi ;
-  - pip install flake8 "pycodestyle>=2.3.0"
-  - pip install prospector "pylint>=1.7.4"
+  - if [ "${ENV}" = "conda" ]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash ./miniconda.sh -b -p "${HOME}/miniconda";
+      export PATH=${HOME}/miniconda/bin:$PATH;
+      conda info -a;
+      conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
+      pip install flake8
+    fi ;
+  - if [ "${ENV}" = "data" ]; then
+      pip install --only-binary=numpy,scipy numpy scipy ;
+    fi ;
+  - if [ "${ENV}" = "prospector" ]; then
+      pip install prospector "pylint>=1.7.4"
+    fi ;
+  - if [ -f tests/${PROJECT}/requirements.txt ]; then
+      pip install -r tests/${PROJECT}/requirements.txt ;
+    fi ;
+  - if [ -f "${PROJECT}/requirements.txt" ]; then
+      pip install -r "${PROJECT}/requirements.txt" ;
+    fi ;
   - pip install pytest-cov coveralls
 
 script:
-  - flake8 ./${PROJECT} --show-source --statistics
-  - prospector ./${PROJECT} --profile ./.landscape.yml --profile-path ./ --die-on-tool-error
+  # TODO: only reason prospector is in it's own execution instance is because it can't function
+  # with flake8 due to prospector's version pinning of pycodestyle. For more information see
+  # https://github.com/landscapeio/prospector/issues/224
+  - if [ "${ENV}" != "prospector" ] ; then flake8 ./${PROJECT} --show-source --statistics ; fi
+  - if [ "${ENV}" = "prospector" ] ; then prospector ./${PROJECT} --profile ./.landscape.yml --profile-path ./ --die-on-tool-error ; fi
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./.landscape.yml --profile-path ./ ; fi
   - if [ -d ./tests/${PROJECT} ]; then
