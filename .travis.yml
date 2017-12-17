@@ -52,21 +52,21 @@ install:
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/requirements.txt ;
       fi ;
-      pip install flake8
+      pip install flake8 ;
     fi ;
   - if [ "${ENV}" = "conda" ]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash ./miniconda.sh -b -p "${HOME}/miniconda";
-      export PATH=${HOME}/miniconda/bin:$PATH;
-      conda info -a;
-      conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
-      pip install flake8
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh ;
+      bash ./miniconda.sh -b -p "${HOME}/miniconda" ;
+      export PATH=${HOME}/miniconda/bin:$PATH ;
+      conda info -a ;
+      conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt ;
+      pip install flake8 ;
     fi ;
   - if [ "${ENV}" = "data" ]; then
       pip install --only-binary=numpy,scipy numpy scipy ;
     fi ;
   - if [ "${ENV}" = "prospector" ]; then
-      pip install prospector "pylint>=1.7.4"
+      pip install prospector "pylint>=1.7.4" ;
     fi ;
   - if [ -f tests/${PROJECT}/requirements.txt ]; then
       pip install -r tests/${PROJECT}/requirements.txt ;
@@ -74,7 +74,7 @@ install:
   - if [ -f "${PROJECT}/requirements.txt" ]; then
       pip install -r "${PROJECT}/requirements.txt" ;
     fi ;
-  - pip install pytest-cov coveralls
+  - pip install pytest-cov coveralls ;
 
 script:
   # TODO: only reason prospector is in it's own execution instance is because it can't function
@@ -82,8 +82,8 @@ script:
   # https://github.com/landscapeio/prospector/issues/224
   - if [ "${ENV}" != "prospector" ] ; then flake8 ./${PROJECT} --show-source --statistics ; fi
   - if [ "${ENV}" = "prospector" ] ; then prospector ./${PROJECT} --profile ./.landscape.yml --profile-path ./ --die-on-tool-error ; fi
-  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
-  - if [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./.landscape.yml --profile-path ./ ; fi
+  - if [ "${ENV}" != "prospector" ] && [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
+  - if [ "${ENV}" = "prospector" ] && [ -d ./tests/${PROJECT} ]; then prospector ./tests/${PROJECT} --profile ./.landscape.yml --profile-path ./ ; fi
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ;
