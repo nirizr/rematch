@@ -3,19 +3,19 @@ language: python
 matrix:
   include:
     - python: "2.7"
-      env: PROJECT=idaplugin
+      env: PROJECT=idaplugin ENV=conda
     - python: "2.7"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.debug'
       services:
         - mysql
         - rabbitmq
     - python: "3.5"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.production'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.production'
       services:
         - mysql
         - rabbitmq
     - python: "2.7"
-      env: PROJECT=server DJANGO_SETTINGS_MODULE='rematch.settings.docker' ENV=docker
+      env: PROJECT=server ENV=docker DJANGO_SETTINGS_MODULE='rematch.settings.docker'
       services: docker
     - python: "2.7"
       env: PROJECT=setup.py
@@ -44,23 +44,22 @@ install:
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/requirements.txt ;
       fi ;
-    else
-      if [ "${PROJECT}" = "idaplugin" ]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-        bash ./miniconda.sh -b -p "${HOME}/miniconda";
-        export PATH=${HOME}/miniconda/bin:$PATH;
-        conda info -a;
-        conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt;
-      else
-        pip install --only-binary=numpy,scipy numpy scipy ;
-      fi ;
-
-      if [ -f tests/${PROJECT}/requirements.txt ]; then
-        pip install -r tests/${PROJECT}/requirements.txt ;
-      fi ;
-      if [ -f "${PROJECT}/requirements.txt" ]; then
-        pip install -r "${PROJECT}/requirements.txt" ;
-      fi ;
+    fi ;
+  - if [ "${ENV}" = "conda" ]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh ;
+      bash ./miniconda.sh -b -p "${HOME}/miniconda" ;
+      export PATH=${HOME}/miniconda/bin:$PATH ;
+      conda info -a ;
+      conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt ;
+    fi ;
+  - if [ "${ENV}" = "data" ]; then
+      pip install --only-binary=numpy,scipy numpy scipy ;
+    fi ;
+  - if [ -f tests/${PROJECT}/requirements.txt ]; then
+      pip install -r tests/${PROJECT}/requirements.txt ;
+    fi ;
+  - if [ -f "${PROJECT}/requirements.txt" ]; then
+      pip install -r "${PROJECT}/requirements.txt" ;
     fi ;
   - pip install flake8 coveralls pytest-cov ;
 
