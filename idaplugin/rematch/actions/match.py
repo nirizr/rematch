@@ -4,7 +4,7 @@ import idautils
 from ..dialogs.match import MatchDialog
 from ..dialogs.matchresult import MatchResultDialog
 
-from .. import instances
+from ..instances import FunctionInstance
 from .. import network, netnode, log
 from . import base
 
@@ -70,9 +70,12 @@ class MatchAction(base.BoundFileAction):
 
   @staticmethod
   def calc_file_version_hash():
-    version_obj = {}
-    version_obj['functions'] = {offset: list(idautils.Chunks(offset))
-                                  for offset in idautils.Functions()}
+    version_obj = []
+    version_obj.append(('functions', [(offset, list(idautils.Chunks(offset)))
+                                        for offset in idautils.Functions()]))
+    # little hackish way of getting the version of all vectors of an instance
+    version_obj.append(('vectors', FunctionInstance(None).version()))
+
     version_str = repr(version_obj)
     version_hash = hashlib.md5(version_str).hexdigest()
 
@@ -132,7 +135,7 @@ class MatchAction(base.BoundFileAction):
 
     # pop a function, serialize and add to the ready set
     offset = self.functions.pop()
-    func = instances.FunctionInstance(self.file_version_id, offset)
+    func = FunctionInstance(self.file_version_id, offset)
     self.instance_set.append(func.serialize())
 
     # if ready set contains 100 or more functions, or if we just poped the last

@@ -20,3 +20,6 @@ class BaseInstance(object):
     return {"file_version": self.file_version, "type": self.type,
             "offset": self.offset, "size": size, "vectors": vectors,
             "annotations": annotations}
+
+  def version(self):
+    return {vector.type: vector.type_version for vector in self.vectors}
