@@ -18,8 +18,7 @@ class BasicBlockGraphVector(vector.Vector):
 
     self.seen_nodes = set()
 
-  def data(self, offset):
-    del offset
+  def data(self):
 
     # Assuming node #0 is the root node
     serialized_bbs = self.add_node(self.nodes[0])
@@ -48,7 +47,7 @@ class BasicBlockGraphVector(vector.Vector):
     # alternatives: offset from start of function
     return node.endEA - node.startEA
 
-  sort_ket = token
+  sort_key = token
 
   def node_contained(self, node):
     # make sure only nodes inside the function are accounted for
