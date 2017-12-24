@@ -73,8 +73,10 @@ class MatchAction(base.BoundFileAction):
     version_obj = []
     version_obj.append(('functions', [(offset, list(idautils.Chunks(offset)))
                                         for offset in idautils.Functions()]))
-    # little hackish way of getting the version of all vectors of an instance
-    version_obj.append(('vectors', FunctionInstance(None).version()))
+    # TODO: This is a  little hackish way of getting the version of all vectors
+    # of an instance. cannot make version a classmethod because vector sets are
+    # only built by __init__ methods
+    version_obj.append(('vectors', FunctionInstance(None, None).version()))
 
     version_str = repr(version_obj)
     version_hash = hashlib.md5(version_str).hexdigest()
