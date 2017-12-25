@@ -166,11 +166,9 @@ class MatchResultDialog(gui.DockableDialog):
     if parent is None:
       return
 
-    self.blockSignals(True)
     for curr_child in self.enumerate_children(parent):
       if item != curr_child:
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
-    self.blockSignals(False)
 
   def show_script(self):
     self.script_dialog = resultscript.ResultScriptDialog()

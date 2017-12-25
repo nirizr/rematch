@@ -71,9 +71,17 @@ class DockableDialog(WidgetsDialog, PluginForm):
     # Set the layout when form is created
     form.setLayout(self.base_layout)
 
-    form.rejected.connect(self.reject_base)
-    form.accepted.connect(self.accept_base)
-    form.finished.connect(self.finish_base)
+  def OnClose(self, form):
+      del form
+      self.finish_base()
+
+  def accept(self):
+    self.accpet_base()
+    self.Close()
+
+  def reject(self):
+    self.reject_base()
+    self.Close()
 
   def show(self):
     self.Show(self.title)
