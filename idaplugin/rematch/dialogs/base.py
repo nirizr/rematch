@@ -55,6 +55,6 @@ class BaseDialog(object):
     if response_result:
       self.accept()
 
-  def exception_base(self, exception):
+  def exception_base(self, exc_info):
     if self.exception_handler:
-      self.exception_handler(exception)
+      self.exception_handler(exc_info)

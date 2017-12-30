@@ -1,3 +1,5 @@
+import sys
+
 from idasix import QtCore
 
 import urllib
@@ -18,10 +20,8 @@ _threadpool.setMaxThreadCount(config['network']['threadcount'])
 
 
 class WorkerSignals(QtCore.QObject):
-  result_dict = QtCore.Signal(dict)
-  result_list = QtCore.Signal(list)
-  result_str = QtCore.Signal(str)
-  result_exception = QtCore.Signal(Exception)
+  result = QtCore.Signal(object)
+  error = QtCore.Signal(tuple)
 
 
 class QueryWorker(QtCore.QRunnable):
@@ -78,12 +78,12 @@ class QueryWorker(QtCore.QRunnable):
       ida_kernel_enqueue = utils.IdaKernelQueue(write=write, wait=wait)
       callback_wrap = ida_kernel_enqueue(callback_wrap)
 
-      self.signals.result_dict.connect(callback_wrap)
-      self.signals.result_list.connect(callback_wrap)
-      self.signals.result_str.connect(callback_wrap)
+      self.signals.result.connect(callback_wrap)
+
     if not exception_callback:
       exception_callback = default_exception_callback
-    self.signals.result_exception.connect(exception_callback)
+    self.signals.error.connect(exception_callback)
+
     _threadpool.start(self)
 
   def cancel(self):
@@ -126,23 +126,23 @@ class QueryWorker(QtCore.QRunnable):
         if not self.running:
           break
 
-        if isinstance(response, dict):
-          self.signals.result_dict.emit(response)
-        elif isinstance(response, list):
-          self.signals.result_list.emit(response)
-        elif isinstance(response, str):
-          self.signals.result_str.emit(response)
-    except Exception as ex:
+        self.signals.result.emit(response)
+    except Exception:
       self.running = False
-      self.signals.result_exception.emit(ex)
+      self.signals.error.emit(sys.exc_info())
 
   def __del__(self):
     if self.running:
       log('network').warn('Worker deleted while running: %s', self.url)
 
 
-def default_exception_callback(exception):
-  raise exception
+def default_exception_callback(exc_info):
+  import traceback
+
+  exc_type, exc_value, exc_traceback = exc_info
+  exception_traceback = "".join(traceback.format_exception(exc_type, exc_value,
+                                                           exc_traceback))
+  log('main').warn("callback exception: %s", exception_traceback)
 
 
 def build_params(method, params):
