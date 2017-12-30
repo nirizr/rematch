@@ -59,28 +59,28 @@ class QueryWorker(QtCore.QRunnable):
 
     self.signals = WorkerSignals()
 
-  def start(self, callback=None, exception_callback=None, requeue=None):
+  def start(self, callback=None, exception_callback=None, write=False,
+            wait=False):
     if self.started:
       raise Exception("query worker already started")
-
-    if requeue and not callback:
-      raise Exception("cannot requeue without a callable")
-
-    if requeue not in (None, 'read', 'write'):
-      raise Exception("requeue possible values are: None, 'read' or 'write', "
-                      "got: {}".format(requeue))
 
     self.running = True
     self.started = True
 
-    if requeue:
-      requeue = requeue == 'write'
-      callback = utils.IdaKernelQueue(write=requeue)(callback)
-
     if callback:
-      self.signals.result_dict.connect(callback)
-      self.signals.result_list.connect(callback)
-      self.signals.result_str.connect(callback)
+      def callback_wrap(result):
+        try:
+          callback(result)
+        except Exception:
+          import traceback
+          traceback.print_exc()
+
+      ida_kernel_enqueue = utils.IdaKernelQueue(write=write, wait=wait)
+      callback_wrap = ida_kernel_enqueue(callback_wrap)
+
+      self.signals.result_dict.connect(callback_wrap)
+      self.signals.result_list.connect(callback_wrap)
+      self.signals.result_str.connect(callback_wrap)
     if not exception_callback:
       exception_callback = default_exception_callback
     self.signals.result_exception.connect(exception_callback)
