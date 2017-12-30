@@ -117,7 +117,7 @@ class QueryWorker(QtCore.QRunnable):
 
       # by default, only perform this loop once, unless there was a reason to
       # continue
-      break
+      self.running = False
 
   def run(self):
     try:
@@ -133,7 +133,14 @@ class QueryWorker(QtCore.QRunnable):
         elif isinstance(response, str):
           self.signals.result_str.emit(response)
     except Exception as ex:
+      self.running = False
       self.signals.result_exception.emit(ex)
+
+  def __del__(self):
+    if self.running:
+      log('network').warn('Worker deleted while running: %s %s', self,
+                          self.url)
+    log('network').info("Deleted %s", self)
 
 
 def default_exception_callback(exception):
