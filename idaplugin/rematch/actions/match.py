@@ -33,7 +33,7 @@ class MatchAction(base.BoundFileAction):
     self.target_file = None
     self.strategy = None
     self.matchers = None
-    self.recieved = None
+    self.seen = None
 
     self.delayed_queries = []
 
@@ -236,14 +236,14 @@ class MatchAction(base.BoundFileAction):
     self.pbar.canceled.connect(self.cancel)
     self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Receiving match results...")
-    self.pbar.setRange(0, 0)
+    self.pbar.setRange(0, 3)  # 3 for 3 end points (locals, remotes, matches)
     self.pbar.setValue(0)
     self.pbar.accepted.connect(self.accept_results)
     self.pbar.show()
 
     self.results = MatchResultDialog(self.task_id)
 
-    self.recieved = set()
+    self.seen = set()
 
     log('match_action').info("Result download started")
     locals_url = "collab/tasks/{}/locals/".format(self.task_id)
@@ -268,17 +268,13 @@ class MatchAction(base.BoundFileAction):
     new_locals = {obj['id']: obj for obj in response['results']}
     self.results.add_locals(new_locals)
 
-    self.recieved.add('locals')
-
-    self.handle_page(response)
+    self.handle_page(response, 'locals')
 
   def handle_remotes(self, response):
     new_remotes = {obj['id']: obj for obj in response['results']}
     self.results.add_remotes(new_remotes)
 
-    self.recieved.add('remotes')
-
-    self.handle_page(response)
+    self.handle_page(response, 'remotes')
 
   def handle_matches(self, response):
     def rename(o):
@@ -289,22 +285,20 @@ class MatchAction(base.BoundFileAction):
     new_matches = map(rename, response['results'])
     self.results.add_matches(new_matches)
 
-    self.recieved.add('matches')
+    self.handle_page(response, 'matches')
 
-    self.handle_page(response)
-
-  def handle_page(self, response):
-    if 'previous' not in response or not response['previous']:
+  def handle_page(self, response, page_type):
+    if page_type not in self.seen:
+      self.seen.add(page_type)
       self.pbar.setMaximum(self.pbar.maximum() + response['count'])
+      self.pbar.setValue(self.pbar.value() + 1)
 
-    new_value = max(self.pbar.value(), 0) + len(response['results'])
+    self.pbar.setValue(self.pbar.value() + len(response['results']))
     log('match_action').info("result download progress: {} / {} with {}"
-                             "".format(new_value, self.pbar.maximum(),
-                                       self.recieved))
-    if new_value >= self.pbar.maximum() and len(self.recieved) >= 3:
+                             "".format(self.pbar.value(), self.pbar.maximum(),
+                                       self.seen))
+    if self.pbar.value() >= self.pbar.maximum():
       self.pbar.accept()
-    else:
-      self.pbar.setValue(new_value)
 
   def accept_results(self):
     log('match_action').info("Result download completed successfully")
