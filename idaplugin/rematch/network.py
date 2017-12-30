@@ -138,9 +138,7 @@ class QueryWorker(QtCore.QRunnable):
 
   def __del__(self):
     if self.running:
-      log('network').warn('Worker deleted while running: %s %s', self,
-                          self.url)
-    log('network').info("Deleted %s", self)
+      log('network').warn('Worker deleted while running: %s', self.url)
 
 
 def default_exception_callback(exception):
