@@ -142,7 +142,6 @@ class MatchResultDialog(gui.DockableDialog):
     if local_item:
       ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
       self.graph_dialog.Show()
-      self.activateWindow()
 
     if remote_item:
       # TODO: change graph to a "loading..." message
