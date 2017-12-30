@@ -31,17 +31,17 @@ class WidgetsDialog(BaseDialog):
     ok_btn.clicked.connect(self.submit_base)
     cancel_btn.clicked.connect(self.reject)
 
-  def exception_base(self, exc_info):
-    super(WidgetsDialog, self).exception_base(exc_info)
-    exception = exc_info[1]
-    if hasattr(exception, 'errors'):
+  def exception_base(self, exc_type, exc_value, exc_traceback):
+    super(WidgetsDialog, self).exception_base(exc_type, exc_value,
+                                              exc_traceback)
+    if hasattr(exc_value, 'errors'):
       errors = ("{}: {}".format(k, ", ".join(v))
-                for k, v in exception.errors())
+                for k, v in exc_value.errors())
       exception_string = "\t" + "\n\t".join(errors)
-    elif hasattr(exception, 'message'):
-      exception_string = exception.message
+    elif hasattr(exc_value, 'message'):
+      exception_string = exc_value.message
     else:
-      exception_string = str(exception)
+      exception_string = str(exc_value)
     self.statusLbl.setText("Error(s) occured:\n{}".format(exception_string))
     self.statusLbl.setStyleSheet("color: red;")
 
