@@ -1,5 +1,3 @@
-import sys
-
 from idasix import QtCore
 
 import urllib
@@ -21,7 +19,7 @@ _threadpool.setMaxThreadCount(config['network']['threadcount'])
 
 class WorkerSignals(QtCore.QObject):
   result = QtCore.Signal(object)
-  error = QtCore.Signal(tuple)
+  error = QtCore.Signal(Exception, str)
 
 
 class QueryWorker(QtCore.QRunnable):
@@ -127,22 +125,19 @@ class QueryWorker(QtCore.QRunnable):
           break
 
         self.signals.result.emit(response)
-    except Exception:
+    except Exception as ex:
       self.running = False
-      self.signals.error.emit(sys.exc_info())
+      import traceback
+      self.signals.error.emit(ex, traceback.format_exc())
 
   def __del__(self):
     if self.running:
       log('network').warn('Worker deleted while running: %s', self.url)
 
 
-def default_exception_callback(exc_info):
-  import traceback
-
-  exc_type, exc_value, exc_traceback = exc_info
-  exception_traceback = "".join(traceback.format_exception(exc_type, exc_value,
-                                                           exc_traceback))
-  log('main').warn("callback exception: %s", exception_traceback)
+def default_exception_callback(exception, traceback):
+  del exception
+  log('main').warn("callback exception: %s", traceback)
 
 
 def build_params(method, params):

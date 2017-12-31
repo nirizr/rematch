@@ -31,9 +31,8 @@ class WidgetsDialog(BaseDialog):
     ok_btn.clicked.connect(self.submit_base)
     cancel_btn.clicked.connect(self.reject)
 
-  def exception_base(self, exc_info):
-    super(WidgetsDialog, self).exception_base(exc_info)
-    exception = exc_info[1]
+  def exception_base(self, exception, traceback):
+    super(WidgetsDialog, self).exception_base(exception, traceback)
     if hasattr(exception, 'errors'):
       errors = ("{}: {}".format(k, ", ".join(v))
                 for k, v in exception.errors())
