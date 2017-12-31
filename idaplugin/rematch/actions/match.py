@@ -241,7 +241,7 @@ class MatchAction(base.BoundFileAction):
     self.pbar.accepted.connect(self.accept_results)
     self.pbar.show()
 
-    self.results = MatchResultDialog(self.task_id)
+    self.results = MatchResultDialog(self.task_id, "Match results")
 
     self.seen = set()
 
