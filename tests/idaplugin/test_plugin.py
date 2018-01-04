@@ -65,3 +65,5 @@ def test_update(idapro_app):
   idaplugin.rematch.update.check_update()
   time.sleep(1)
   idapro_app.processEvents()
+  time.sleep(1)
+  idapro_app.processEvents()
