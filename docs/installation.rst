@@ -10,16 +10,16 @@ Installing the Rematch Server
 -----------------------------
 
 Installing a rematch server is only required once for a group of rematch users.
-Once an admin user is created, additional users can be managend through the
+Once an admin user is created, additional users can be managed through the
 admin console.
 
 .. warning:: Since permissions are not currently enforced, it is advised that
   confidential data will be kept on servers only accessible to those with
   permission to access said data. See Privacy section for more details.
 
-.. tip:: Windows based server installtions are possible but not recommended.
+.. tip:: Windows based server installations are possible but not recommended.
   Some packages (scikit-learn, numpy, scipy) are required by the server but are
-  more complicated to install on windows. Windows Subsystem for Linux may ease
+  more difficult to install on windows. Windows Subsystem for Linux may ease
   the installation process. Using Anaconda for python package management may
   also be helpful.
 
@@ -29,10 +29,11 @@ Installing Rematch server docker container
 We provide a docker container with Rematch server installed and configured with
 nginx, mysql, rabbitmq and celery micro components. This makes server
 deployment a lot easier however a docker installation and roughly 1 GB of free
-space is required.
+space are required.
 
 The docker container is not in the docker hub, but the the following docker-compose
-command can be used to build docker inside the rematch repository:
+command can be used to build and fire up a docker, when run inside the rematch
+repository:
 
 .. code-block:: console
 
@@ -53,7 +54,7 @@ configured to), so installing the plugin is a one-time process.
 Installing the plugin using pip
 +++++++++++++++++++++++++++++++
 
-If pip is installed for IDA's version of python, using it is simplest
+If pip is installed for IDA's version of python, using it is the simplest
 installation method.
 
 .. note:: By default, pip is not installed for Windows installations of IDA,
