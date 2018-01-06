@@ -2,7 +2,7 @@ FROM python:latest
 ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq tmux git python-dev \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq python-dev \
           python-mysqldb build-essential libmysqlclient-dev python-pip \
           python-numpy python-sklearn netcat-traditional \
           mysql-client-5.5 rabbitmq-server nginx
