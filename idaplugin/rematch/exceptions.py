@@ -69,6 +69,8 @@ class InputErrorException(QueryException):
 
 
 def factory(ex):
+  original_tb = format_exc()
+
   if isinstance(ex, HTTPError):
     response_text = ex.read()
     try:
@@ -90,8 +92,7 @@ def factory(ex):
   elif isinstance(ex, URLError):
     raise ConnectionException(reason=ex.reason)
 
-  tb = format_exc()
-  raise Exception("Couldn't factor an exception: {}".format(tb))
+  raise Exception("Couldn't factor an exception: {}".format(original_tb))
 
 
 def handle_400(resp):

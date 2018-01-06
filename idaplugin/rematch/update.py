@@ -100,4 +100,4 @@ def handle_exception(exception):
   if isinstance(exception, exceptions.NotFoundException):
     log('update').info("Couldn't find latest release for plugin")
   else:
-    log('update').warning("Update check failed")
+    raise exception
