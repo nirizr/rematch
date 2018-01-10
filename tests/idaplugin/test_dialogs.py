@@ -29,6 +29,8 @@ def test_dialog(dialog_entry, idapro_app):
     idapro_app.processEvents()
   except Exception as ex:
     if dialog_entry.__name__ in known_failing_dialogs:
+      import traceback
       pytest.xfail("Dialog {} which was expected to fail failed with "
-                   "exception {}".format(dialog_entry.__name__, str(ex)))
+                   "exception {}. {}".format(dialog_entry.__name__, str(ex),
+                                             traceback.format_exc()))
     raise
