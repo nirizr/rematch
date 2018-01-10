@@ -68,9 +68,9 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test ./ --verbose ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test -rapP ./ --verbose ;
       else
-        PYTHONPATH=. py.test ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ;
+        PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ;
       fi ;
     fi ;
   - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py server install ; fi ;
