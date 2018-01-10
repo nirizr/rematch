@@ -53,7 +53,8 @@ class AddFileDialog(gui.GuiDialog):
     layout.addWidget(QtWidgets.QLabel("Description:"), 2, 0)
     layout.addWidget(QtWidgets.QLabel("MD5 hash:"), 3, 0)
 
-    self.project_cbb = widgets.QItemSelect('projects')
+    self.project_cbb = widgets.QItemSelect('projects', 'name', 'id',
+                                           'description')
     layout.addWidget(self.project_cbb, 0, 1)
 
     self.name_txt = QtWidgets.QLineEdit()

@@ -7,51 +7,10 @@ import idc
 from .. import network
 
 
-class QItemSelect(QtWidgets.QComboBox):
-  def __init__(self, item, name_field='name', id_field='id', allow_none=True,
-               exclude=None, default_id=None, **kwargs):
-    super(QItemSelect, self).__init__(**kwargs)
-    self.item = item
-    self.name_field = name_field
-    self.id_field = id_field
-    self.allow_none = allow_none
-    self.exclude = exclude
-    self.default_id = default_id
-
-    self.refresh()
-
-  def refresh(self):
-    response = network.query("GET", "collab/{}/".format(self.item), json=True)
-
-    # copy currently selected or get default
-    if self.currentIndex() == -1:
-      selected_id = self.default_id
-    else:
-      selected_id = self.currentData()
-
-    # only clear after response is received
-    self.clear()
-    for idx, obj in enumerate(response):
-      item_name = obj[self.name_field]
-      item_id = obj[self.id_field]
-      if self.exclude and (item_name in self.exclude or
-                           item_id in self.exclude):
-        continue
-
-      text = "{} ({})".format(item_name, item_id)
-      self.insertItem(idx, text, int(item_id))
-      if item_id == selected_id:
-        self.setCurrentIndex(idx)
-
-    if self.allow_none:
-      self.insertItem(0, "None", None)
-    elif self.count() == 0:
-      self.setEnabled(False)
-
-
 class QItem(object):
   def __init__(self, item, name_field, id_field, description_field,
-               exclude=None, columns=3, **kwargs):
+               exclude=None, columns=3, selected=None, empty_disabled=True,
+               **kwargs):
     super(QItem, self).__init__(**kwargs)
     self.item = item
     self.name_field = name_field
@@ -59,6 +18,8 @@ class QItem(object):
     self.description_field = description_field
     self.exclude = exclude
     self.columns = columns
+    self.selected = selected
+    self.empty_disabled = empty_disabled
 
     self.load()
 
@@ -79,6 +40,39 @@ class QItem(object):
       item = self.create_item(i=i, item_name=item_name, item_id=item_id,
                               item_description=item_description)
       self.addWidget(item, i / self.columns, i % self.columns)
+
+      if self.selected:
+        selected = (item_name in self.selected or item_id in self.selected)
+        self.set_selected(i, selected)
+
+    if self.count() == 0 and self.empty_disabled:
+      self.setEnabled(False)
+
+
+class QItemSelect(QItem, QtWidgets.QComboBox):
+  def __init__(self, *args, **kwargs):
+    self.allow_none = kwargs.pop('allow_none', False)
+    super(QItemSelect, self).__init__(*args, **kwargs)
+
+    if self.allow_none:
+      self.insertItem(0, "None", None)
+
+  @staticmethod
+  def create_item(i, item_name, item_id, item_description):
+    del i
+    # TODO: include the item description as tooltip
+    del item_description
+    text = "{} ({})".format(item_name, item_id)
+    return (text, item_id)
+
+  def addWidget(self, item, row, col):
+    del row, col
+    text, item_id = item
+    self.addItem(text, item_id)
+
+  def set_selected(self, i, selected):
+    if selected:
+      self.setCurrentIndex(i)
 
 
 class QItemCheckBoxes(QItem, QtWidgets.QGridLayout):

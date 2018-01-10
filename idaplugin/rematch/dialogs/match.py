@@ -24,8 +24,10 @@ class MatchDialog(gui.GuiDialog):
     self.source_gbx.setLayout(self.source)
     self.base_layout.addWidget(self.source_gbx)
 
-    self.target_project = widgets.QItemSelect('projects', allow_none=False)
-    self.target_file = widgets.QItemSelect('files', allow_none=False,
+    self.target_project = widgets.QItemSelect('projects', 'name', 'id',
+                                              'description', allow_none=False)
+    self.target_file = widgets.QItemSelect('files', 'name', 'id',
+                                           'description', allow_none=False,
                                            exclude=[netnode.bound_file_id])
     choices = [("Entire DB", 'db', None),
                ("Project", 'project', self.target_project),
