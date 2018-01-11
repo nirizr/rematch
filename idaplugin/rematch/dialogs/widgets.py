@@ -105,16 +105,15 @@ class QRadioLayout(QtWidgets.QGridLayout):
     self.create_items(radios)
 
   def create_items(self, radios):
-    for i, radio in enumerate(radios):
-      item_name, item_id = radio
-      item_widget = self.create_item(i=i, item_name=item_name,
-                                     item_id=item_id)
+    for i, radio_details in enumerate(radios):
+      item_widget = self.create_item(i, *radio_details)
       self.addWidget(item_widget, i, 0, QtCore.Qt.AlignTop)
 
-  def create_item(self, i, item_name, item_id, **kwargs):
-    del kwargs
+  def create_item(self, i, item_name, item_id, item_description, *args):
+    del args
     item_widget = QtWidgets.QRadioButton(item_name)
     item_widget.setObjectName(item_id)
+    item_widget.setToolTip(item_description)
 
     self.radiogroup.addButton(item_widget, i)
 
@@ -130,15 +129,16 @@ class QRadioLayout(QtWidgets.QGridLayout):
 
 
 class QRadioExtraLayout(QRadioLayout):
-  def create_items(self, radios):
-    for i, radio in enumerate(radios):
-      item_name, item_id, item_extra = radio
-      item_widget = self.create_item(i=i, item_name=item_name,
-                                     item_id=item_id)
-      self.addWidget(item_widget, i, 0, QtCore.Qt.AlignTop)
-      if item_extra:
-        self.update_item_extra(item_widget, item_extra)
-        self.addWidget(item_extra, i, 1, QtCore.Qt.AlignTop)
+  def create_item(self, i, item_name, item_id, item_description, *args):
+    # slightly ugly to have overriden create_item have the same parameters
+    item_extra, = args
+    item = super(QRadioExtraLayout, self).create_item(i, item_name, item_id,
+                                                      item_description)
+    if item_extra:
+      self.update_item_extra(item, item_extra)
+      self.addWidget(item_extra, i, 1, QtCore.Qt.AlignTop)
+
+    return item
 
   @staticmethod
   def update_item_extra(item_widget, item_extra):

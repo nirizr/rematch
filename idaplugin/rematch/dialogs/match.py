@@ -15,10 +15,13 @@ class MatchDialog(gui.GuiDialog):
     lbl.setToolTip("Matching only user functions functionality is not "
                    "currently supported. Plese express your need of this "
                    "functionality at our github.")
-    choices = [("Entire IDB", 'idb', None),
-               ("User functions", 'user', lbl),
-               ("Single function", 'single', self.source_single),
-               ("Range", 'range', self.source_range)]
+    choices = [("Entire IDB", 'idb', "Match this whole IDB.", None),
+               ("User functions", 'user', "Match only user-modified "
+                                          "functions.", lbl),
+               ("Single function", 'single', "Match a single function.",
+                self.source_single),
+               ("Range", 'range', "Match a range of functions.",
+                self.source_range)]
     self.source = widgets.QRadioExtraLayout(*choices)
     self.source_gbx = QtWidgets.QGroupBox("Match source")
     self.source_gbx.setLayout(self.source)
@@ -29,9 +32,12 @@ class MatchDialog(gui.GuiDialog):
     self.target_file = widgets.QItemSelect('files', 'name', 'id',
                                            'description', allow_none=False,
                                            exclude=[netnode.bound_file_id])
-    choices = [("Entire DB", 'db', None),
-               ("Project", 'project', self.target_project),
-               ("Another file", 'file', self.target_file)]
+    choices = [("Entire DB", 'db', "Match against entire remote database.",
+                None),
+               ("Project", 'project', "Match against a single remote project.",
+                self.target_project),
+               ("Another file", 'file', "Match against a single remote file.",
+                self.target_file)]
     self.target = widgets.QRadioExtraLayout(*choices)
     self.target_gbx = QtWidgets.QGroupBox("Match target")
     self.target_gbx.setLayout(self.target)
