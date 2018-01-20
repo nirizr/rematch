@@ -25,10 +25,12 @@ def get_requirements(fname):
   return (l for l in open(fname).readlines() if not l.startswith('-r '))
 
 
-def build_setup(package_base, package_name, version_path, classifiers=[],
+def build_setup(package_base, package_name, version_path, classifiers=None,
                 package_data=None, script_args=None, **kwargs):
   if package_data is None:
     package_data = {}
+  if classifiers is None:
+    classifiers = []
 
   # generate install_requires based on requirements.txt
   base_path = os.path.abspath(os.path.dirname(__file__))
@@ -103,6 +105,10 @@ def usage_error(msg):
   sys.exit(1)
 
 
+expected_packages = {'server', 'idaplugin'}
+available_packages = set(os.listdir('.')) & expected_packages
+
+
 def get_requested_package():
   if 'REMATCH_SETUP_PACKAGE' in os.environ:
     return os.environ['REMATCH_SETUP_PACKAGE']
@@ -110,8 +116,7 @@ def get_requested_package():
   if len(sys.argv) > 1:
     return sys.argv.pop(1)
 
-  available_packages = expected_packages & set(os.listdir)
-  if len(available_package) == 1:
+  if len(available_packages) == 1:
     return available_packages.pop()
 
   usage_error("Couldn't figure out requested package, please specify one of "
@@ -121,16 +126,14 @@ def get_requested_package():
 
 
 def get_package():
-  expected_packages = {'server', 'idaplugin'}
-  packages = set(os.listdir('.')) & expected_packages
-
   requested_package = get_requested_package()
 
-  if requested_package not in packages:
+  if requested_package not in available_packages:
     usage_error("Requested package is currently missing: {}"
                 "".format(requested_package))
 
   return requested_package
+
 
 if __name__ == '__main__':
   package = get_package()
