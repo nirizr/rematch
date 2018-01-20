@@ -1,4 +1,4 @@
-|Read The Docs| |Gitter Chat| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI|
+|Read The Docs| |Gitter Chat| |Build Status| |Code Health| |Codacy Badge| |idaplugin PyPI| |server PyPI| |Docker Build|
 
 rematch
 =======
@@ -153,3 +153,6 @@ python scripting! :D).
 .. |server PyPI| image:: https://img.shields.io/pypi/v/rematch-server.svg
    :alt: rematch-server PyPI
    :target: https://pypi.python.org/pypi/rematch-server
+.. |Docker Build| image:: https://img.shields.io/docker/build/nirizr/rematch.svg
+   :alt: Docker Build Status
+   :target: https://cloud.docker.com/app/nirizr/repository/docker/nirizr/rematch/general
