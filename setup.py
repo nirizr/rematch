@@ -25,7 +25,7 @@ def get_requirements(fname):
   return (l for l in open(fname).readlines() if not l.startswith('-r '))
 
 
-def build_setup(package_base, package_name, version_path,
+def build_setup(package_base, package_name, version_path, classifiers=[],
                 package_data=None, script_args=None):
   if package_data is None:
     package_data = {}
@@ -68,8 +68,9 @@ def build_setup(package_base, package_name, version_path,
     install_requires=install_requires,
     long_description=read(readme_path),
     classifiers=[
-      "Development Status :: 3 - Alpha",
-    ],
+      "Development Status :: 2 - Pre-Alpha",
+      "Programming Language :: Python",
+    ] + classifiers,
   )
 
 
@@ -77,7 +78,11 @@ def build_setup_server(script_args=None):
   build_setup(package_base='server',
               package_name='rematch-server',
               version_path='./',
-              script_args=script_args)
+              script_args=script_args,
+              classifiers=["Programming Language :: Python :: 2",
+                           "Programming Language :: Python :: 3",
+                           "Environment :: Web Environment",
+                           "Framework :: Django"])
 
 
 def build_setup_idaplugin(script_args=None):
@@ -86,7 +91,8 @@ def build_setup_idaplugin(script_args=None):
               package_name='rematch-idaplugin',
               version_path='rematch',
               package_data=package_data,
-              script_args=script_args)
+              script_args=script_args,
+              classifiers=["Programming Language :: Python :: 2"])
 
 
 def usage_error(msg):
