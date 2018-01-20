@@ -4,16 +4,18 @@ import json
 
 
 class Vector(object):
-  @classmethod
-  def collect(cls, offset, instance_id=None):
-    data = cls.data(offset)
+  def __init__(self, offset, instance_id=None):
+    self.offset = offset
+    self.instance_id = instance_id
+
+  def collect(self):
+    data = self.data()
     if not data:
       return None
 
     data = json.dumps(data)
-    return {"instance": instance_id, "type": cls.type,
-            "type_version": cls.type_version, "data": data}
+    return {"instance": self.instance_id, "type": self.type,
+            "type_version": self.type_version, "data": data}
 
-  @staticmethod
-  def inst_count(offset):
-    return len(list(idautils.FuncItems(offset)))
+  def inst_count(self):
+    return len(list(idautils.FuncItems(self.offset)))

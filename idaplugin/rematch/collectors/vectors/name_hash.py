@@ -10,9 +10,8 @@ class NameHashVector(vector.Vector):
   type = 'name_hash'
   type_version = 0
 
-  @classmethod
-  def data(cls, offset):
-    name = idc.Name(offset)
+  def data(self):
+    name = idc.Name(self.offset)
     if ida_name.is_uname(name):
       return None
 
