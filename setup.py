@@ -26,7 +26,7 @@ def get_requirements(fname):
 
 
 def build_setup(package_base, package_name, version_path, classifiers=[],
-                package_data=None, script_args=None):
+                package_data=None, script_args=None, **kwargs):
   if package_data is None:
     package_data = {}
 
@@ -71,6 +71,7 @@ def build_setup(package_base, package_name, version_path, classifiers=[],
       "Development Status :: 2 - Pre-Alpha",
       "Programming Language :: Python",
     ] + classifiers,
+    **kwargs
   )
 
 
@@ -82,7 +83,8 @@ def build_setup_server(script_args=None):
               classifiers=["Programming Language :: Python :: 2",
                            "Programming Language :: Python :: 3",
                            "Environment :: Web Environment",
-                           "Framework :: Django"])
+                           "Framework :: Django"],
+              zip_safe=True)
 
 
 def build_setup_idaplugin(script_args=None):
@@ -92,7 +94,8 @@ def build_setup_idaplugin(script_args=None):
               version_path='rematch',
               package_data=package_data,
               script_args=script_args,
-              classifiers=["Programming Language :: Python :: 2"])
+              classifiers=["Programming Language :: Python :: 2"],
+              zip_safe=False)
 
 
 def usage_error(msg):
