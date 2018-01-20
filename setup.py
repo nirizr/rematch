@@ -89,28 +89,53 @@ def build_setup_idaplugin(script_args=None):
               script_args=script_args)
 
 
-if __name__ == '__main__':
+def usage_error(msg):
+  print(msg)
+  sys.exit(1)
+
+
+def get_requested_package():
+  if 'REMATCH_SETUP_PACKAGE' in os.environ:
+    return os.environ['REMATCH_SETUP_PACKAGE']
+
+  if len(sys.argv) > 1:
+    return sys.argv.pop(1)
+
+  available_packages = expected_packages & set(os.listdir)
+  if len(available_package) == 1:
+    return available_packages.pop()
+
+  usage_error("Couldn't figure out requested package, please specify one of "
+              "available packages through either 'REMATCH_SETUP_PACKAGE' "
+              "environment variable or the first argument. Available packages "
+              "are: {}".format(available_packages))
+
+
+def get_package():
   expected_packages = {'server', 'idaplugin'}
   packages = set(os.listdir('.')) & expected_packages
 
-  if len(sys.argv) < 2 and len(packages) > 1:
-    print("Usage: {} {{package name}}".format(sys.argv[0]))
-    print("Available packages are: {}".format(", ".join(packages)))
-    sys.exit(1)
+  requested_package = get_requested_package()
+
+  if requested_package not in packages:
+    usage_error("Requested package is currently missing: {}"
+                "".format(requested_package))
+
+  return requested_package
+
+if __name__ == '__main__':
+  package = get_package()
+
+  if package == 'server':
+    build_setup_server()
+  elif package == 'idaplugin':
+    build_setup_idaplugin()
 
   # If all packages are available, allow a 'release' command that would push
   # all packages to pypi
-  if sys.argv[1] == 'release' and packages == expected_packages:
-    script_args = ['sdist', '--dist-dir=./dist', '--formats=zip', 'upload']
-    if not (len(sys.argv) >= 3 and sys.argv[2] == 'official'):
-      script_args += ['-r', 'pypitest']
-    build_setup_server(script_args=script_args)
-    build_setup_idaplugin(script_args=script_args)
-  else:
-    package = packages.pop() if len(packages) == 1 else sys.argv[1]
-    if sys.argv[1] == package:
-      sys.argv = sys.argv[:1] + sys.argv[2:]
-    if package == 'server':
-      build_setup_server()
-    elif package == 'idaplugin':
-      build_setup_idaplugin()
+#  if package == 'release' and packages == expected_packages:
+#    script_args = ['sdist', '--dist-dir=./dist', '--formats=zip', 'upload']
+#    if not (len(sys.argv) >= 3 and sys.argv[2] == 'official'):
+#      script_args += ['-r', 'pypitest']
+#    build_setup_server(script_args=script_args)
+#    build_setup_idaplugin(script_args=script_args)
