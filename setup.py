@@ -72,6 +72,7 @@ def build_setup(package_base, package_name, version_path, classifiers=None,
     classifiers=[
       "Development Status :: 2 - Pre-Alpha",
       "Programming Language :: Python",
+      "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
     ] + classifiers,
     **kwargs
   )
@@ -83,7 +84,16 @@ def build_setup_server(script_args=None):
               version_path='./',
               script_args=script_args,
               classifiers=["Programming Language :: Python :: 2",
+                           "Programming Language :: Python :: 2.7",
                            "Programming Language :: Python :: 3",
+                           "Programming Language :: Python :: 3.0",
+                           "Programming Language :: Python :: 3.1",
+                           "Programming Language :: Python :: 3.2",
+                           "Programming Language :: Python :: 3.3",
+                           "Programming Language :: Python :: 3.4",
+                           "Programming Language :: Python :: 3.5",
+                           "Programming Language :: Python :: 3.6",
+                           "Programming Language :: Python :: 3.7",
                            "Environment :: Web Environment",
                            "Framework :: Django"],
               zip_safe=True)
@@ -96,7 +106,8 @@ def build_setup_idaplugin(script_args=None):
               version_path='rematch',
               package_data=package_data,
               script_args=script_args,
-              classifiers=["Programming Language :: Python :: 2"],
+              classifiers=["Programming Language :: Python :: 2",
+                           "Programming Language :: Python :: 2.7"],
               zip_safe=False)
 
 
