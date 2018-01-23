@@ -12,14 +12,13 @@ if [ "$branch_name" != "$BRANCH" ] ; then
     exit -1 ;
 fi ;
 
-
-if [ "$(git rev-parse $BRANCH)" != "$(git ls-remote $REMOTE -h refs/heads/$BRANCH | cut -f 1 )" ] ; then
-    echo "local and remote branches are out of sync, releases are only possible on up-to-date branch"
+if [ "$(git status -uno | grep "nothing to commit" | wc -l)" -eq "0" ] ; then
+    echo "local branch is dirty, can only release in clean workspaces"
     exit -2 ;
 fi ;
 
-if [ "$(git status -uno | grep "nothing to commit" | wc -l)" -eq "0" ] ; then
-    echo "local branch is dirty, can only release in clean workspaces"
+if [ "$(git rev-parse $BRANCH)" != "$(git ls-remote $REMOTE -h refs/heads/$BRANCH | cut -f 1 )" ] ; then
+    echo "local and remote branches are out of sync, releases are only possible on up-to-date branch"
     exit -3 ;
 fi ;
 
