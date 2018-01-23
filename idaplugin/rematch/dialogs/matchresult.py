@@ -217,7 +217,7 @@ class MatchResultDialog(gui.DockableDialog):
     q = network.QueryWorker("GET", "collab/annotations/", json=True,
                             params={"instance": self.matched_map.keys()},
                             splittable="instance")
-    q.start(self.handle_apply_matches, requeue='write')
+    q.start(self.handle_apply_matches, write=True)
 
   def handle_apply_matches(self, response):
     for annotation in response:
