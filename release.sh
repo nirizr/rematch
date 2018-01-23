@@ -22,8 +22,24 @@ if [ "$(git rev-parse $BRANCH)" != "$(git ls-remote $REMOTE -h refs/heads/$BRANC
     exit -3 ;
 fi ;
 
+
 echo "Building the IDAPLUGIN package"
 REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist bdist_wheel --dist-dir=./dist/idaplugin --formats=zip,gztar
 
 echo "Building the SERVER package"
 REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist bdist_wheel --dist-dir=./dist/server --formats=zip,gztar
+
+
+echo "Generating changelog"
+latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null ) ;
+
+changelog="**Changes for version $new_version ($changes changes):**\n" ;
+if [ "$latest_tag" == "" ]; then
+    changelog+="First release"
+else
+    changelog+=$(git log "$latest_tag..HEAD" --oneline --no-merges) ;
+fi ;
+
+echo $changelog >> CHANGELOG.rst
+
+# git-release "$(REPO)" "$(new_version)" "$(branch_name)" "$(changelog)" 'dist/*/*'
