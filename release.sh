@@ -23,6 +23,13 @@ if [ "$(git rev-parse $BRANCH)" != "$(git ls-remote $REMOTE -h refs/heads/$BRANC
 fi ;
 
 
+# updating version
+bump_version () {
+
+    sed -Ei -e 's/__version__ *= *"([^"]*)"/__version__ = "$new_version"/g' idaplugin/rematch/version.py
+}
+
+
 echo "Building the IDAPLUGIN package"
 REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist bdist_wheel --dist-dir=./dist/idaplugin --formats=zip,gztar
 
