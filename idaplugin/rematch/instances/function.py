@@ -24,6 +24,8 @@ class FunctionInstance(EmptyFunctionInstance):
                      collectors.vectors.MnemonicHistVector,
                      collectors.vectors.BasicBlockSizeHistVector}
     self.annotations |= {collectors.annotations.AssemblyAnnotation}
+                         collectors.annotations.PositionalAnnotation,
+                         collectors.annotations.RegularCommentAnnotation}
 
   def size(self):
     """return the overall size of function by adding sizes of all indevidual
