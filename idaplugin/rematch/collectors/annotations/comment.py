@@ -11,8 +11,8 @@ class CommentAnnotation(annotation.Annotation):
   def data(offset):
     func = ida_funcs.get_func(offset)
 
-    comments = [ea - offset: self.get_comment(ea)
-                  for ea in idautils.Heads(func.startEA, func.endEA)]
+    comments = {ea - offset: self.get_comment(ea)
+                  for ea in idautils.Heads(func.startEA, func.endEA)}
     return comments
 
   @staticmethod
