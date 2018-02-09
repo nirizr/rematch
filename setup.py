@@ -2,8 +2,9 @@
 
 import sys
 import os
-from setuptools import setup, find_packages
 import re
+from setuptools import setup, find_packages
+import pip
 
 
 # Utility function to read the README file.
@@ -22,7 +23,8 @@ def get_version(path):
 
 
 def get_requirements(fname):
-  return open(fname).readlines()
+  reqs = pip.req.parse_requirements(fname, session=pip.download.PipSession())
+  return [str(req.req) for req in reqs]
 
 
 def build_setup(package_base, package_name, version_path,
