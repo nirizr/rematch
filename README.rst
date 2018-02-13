@@ -30,13 +30,13 @@ information can be found at https://rematch.readthedocs.io
 **IDA plugin**: Installing the IDA plugin is a simple as dropping it in IDA's
 plugins directory.
 
-**Web service**: Installing the web service requires docker and pulling
-the webservice's docker image from docker hub by executing the following
-command:
+**Web service**: Installing the web service requires docker and building
+the webservice's docker image by executing the following command:
 
 .. code-block:: console
 
-    $ docker pull nirizr/rematch
+    $ docker-compose -f ./server/docker-compose.yml build ;
+    $ docker-compose -f ./server/docker-compose.yml up -d ;
 
 .. |Read The Docs| image:: https://readthedocs.org/projects/rematch/badge/?version=latest
    :alt: Read The Docs
