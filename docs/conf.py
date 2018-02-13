@@ -31,9 +31,9 @@ import os
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.todo',
-    'sphinx.ext.autosectionlabel']
+              'sphinx.ext.doctest',
+              'sphinx.ext.todo',
+              'sphinx.ext.autosectionlabel']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -95,11 +95,11 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
     html_context = {
-        "display_github": True, # Integrate GitHub
-        "github_user": "nirizr", # Username
-        "github_repo": "rematch", # Repo name
-        "github_version": "master", # Version
-        "conf_py_path": "/docs/", # Path in the checkout to the docs root
+        "display_github": True,  # Integrate GitHub
+        "github_user": "nirizr",  # Username
+        "github_repo": "rematch",  # Repo name
+        "github_version": "master",  # Version
+        "conf_py_path": "/docs/",  # Path in the checkout to the docs root
     }
 
 
@@ -170,6 +170,3 @@ texinfo_documents = [
      author, 'Rematch', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
