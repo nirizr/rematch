@@ -6,8 +6,8 @@ The rematch project is composed of two parts: a server and an IDA plugin client.
 While installing the plugin is exteremly easy, installing the server tends to
 be a little more difficult. Luckily, it's only done once per organisation.
 
-Installing the Rematch Server
------------------------------
+Installing Rematch Server
+-------------------------
 
 Installing a rematch server is only required once for a group of rematch users.
 Once an admin user is created, additional users can be managed through the
@@ -31,9 +31,24 @@ nginx, mysql, rabbitmq and celery micro components. This makes server
 deployment a lot easier however a docker installation and roughly 1 GB of free
 space are required.
 
-The docker container is not in the docker hub, but the the following docker-compose
-command can be used to build and fire up a docker, when run inside the rematch
-repository:
+The rematch server docker component is published and available at the `Docker
+Hub <https://hub.docker.com/r/nirizr/rematch>`_. In order to install the
+Rematch server from the docker hub, simply install docker and run the following
+command (please make sure docker is installed and running beforehand):
+
+.. code-block:: console
+
+    $ docker pull nirizr/rematch
+
+This will automatically fetch an create a rematch server docker environment for
+you.
+
+Building and running Rematch server docker container
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+If you wish to build your own docker image from source, the docker-compose
+command can be used to build and fire up a docker, when run inside the root
+directory of the rematch repository:
 
 .. code-block:: console
 
@@ -41,8 +56,8 @@ repository:
    $ docker-compose -f ./server/docker-compose.yml build ;
    $ docker-compose -f ./server/docker-compose.yml up -d ;
 
-Installing the Rematch IDA Plugin
----------------------------------
+Installing Rematch IDA Plugin
+-----------------------------
 
 Installing IDA plugins is done by placing the plugin source inside IDA's
 plugins directory (location is based on operating system). To make plugin
@@ -51,8 +66,8 @@ installation as simple as possibe, the rematch plugin has no dependecies.
 Once installed the plugin automatically updates itself (as long as it's
 configured to), so installing the plugin is a one-time process.
 
-Installing the plugin using pip
-+++++++++++++++++++++++++++++++
+Installing plugin using pip
++++++++++++++++++++++++++++
 
 If pip is installed for IDA's version of python, using it is the simplest
 installation method.
@@ -98,8 +113,8 @@ this run the following pip command line with any instance of pip:
       $ pip install rematch-idaplugin
           --target="C:\Program Files (x86)\IDA 6.9\plugins"
 
-Installing the plugin manually
-++++++++++++++++++++++++++++++
+Installing plugin manually
+++++++++++++++++++++++++++
 
 If you don't have pip, or prefer not to use it, you can still manually install
 the plugin by simply extracting the contents of the `idaplugin directory

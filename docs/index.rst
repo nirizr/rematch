@@ -30,7 +30,6 @@ synchronization between multiple reverse engineers working on the same file.
 
    installation
    usage
-   engines
    architecture
    faq
    glossary
