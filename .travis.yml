@@ -21,6 +21,8 @@ matrix:
       env: PROJECT=setup.py
     - python: "3.6"
       env: PROJECT=setup.py
+    - python: "3.6"
+      env: PROJECT=docs
 
 branches:
   only:
@@ -75,6 +77,7 @@ script:
     fi ;
   - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py server install ; fi ;
   - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
+  - if [ "${PROJECT}" = "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
 
 after_script:
   - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" != "docker" ]; then
