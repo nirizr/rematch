@@ -4,7 +4,10 @@ import sys
 import os
 import re
 from setuptools import setup, find_packages
-import pip
+try: # for pip >= 10
+  from pip._internal.req import parse_requirements
+except ImportError: # for pip <= 9.0.3
+  from pip.req import parse_requirements
 
 
 # Utility function to read the README file.
@@ -23,7 +26,7 @@ def get_version(path):
 
 
 def get_requirements(fname):
-  reqs = pip.req.parse_requirements(fname, session=pip.download.PipSession())
+  reqs = parse_requirements(fname, session=pip.download.PipSession())
   return [str(req.req) for req in reqs]
 
 
