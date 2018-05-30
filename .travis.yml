@@ -21,6 +21,8 @@ matrix:
       env: PROJECT=setup.py
     - python: "3.6"
       env: PROJECT=setup.py
+    - python: "3.6"
+      env: PROJECT=docs
 
 branches:
   only:
@@ -44,6 +46,7 @@ install:
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/requirements.txt ;
       fi ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install coveralls pytest-cov ;
     fi ;
   - if [ "${ENV}" = "conda" ]; then
       wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh ;
@@ -68,15 +71,19 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test -rapP ./ --verbose ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test -rapP ./ --verbose --cov-report= --cov=. ;
       else
-        PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=$PROJECT ;
+        PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       fi ;
     fi ;
   - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py server install ; fi ;
   - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
+  - if [ "${PROJECT}" = "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
 
 after_script:
   - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" != "docker" ]; then
       coveralls ;
+    fi ;
+  - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" = "docker" ]; then
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec web env TRAVIS=${TRAVIS} TRAVIS_JOB_ID=${TRAVIS_JOB_ID} TRAVIS_BRANCH=${TRAVIS_BRANCH} TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} coveralls ;
     fi ;
