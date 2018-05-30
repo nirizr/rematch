@@ -6,10 +6,10 @@ import inspect
 import json
 
 
-def collect(collectors, offset, instance_id=None):
+def collect(collectors, offset):
   for collector in collectors:
     try:
-      collector_obj = collector(offset, instance_id)
+      collector_obj = collector(offset)
       r = collector_obj.collect()
       if r:
         yield r
