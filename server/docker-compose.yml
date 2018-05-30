@@ -1,7 +1,7 @@
 version: '2'
 services:
   rabbitmq:
-    image: "rabbitmq:3-management"
+    image: rabbitmq
     hostname: rabbit
     environment:
       - RABBITMQ_DEFAULT_USER=admin
@@ -14,7 +14,7 @@ services:
     restart: always
 
   db:
-    image: mysql
+    image: mariadb
     hostname: db
     environment:
       - MYSQL_USER=root
