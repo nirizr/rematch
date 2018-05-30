@@ -76,28 +76,24 @@ class QItemSelect(QItem, QtWidgets.QComboBox):
 
 
 class QItemCheckBoxes(QItem, QtWidgets.QGridLayout):
-  def __init__(self, *args, **kwargs):
-    self.checkboxes = []
-    super(QItemCheckBoxes, self).__init__(*args, **kwargs)
-
   def create_item(self, item_name, item_id, item_description, **kwargs):
     del kwargs
     widget = QtWidgets.QCheckBox(item_name)
     widget.id = item_id
-    widget.setChecked(True)
     if item_description:
       widget.setToolTip(item_description)
-    self.checkboxes.append(widget)
     return widget
 
+  def set_selected(self, i, selected):
+      self.itemAt(i).setChecked(selected)
+
   def get_result(self):
-    return [cb.id for cb in self.checkboxes if cb.isChecked()]
+    return [self.itemAt(i).id
+              for i in range(self.count()) if self.itemAt(i).isChecked()]
 
 
 class QRadioLayout(QtWidgets.QGridLayout):
   def __init__(self, *radios, **kwargs):
-    self.checked = kwargs.pop('checked', None)
-
     super(QRadioLayout, self).__init__(**kwargs)
 
     self.radiogroup = QtWidgets.QButtonGroup()
@@ -117,12 +113,10 @@ class QRadioLayout(QtWidgets.QGridLayout):
 
     self.radiogroup.addButton(item_widget, i)
 
-    # if checked is supplied, set correct radio as checked
-    # else set first radio as checked`
-    if (self.checked is None and i == 0) or self.checked == item_id:
-      item_widget.setChecked(True)
-
     return item_widget
+
+  def set_selected(self, i, selected):
+    self.radiogroup.button(i).setChecked(selected)
 
   def get_result(self):
     return self.radiogroup.checkedButton().objectName()
