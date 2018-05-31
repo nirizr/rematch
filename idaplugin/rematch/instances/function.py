@@ -23,7 +23,7 @@ class FunctionInstance(EmptyFunctionInstance):
                      collectors.vectors.MnemonicHashVector,
                      collectors.vectors.MnemonicHistVector,
                      collectors.vectors.BasicBlockSizeHistVector}
-    self.annotations |= {collectors.annotations.AssemblyAnnotation}
+    self.annotations |= {collectors.annotations.AssemblyAnnotation,
                          collectors.annotations.PositionalAnnotation,
                          collectors.annotations.RegularCommentAnnotation}
 

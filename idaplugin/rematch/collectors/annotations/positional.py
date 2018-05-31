@@ -35,7 +35,7 @@ class PositionalAnnotation(annotation.Annotation):
                             for succ in node.succs()
                             if succ.id in node_ids]
       serialized_node = {'id': node.id, 'start': node.startEA,
-                         'end': node.endEA,'successive': successive_nodes,
+                         'end': node.endEA, 'successive': successive_nodes,
                          'assembly': assembly}
       nodes_data.append(serialized_node)
 
