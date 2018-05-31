@@ -6,9 +6,10 @@ from . import gui
 from .. import utils
 
 
-class ResultScriptDialog(gui.GuiDialog):
+class FilterScriptDialog(gui.GuiDialog):
   def __init__(self, *args, **kwargs):
-    super(ResultScriptDialog, self).__init__("Result script", *args, **kwargs)
+    super(FilterScriptDialog, self).__init__("Result filter script", *args,
+                                             **kwargs)
 
     self.scripts_path = utils.get_plugin_path('scripts')
 
@@ -123,7 +124,7 @@ class ResultScriptDialog(gui.GuiDialog):
     current_file = self.cb.currentText()
     fpath, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save Data File",
                                                      self.scripts_path,
-                                                     "Python files (*.pyf)")
+                                                     "Python filter (*.pyf)")
     if not fpath:
       return
 

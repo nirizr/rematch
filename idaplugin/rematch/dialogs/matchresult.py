@@ -11,7 +11,7 @@ from .. import exceptions
 
 from .. import collectors
 
-from . import resultscript
+from . import filterscript
 from . import serializedgraph
 
 
@@ -170,7 +170,7 @@ class MatchResultDialog(gui.DockableDialog):
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
 
   def show_script(self):
-    self.script_dialog = resultscript.ResultScriptDialog()
+    self.script_dialog = filterscript.FilterScriptDialog()
     self.script_dialog.accepted.connect(self.update_script)
     self.script_dialog.show()
 
