@@ -1,7 +1,7 @@
 from . import exceptions
 from . import network
 
-from . import config, log
+from . import config
 
 
 class User(dict):
@@ -13,27 +13,17 @@ class User(dict):
 
     self.success_callback = None
     self.server = None
+    self.update(self.LOGGEDOUT_USER)
 
-    try:
+    # only attempt user auto login if configured
+    if not config['settings']['login']['autologin']:
       self.refresh()
-
-      # refresh was successful
-      if self['is_authenticated']:
-        return
-
-      # only attempt user auto login if configured
-      if not config['settings']['login']['autologin']:
-        return
-
-      if ('login' in config and 'username' in config['login'] and
+    elif ('login' in config and 'username' in config['login'] and
           'password' in config['login'] and 'server' in config['login'] and
           config['login']['username'] and config['login']['password'] and
           config['login']['server']):
-        self.login(config['login']['username'], config['login']['password'],
-                   config['login']['server'])
-    except exceptions.RematchException:
-      log('user').exception("Failed logging in at startup")
-      self.update(self.LOGGEDOUT_USER)
+      self.login(config['login']['username'], config['login']['password'],
+                 config['login']['server'])
 
   def login(self, username, password, server, success_callback=None,
             exception_callback=None):
@@ -43,7 +33,7 @@ class User(dict):
     # authenticate
     login_params = {'username': username, 'password': password}
     q = network.QueryWorker("POST", "accounts/login/", params=login_params,
-                            server=server, json=True)
+                            server=server, token="", json=True)
     q.start(self.handle_login, exception_callback)
 
   def handle_login(self, response):
@@ -56,26 +46,28 @@ class User(dict):
   def logout(self):
     q = network.QueryWorker("POST", "accounts/logout/", json=True)
     q.start()
-    if 'token' in config['login']:
+    if 'login' in config and 'token' in config['login']:
       del config['login']['token']
     self.clear()
     self.update(self.LOGGEDOUT_USER)
 
   def refresh(self):
-    self.clear()
-    self.update(self.LOGGEDOUT_USER)
+    if not ('login' in config and 'token' in config['login'] and
+            config['login']['token']):
+      return
 
-    if not ('token' in config['login'] and config['login']['token']):
+    if not ('login' in config and 'server' in config['login'] and
+            config['login']['server']):
       return
 
     q = network.QueryWorker("GET", "accounts/profile/", json=True)
     q.start(self.handle_refresh, self.handle_refresh_failure)
 
   def handle_refresh(self, response):
+    self.clear()
     self.update(response)
     if self.success_callback:
       self.success_callback(response)
-      self.success_callback = None
 
   @staticmethod
   def handle_refresh_failure(exception):
