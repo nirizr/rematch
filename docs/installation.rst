@@ -23,28 +23,13 @@ admin console.
   the installation process. Using Anaconda for python package management may
   also be helpful.
 
-Installing Rematch server docker container
-++++++++++++++++++++++++++++++++++++++++++
+Building and running Rematch server docker container
+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 We provide a docker container with Rematch server installed and configured with
 nginx, mysql, rabbitmq and celery micro components. This makes server
-deployment a lot easier however a docker installation and roughly 1 GB of free
+deployment a lot easier, however a docker installation and roughly 600 MB of free
 space are required.
-
-The rematch server docker component is published and available at the `Docker
-Hub <https://hub.docker.com/r/nirizr/rematch>`_. In order to install the
-Rematch server from the docker hub, simply install docker and run the following
-command (please make sure docker is installed and running beforehand):
-
-.. code-block:: console
-
-    $ docker pull nirizr/rematch
-
-This will automatically fetch an create a rematch server docker environment for
-you.
-
-Building and running Rematch server docker container
-++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 If you wish to build your own docker image from source, the docker-compose
 command can be used to build and fire up a docker, when run inside the root

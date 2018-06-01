@@ -3,9 +3,9 @@ ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq python-dev \
-          python-mysqldb build-essential libmysqlclient-dev python-pip \
+          python-mysqldb build-essential default-libmysqlclient-dev python-pip \
           python-numpy python-sklearn netcat-traditional \
-          mysql-client-5.5 rabbitmq-server nginx
+          mysql-client rabbitmq-server nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 RUN mkdir /rematch_server

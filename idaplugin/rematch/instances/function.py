@@ -21,7 +21,8 @@ class FunctionInstance(EmptyFunctionInstance):
                      collectors.vectors.IdentityHashVector,
                      collectors.vectors.AssemblyHashVector,
                      collectors.vectors.MnemonicHashVector,
-                     collectors.vectors.MnemonicHistVector}
+                     collectors.vectors.MnemonicHistVector,
+                     collectors.vectors.BasicBlockSizeHistVector}
     self.annotations |= {collectors.annotations.AssemblyAnnotation}
 
   def size(self):

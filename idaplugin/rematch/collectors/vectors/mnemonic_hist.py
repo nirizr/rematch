@@ -18,4 +18,7 @@ class MnemonicHistVector(vector.Vector):
       mnem_line = mnem_line.lower()
       instruction_hist[mnem_line] += 1
 
+    if sum(instruction_hist.values()) < 5:
+      return None
+
     return instruction_hist

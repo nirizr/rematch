@@ -6,16 +6,16 @@ import inspect
 import json
 
 
-def collect(collectors, offset, instance_id=None):
-  for collector in collectors:
+def collect(collectors, offset):
+  for collector_cls in collectors:
     try:
-      collector_obj = collector(offset, instance_id)
-      r = collector_obj.collect()
+      r = collector_cls(offset).serialize()
       if r:
         yield r
     except UnicodeDecodeError:
       log('annotation').error("Unicode decoding error during serializion of "
-                              "type %s at offset %x", collector.type, offset)
+                              "type %s at offset %x", collector_cls.type,
+                              offset)
 
 
 def apply(offset, annotation):
@@ -27,7 +27,7 @@ def apply(offset, annotation):
 
     annotation_data = json.loads(annotation['data'])
 
-    if annotation_cls.data(offset) == annotation_data:
+    if annotation_cls(offset).data() == annotation_data:
       log('annotation_apply').info("Setting annotation %s skipped at %s with "
                                    "%s because value is already set",
                                    annotation_cls, offset, annotation_data)

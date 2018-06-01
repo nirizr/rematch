@@ -8,22 +8,20 @@ from . import annotation
 class PrototypeAnnotation(annotation.Annotation):
   type = 'prototype'
 
-  @classmethod
-  def data(cls, offset):
-    t = ida_typeinf.idc_get_type(offset)
+  def data(self):
+    t = ida_typeinf.idc_get_type(self.offset)
     # if failed getting type, there's no annotation here
     if t is None:
       return False
 
     # if type equals guessed type, no need to save annotation
-    if t == ida_typeinf.idc_guess_type(offset):
+    if t == ida_typeinf.idc_guess_type(self.offset):
       return False
 
     return {'prototype': t}
 
-  @classmethod
-  def apply(cls, offset, data):
+  def apply(self, data):
     prototype = data['prototype']
-    if idc.SetType(offset, prototype) is None:
+    if idc.SetType(self.offset, prototype) is None:
       log('annotation_prototype').warn("Setting prototype failed at %s with "
-                                       "%s", offset, data)
+                                       "%s", self.offset, data)

@@ -13,9 +13,8 @@ from . import annotation
 class AssemblyAnnotation(annotation.Annotation):
   type = 'assembly'
 
-  @staticmethod
-  def data(offset):
-    func = ida_funcs.get_func(offset)
+  def data(self):
+    func = ida_funcs.get_func(self.offset)
 
     def clean(asm):
       """This removes markers of function offsets, including hidden variable
@@ -51,6 +50,5 @@ class AssemblyAnnotation(annotation.Annotation):
     return nodes_data
 
   @staticmethod
-  def apply(offset, data):
-    del offset
+  def apply(data):
     del data
