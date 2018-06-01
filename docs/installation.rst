@@ -41,6 +41,16 @@ directory of the rematch repository:
    $ docker-compose -f ./server/docker-compose.yml build ;
    $ docker-compose -f ./server/docker-compose.yml up -d ;
 
+Then execute the following command to set up the rematch server adminstrator
+account:
+
+.. code-block:: console
+
+   $ docker-compose -f ./server/docker-compose.yml exec web ./manage.py createsuperuser
+
+Finally, point your browser to http://SERVER_IP:8000/admin/ to manage the
+service and add more users.
+
 Installing Rematch IDA Plugin
 -----------------------------
 

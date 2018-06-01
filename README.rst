@@ -35,8 +35,17 @@ the webservice's docker image by executing the following command:
 
 .. code-block:: console
 
-    $ docker-compose -f ./server/docker-compose.yml build ;
-    $ docker-compose -f ./server/docker-compose.yml up -d ;
+   $ docker-compose -f ./server/docker-compose.yml build ;
+   $ docker-compose -f ./server/docker-compose.yml up -d ;
+
+To create the rematch server administrator execute the following command:
+
+.. code-block:: console
+
+    $ docker-compose -f ./server/docker-compose.yml exec web ./manage.py createsuperuser
+
+Finally, point your browser to http://SERVER_IP:8000/admin/ to manage the
+service and add more users.
 
 .. |Read The Docs| image:: https://readthedocs.org/projects/rematch/badge/?version=latest
    :alt: Read The Docs

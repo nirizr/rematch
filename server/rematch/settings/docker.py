@@ -18,6 +18,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
 
+
+# Accept all hosts by default, this isn't the most secure
+ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = "/rematch_server/static/"
 
