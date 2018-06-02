@@ -157,7 +157,7 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("Data upload completed successfully")
 
     self.clean()
-    self.delayed_queries = []
+    self.cancel_delayed()
 
     self.start_task()
 
@@ -221,7 +221,7 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("Remote task completed successfully")
 
     self.clean()
-    self.delayed_queries = []
+    self.cancel_delayed()
 
     self.start_results()
 
@@ -289,16 +289,16 @@ class MatchAction(base.BoundFileAction):
       self.pbar.setValue(self.pbar.value() + 1)
 
     self.pbar.setValue(self.pbar.value() + len(response['results']))
-    log('match_action').info("result download progress: {} / {} with {}"
-                             "".format(self.pbar.value(), self.pbar.maximum(),
-                                       self.seen))
+    # log('match_action').info("result download progress: {} / {} with {}"
+    #                        "".format(self.pbar.value(), self.pbar.maximum(),
+    #                                  self.seen))
     if self.pbar.value() >= self.pbar.maximum():
       self.pbar.accept()
 
   def accept_results(self):
-    log('match_action').info("Result download completed successfully")
+    # log('match_action').info("Result download completed successfully")
 
     self.clean()
-    self.delayed_queries = []
+    self.cancel_delayed()
 
     self.results.show()

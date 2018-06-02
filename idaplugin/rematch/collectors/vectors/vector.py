@@ -6,7 +6,8 @@ import idautils
 class Vector(collector.Collector):
   def serialize(self):
     s = super(Vector, self).serialize()
-    s["type_version"] = self.type_version
+    if s:
+      s["type_version"] = self.type_version
     return s
 
   def inst_count(self):

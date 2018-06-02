@@ -48,6 +48,9 @@ class QItem(object):
     if self.count() == 0 and self.empty_disabled:
       self.setEnabled(False)
 
+    if self.selected is None and self.count() > 0:
+      self.set_selected(0, True)
+
 
 class QItemSelect(QItem, QtWidgets.QComboBox):
   def __init__(self, *args, **kwargs):
@@ -85,11 +88,12 @@ class QItemCheckBoxes(QItem, QtWidgets.QGridLayout):
     return widget
 
   def set_selected(self, i, selected):
-      self.itemAt(i).setChecked(selected)
+      self.itemAt(i).widget().setChecked(selected)
 
   def get_result(self):
-    return [self.itemAt(i).id
-              for i in range(self.count()) if self.itemAt(i).isChecked()]
+    return [self.itemAt(i).widget().id
+              for i in range(self.count())
+              if self.itemAt(i).widget().isChecked()]
 
 
 class QRadioLayout(QtWidgets.QGridLayout):
@@ -124,10 +128,12 @@ class QRadioLayout(QtWidgets.QGridLayout):
 
 class QRadioExtraLayout(QRadioLayout):
   def create_item(self, i, item_name, item_id, item_description, *args):
-    # slightly ugly to have overriden create_item have the same parameters
-    item_extra, = args
+    # slightly ugly to have overriden create_item to have the same parameters
+    item_extra, selected = args
     item = super(QRadioExtraLayout, self).create_item(i, item_name, item_id,
                                                       item_description)
+    self.set_selected(i, selected)
+
     if item_extra:
       self.update_item_extra(item, item_extra)
       self.addWidget(item_extra, i, 1, QtCore.Qt.AlignTop)
