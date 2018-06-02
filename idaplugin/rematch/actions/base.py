@@ -16,12 +16,13 @@ class Action(object):
     super(Action, self).__init__()
     self.ui_class = ui_class
     self.ui = None
+    self._running = False
 
   def __repr__(self):
     return "<Action: {}>".format(self.ui_class)
 
   def running(self):
-    return self.ui is not None
+    return self._running
 
 
 class IDAAction(Action, ida_kernwin.action_handler_t):
@@ -123,6 +124,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     del ctx
     if self.running():
       return
+    self._running = True
 
     if callable(self.ui_class):
       self.ui = self.ui_class(accept_handler=self.accept_handler,
@@ -131,32 +133,15 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
                               submit_handler=self.submit_handler,
                               response_handler=self.response_handler,
                               exception_handler=self.exception_handler)
-      self.ui.finished.connect(self.close_dialog)
       self.ui.show()
     else:
       raise NotImplementedError("activation called on an action class with no "
                                 "ui_class defined")
 
-  def close_dialog(self):
-    """Destruction and cleanup of dialog bound to action on activation
-
-    This is called when dialog is finished for whatever reason, It is
-    guerenteed to be called after `self.finish_handler` due to slot execution
-    order since Qt4.6"""
-    log('action_base').info("Action finished: %s", self)
-
-    del self.ui
-    self.ui = None
-
-    self.force_update()
-
-  @staticmethod
-  def force_update():
-    """Forcefuly requests IDA kernel to update all widgets and views. Useful
-    for when delayed actions modify the program and/or plugin state without
-    IDA's awareness"""
-    iwid_all = 0xFFFFFFFF
-    ida_kernwin.request_refresh(iwid_all)
+  def finish_handler(self, status):
+    del status
+    log('actions').info("Action finished: %s", self)
+    self._running = False
 
 
 class IdbAction(IDAAction):

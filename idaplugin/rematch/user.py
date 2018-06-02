@@ -3,6 +3,8 @@ from . import network
 
 from . import config
 
+from utils import force_update
+
 
 class User(dict):
   LOGGEDOUT_USER = {"is_authenticated": False, "is_superuser": False,
@@ -51,6 +53,8 @@ class User(dict):
     self.clear()
     self.update(self.LOGGEDOUT_USER)
 
+    force_update()
+
   def refresh(self):
     if not ('login' in config and 'token' in config['login'] and
             config['login']['token']):
@@ -68,6 +72,9 @@ class User(dict):
     self.update(response)
     if self.success_callback:
       self.success_callback(response)
+      self.success_callback = None
+
+    force_update()
 
   @staticmethod
   def handle_refresh_failure(exception):

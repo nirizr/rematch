@@ -1,5 +1,5 @@
 from . import config
-from utils import IdaKernelQueue
+from utils import IdaKernelQueue, force_update
 
 import ida_netnode
 import ida_kernwin
@@ -10,17 +10,10 @@ class NetNode(object):
   def _nn(self):
     return ida_netnode.netnode("$rematch", 0, True)
 
-  @property
-  @IdaKernelQueue(wait=True)
-  def bound_file_id(self):
-    bound_file_id = self._nn.hashstr('bound_file_id')
-    if not bound_file_id:
-      return None
-
-    if not self.validate_bound_server():
-      return None
-
-    return int(bound_file_id)
+  @IdaKernelQueue(write=True, wait=True)
+  def bind_server(self):
+    self._nn.hashset("bound_server", str(config['login']['server']))
+    force_update()
 
   @IdaKernelQueue(wait=True)
   def validate_bound_server(self):
@@ -48,17 +41,26 @@ class NetNode(object):
     elif r == ida_kernwin.ASKBTN_NO:
       return False
 
+  @property
+  @IdaKernelQueue(wait=True)
+  def bound_file_id(self):
+    bound_file_id = self._nn.hashstr('bound_file_id')
+    if not bound_file_id:
+      return None
+
+    if not self.validate_bound_server():
+      return None
+
+    return int(bound_file_id)
+
   @bound_file_id.setter
   @IdaKernelQueue(write=True, wait=True)
   def bound_file_id(self, file_id):
     r = self._nn.hashset("bound_file_id", str(file_id))
     if r:
       self.bind_server()
+    force_update()
     return r
-
-  @IdaKernelQueue(write=True, wait=True)
-  def bind_server(self):
-    self._nn.hashset("bound_server", str(config['login']['server']))
 
   @bound_file_id.deleter
   @IdaKernelQueue(write=True, wait=True)

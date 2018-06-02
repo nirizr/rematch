@@ -18,9 +18,9 @@ class BaseDialog(object):
     if self.reject_handler:
       self.reject_handler()
 
-  def finish_base(self):
+  def finish_base(self, status):
     if self.finish_handler:
-      self.finish_handler()
+      self.finish_handler(status)
 
   def submit_base(self):
     # if no submit_handler, assume dialog is finished

@@ -18,7 +18,6 @@ class MatchAction(base.BoundFileAction):
 
   def __init__(self, *args, **kwargs):
     super(MatchAction, self).__init__(*args, **kwargs)
-    self._running = False
     self.functions = None
     self.results = None
     self.task_id = None
@@ -39,9 +38,6 @@ class MatchAction(base.BoundFileAction):
 
     self.pbar = None
     self.timer = QtCore.QTimer()
-
-  def running(self):
-    return super(MatchAction, self).running() or self._running
 
   def clean(self):
     self.timer.stop()
@@ -66,7 +62,6 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("match action cancelled")
     self.clean()
     self.cancel_delayed()
-    self._running = False
 
   @staticmethod
   def calc_file_version_hash():
