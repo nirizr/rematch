@@ -1,3 +1,4 @@
+-r ../../server/requirements.txt
 pytest
 pytest-django
 python-dateutil

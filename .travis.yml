@@ -23,6 +23,8 @@ matrix:
       env: PROJECT=setup.py
     - python: "3.6"
       env: PROJECT=docs
+    - python: 2.7
+      env: PROJECT=interop ENV=conda DJANGO_SETTINGS_MODULE='rematch.settings.debug'
 
 branches:
   only:
@@ -75,6 +77,8 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" = "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
+      elif [ "${PROJECT}" = "interop" ]; then
+        PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} --verbose --cov-report= --cov=server --cov=idaplugin ;
       else
         PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       fi ;

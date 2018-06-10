@@ -22,7 +22,7 @@ def get_version(path):
 
 
 def get_requirements(fname):
-  return open(fname).readlines()
+  return (l for l in open(fname).readlines() if not l.startswith('-r '))
 
 
 def build_setup(package_base, package_name, version_path,
