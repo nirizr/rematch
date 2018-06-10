@@ -24,7 +24,7 @@ ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = "/rematch_server/static/"
+STATIC_ROOT = "/rematch_server/server/static/"
 
 WSGI_APPLICATION = 'rematch.wsgi.application'
 

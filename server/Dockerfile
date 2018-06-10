@@ -10,11 +10,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 RUN mkdir /rematch_server
 WORKDIR /rematch_server
-ADD ./server/ ./
-ADD ./tests/server/ ./tests/
+ADD ./server/ ./server/
+ADD ./tests/server/ ./tests/server/
 RUN pip install --upgrade pip
-RUN pip install -r /rematch_server/requirements.txt
+RUN pip install -r /rematch_server/server/requirements.txt
 RUN pip install uwsgi
-RUN python /rematch_server/manage.py collectstatic --settings rematch.settings.docker --noinput
+RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
 RUN rm /etc/nginx/sites-enabled/default
-RUN ln -sf /rematch_server/rematch_nginx.conf /etc/nginx/sites-enabled/default
+RUN ln -sf /rematch_server/server/rematch_nginx.conf /etc/nginx/sites-enabled/default
