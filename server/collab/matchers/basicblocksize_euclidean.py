@@ -1,4 +1,4 @@
-from euclidean_matcher import EuclideanDictionaryMatcher
+from .euclidean_matcher import EuclideanDictionaryMatcher
 
 
 class BasicBlockSizeEuclideanMatcher(EuclideanDictionaryMatcher):

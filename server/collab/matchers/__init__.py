@@ -8,14 +8,16 @@ from .mnemonic_hash import MnemonicHashMatcher
 from .name_hash import NameHashMatcher
 from .mnemonic_euclidean import MnemonicEuclideanMatcher
 from .dictionary_matcher import DictionaryMatcher
+from .basicblocksize_euclidean import BasicBlockSizeEuclideanMatcher
 
 
 matchers_list = [InstructionHashMatcher, IdentityHashMatcher, NameHashMatcher,
                  AssemblyHashMatcher, MnemonicHashMatcher,
-                 MnemonicEuclideanMatcher]
+                 MnemonicEuclideanMatcher, BasicBlockSizeEuclideanMatcher]
 
 
 __all__ = ['Matcher', 'HashMatcher', 'EuclideanDictionaryMatcher',
            'InstructionHashMatcher', 'IdentityHashMatcher',
            'AssemblyHashMatcher', 'MnemonicHashMatcher', 'NameHashMatcher',
-           'MnemonicEuclideanMatcher', 'DictionaryMatcher', 'matchers_list']
+           'MnemonicEuclideanMatcher', 'DictionaryMatcher',
+           'BasicBlockSizeEuclideanMatcher', 'matchers_list']

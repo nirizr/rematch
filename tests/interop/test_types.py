@@ -20,7 +20,6 @@ def test_types(collector_module, model_class):
   assert collector_types_set == model_types_set
 
 
-@pytest.mark.skip(reason="Need to fix")
 def test_matcher_vector_types():
   collector_types_set = set(collector_types(vectors, 'type'))
   matcher_vector_types_set = set(collector_types(matchers, 'vector_type'))
