@@ -31,7 +31,7 @@ services:
     build:
       context: ..
       dockerfile: server/Dockerfile
-    command: bash -c "/rematch_server/server/start_docker.sh"
+    command: bash -c "cd /rematch_server/server ; ./start_docker.sh"
     volumes:
       - /home/deb/rematch/
     ports:
@@ -39,10 +39,6 @@ services:
     expose:
       - "8000"
     environment:
-      - IN_DOCKER=1
-      - USERNAME=magic
-      - PASSWORD="qwe123QWE!@#"
-      - EMAIL="nirizr@gmail.com"
       - MYSQL_REMATCH_HOST=db
       - MYSQL_REMATCH_PORT=3306
       - MYSQL_ROOT_PASSWORD=qwe123
