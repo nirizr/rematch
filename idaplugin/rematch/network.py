@@ -85,6 +85,10 @@ class QueryWorker(QtCore.QRunnable):
     _threadpool.start(self)
 
   def cancel(self):
+    if not self.running:
+      return
+
+    log('network').info("async task cancelled: %s", repr(self))
     self.running = False
 
   def run_query(self):

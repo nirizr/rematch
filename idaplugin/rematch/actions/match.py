@@ -54,7 +54,6 @@ class MatchAction(base.BoundFileAction):
 
   def cancel_delayed(self):
     for delayed in self.delayed_queries:
-      log('match_action').info("async task cancelled: %s", repr(delayed))
       delayed.cancel()
     self.delayed_queries = []
 
