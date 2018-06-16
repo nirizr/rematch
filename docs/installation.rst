@@ -46,7 +46,7 @@ account:
 
 .. code-block:: console
 
-   $ docker-compose -f ./server/docker-compose.yml exec web ./manage.py createsuperuser
+   $ docker-compose -f ./server/docker-compose.yml exec web ./server/manage.py createsuperuser
 
 Finally, point your browser to http://SERVER_IP:8000/admin/ to manage the
 service and add more users.
