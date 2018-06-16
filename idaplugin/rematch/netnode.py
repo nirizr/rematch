@@ -11,15 +11,20 @@ class NetNode(object):
     return ida_netnode.netnode("$rematch", 0, True)
 
   @IdaKernelQueue(write=True, wait=True)
-  def bind_server(self):
+  def set_bound_server(self):
     self._nn.hashset("bound_server", str(config['login']['server']))
+    force_update()
+
+  @IdaKernelQueue(write=True, wait=True)
+  def del_bound_server(self):
+    self._nn.hashdel("bound_server")
     force_update()
 
   @IdaKernelQueue(wait=True)
   def validate_bound_server(self):
     bound_server = self._nn.hashstr('bound_server')
     if not bound_server:
-      self.bind_server()
+      self.set_bound_server()
       return True
 
     if bound_server == config['login']['server']:
@@ -34,7 +39,7 @@ class NetNode(object):
     r = ida_kernwin.askbuttons_c("Yes", "No", "Once", ida_kernwin.ASKBTN_YES,
                                  msg)
     if r == ida_kernwin.ASKBTN_YES:
-      self.bind_server()
+      self.set_bound_server()
       return True
     elif r == ida_kernwin.ASKBTN_BTN3:
       return True
@@ -54,18 +59,27 @@ class NetNode(object):
     return int(bound_file_id)
 
   @bound_file_id.setter
-  @IdaKernelQueue(write=True, wait=True)
   def bound_file_id(self, file_id):
-    r = self._nn.hashset("bound_file_id", str(file_id))
-    if r:
-      self.bind_server()
+    if file_id is None:
+      self.del_bound_file_id()
+    else:
+      self.set_bound_file_id(file_id)
+
+  @IdaKernelQueue(write=True, wait=True)
+  def set_bound_file_id(self, file_id):
+    success = self._nn.hashset("bound_file_id", str(file_id))
+    if success:
+      self.set_bound_server()
     force_update()
-    return r
+    return success
 
   @bound_file_id.deleter
   @IdaKernelQueue(write=True, wait=True)
-  def bound_file_id(self):
-    return self._nn.hashdel("bound_file_id")
+  def del_bound_file_id(self):
+    success = self._nn.hashdel("bound_file_id")
+    if success:
+      self.del_bound_server()
+    return success
 
 
 netnode = NetNode()
