@@ -42,7 +42,8 @@ class QItem(object):
       self.addWidget(item, i / self.columns, i % self.columns)
 
       if self.selected:
-        selected = (item_name in self.selected or item_id in self.selected)
+        selected = (item_name in self.selected or item_id in self.selected or
+                    self.selected == "all")
         self.set_selected(i, selected)
 
     if self.count() == 0 and self.empty_disabled:
