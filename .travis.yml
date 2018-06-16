@@ -46,10 +46,10 @@ install:
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install -r ./tests/server/requirements.txt ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install --upgrade -r ./tests/server/requirements.txt ;
       fi ;
-      docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install coveralls pytest-cov ;
-      pip install flake8 ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install --upgrade coveralls pytest-cov ;
+      pip install --upgrade flake8 ;
     fi ;
   - if [ "${ENV}" = "conda" ]; then
       wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh ;
@@ -59,16 +59,16 @@ install:
       conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt ;
     fi ;
   - if [ "${ENV}" = "data" ]; then
-      pip install --only-binary=numpy,scipy numpy scipy ;
+      pip install --upgrade --only-binary=numpy,scipy numpy scipy ;
     fi ;
   - if [ "${ENV}" != "docker" ]; then
       if [ -f "tests/${PROJECT}/requirements.txt" ]; then
-        pip install -r "tests/${PROJECT}/requirements.txt" ;
+        pip install --upgrade -r "tests/${PROJECT}/requirements.txt" ;
       fi ;
       if [ -f "${PROJECT}/requirements.txt" ]; then
-        pip install -r "${PROJECT}/requirements.txt" ;
+        pip install --upgrade -r "${PROJECT}/requirements.txt" ;
       fi ;
-      pip install flake8 coveralls pytest-cov ;
+      pip install --upgrade flake8 coveralls pytest-cov ;
     fi ;
 
 script:
