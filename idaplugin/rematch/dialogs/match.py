@@ -28,9 +28,9 @@ class MatchDialog(gui.GuiDialog):
     self.base_layout.addWidget(self.source_gbx)
 
     self.target_project = widgets.QItemSelect('projects', 'name', 'id',
-                                              'description', allow_none=False)
+                                              'description')
     self.target_file = widgets.QItemSelect('files', 'name', 'id',
-                                           'description', allow_none=False,
+                                           'description',
                                            exclude=[netnode.bound_file_id])
     choices = [("Entire DB", 'db', "Match against entire remote database.",
                 None, True),

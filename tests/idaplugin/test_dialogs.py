@@ -21,6 +21,7 @@ dialogs = sorted(dialogs)
 
 known_failing_dialogs = {'MatchDialog': AttributeError,
                          'AddFileDialog': NotFoundException,
+                         'SettingsDialog': NotFoundException,
                          'MatchResultDialog': TypeError}
 
 

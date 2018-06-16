@@ -21,6 +21,7 @@ class QItem(object):
     self.selected = selected
     self.empty_disabled = empty_disabled
 
+    self.found_selection = False
     self.load()
 
   def load(self):
@@ -45,6 +46,8 @@ class QItem(object):
         selected = (item_name in self.selected or item_id in self.selected or
                     self.selected == "all")
         self.set_selected(i, selected)
+        if selected:
+          self.found_selection = True
 
     if self.count() == 0 and self.empty_disabled:
       self.setEnabled(False)
@@ -58,8 +61,15 @@ class QItemSelect(QItem, QtWidgets.QComboBox):
     self.allow_none = kwargs.pop('allow_none', False)
     super(QItemSelect, self).__init__(*args, **kwargs)
 
+    if self.selected and not self.found_selection:
+      self.insertItem(0, "UNKNOWN ({})".format(self.selected), self.selected)
+      self.set_selected(0, True)
+      self.found_selection = True
+
     if self.allow_none:
       self.insertItem(0, "None", None)
+      if not self.found_selection:
+        self.set_selected(0, True)
 
   @staticmethod
   def create_item(i, item_name, item_id, item_description):
@@ -89,7 +99,7 @@ class QItemCheckBoxes(QItem, QtWidgets.QGridLayout):
     return widget
 
   def set_selected(self, i, selected):
-      self.itemAt(i).widget().setChecked(selected)
+    self.itemAt(i).widget().setChecked(selected)
 
   def get_result(self):
     return [self.itemAt(i).widget().id
