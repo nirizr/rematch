@@ -1,5 +1,7 @@
-import idaplugin
 import pytest
+
+from idaplugin.rematch.dialogs.base import BaseDialog
+from idaplugin.rematch.exceptions import NotFoundException
 
 
 def recurse_subclasses(classes):
@@ -13,11 +15,13 @@ def recurse_subclasses(classes):
   return classes | recurse_subclasses(subclasses)
 
 
-dialogs = recurse_subclasses({idaplugin.rematch.dialogs.base.BaseDialog})
+dialogs = recurse_subclasses({BaseDialog})
 dialogs = sorted(dialogs)
 
 
-known_failing_dialogs = ('MatchDialog', 'AddFileDialog', 'MatchResultDialog')
+known_failing_dialogs = {'MatchDialog': AttributeError,
+                         'AddFileDialog': NotFoundException,
+                         'MatchResultDialog': TypeError}
 
 
 @pytest.mark.parametrize("dialog_entry", dialogs)
@@ -28,7 +32,8 @@ def test_dialog(dialog_entry, idapro_app):
       dialog.show()
     idapro_app.processEvents()
   except Exception as ex:
-    if dialog_entry.__name__ in known_failing_dialogs:
+    if (dialog_entry.__name__ in known_failing_dialogs and
+        ex.__class__ == known_failing_dialogs[dialog_entry.__name__]):
       import traceback
       pytest.xfail("Dialog {} which was expected to fail failed with "
                    "exception {}. {}".format(dialog_entry.__name__, str(ex),
