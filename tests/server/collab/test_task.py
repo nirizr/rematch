@@ -21,9 +21,25 @@ def test_task_resource_empty(resource, limit, admin_client, admin_user):
                                     {'source_end': 1000},
                                     {'target_file': 'files'},
                                     {'strategy': 'binning_strategy'}])
-def test_task(admin_user, params):
+def test_empty_task(admin_user, params):
   task = create_model('tasks', admin_user, **params)
   task.save()
+
+  from collab.tasks import match
+  match(task.id)
+
+
+def test_task(admin_user):
+  task = create_model('tasks', admin_user, target_project=None)
+  task.save()
+
+  create_model('vectors', admin_user,
+               file_version=task.source_file_version).save()
+  create_model('vectors', admin_user,
+               file_version=task.source_file_version).save()
+  create_model('vectors', admin_user).save()
+  create_model('vectors', admin_user).save()
+  create_model('vectors', admin_user).save()
 
   from collab.tasks import match
   match(task.id)

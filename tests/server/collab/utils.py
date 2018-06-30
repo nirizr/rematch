@@ -58,10 +58,12 @@ collab_model_reqs = {'projects': {},
                                  'file_version': 'file_versions'}}
 
 
-def resolve_reqs(model_name, user):
+def resolve_reqs(model_name, user, skip=None):
   model_reqs = collab_model_reqs[model_name]
 
   for req_field, req_model in model_reqs.items():
+    if skip and req_field in skip:
+      continue
     obj = collab_model_objects[req_model]()
 
     create_model(req_model, user, base_obj=obj)
@@ -80,7 +82,8 @@ def create_model(model_name, user, base_obj=None, **additional_fields):
   if isinstance(base_obj, models.Model):
     base_obj.owner = user
 
-    for req_field, obj in resolve_reqs(model_name, user):
+    skip = additional_fields.keys()
+    for req_field, obj in resolve_reqs(model_name, user, skip=skip):
       base_obj.__setattr__(req_field, obj)
 
   for field, value in additional_fields.items():

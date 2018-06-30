@@ -205,6 +205,7 @@ class MatchAction(base.BoundFileAction):
       status = r['status']
       if status == 'failed':
         self.cancel()
+        # TODO: task failed, print a message box saying so
       elif progress_max:
         self.pbar.setMaximum(progress_max)
         if progress >= progress_max:
