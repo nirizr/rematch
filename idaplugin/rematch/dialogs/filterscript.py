@@ -1,9 +1,102 @@
 import os
+import re
 
-from ..idasix import QtWidgets
+from ..idasix import QtWidgets, QtGui
 
 from . import gui
 from .. import utils
+
+
+class SyntaxRule(object):
+  def __init__(self, format_name, regex_pattern, *args, **kwargs):
+    self.regex = re.compile(regex_pattern.format(*args, **kwargs),
+                            re.IGNORECASE)
+    self.format_name = format_name
+
+  def match(self, text):
+    for match_obj in self.regex.finditer(text):
+      index = match_obj.start(1)
+      length = match_obj.end(1) - index
+      if length:
+        yield index, length, self.format_name
+
+
+class SyntaxFormat(QtGui.QTextCharFormat):
+  def __init__(self, color, style='', *args, **kwargs):
+    super(SyntaxFormat, self).__init__(*args, **kwargs)
+
+    _color = QtGui.QColor()
+    if isinstance(color, str):
+      _color.setNamedColor(color)
+    else:
+      _color.setRgb(*color)
+    self.setForeground(_color)
+
+    if 'bold' in style:
+      self.setFontWeight(QtGui.QFont.Bold)
+    if 'italic' in style:
+      self.setFontItalic(True)
+
+
+class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
+  keywords = ['and', 'assert', 'break', 'class', 'continue', 'def', 'del',
+              'elif', 'else', 'except', 'exec', 'finally', 'for', 'from',
+              'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or',
+              'pass', 'print', 'raise', 'return', 'try', 'while', 'yield',
+              'None', 'True', 'False']
+
+  operators = ['=', '==', '!=', '<', '<=', '>', '>=',
+               '\+', '-', '\*', '/', '//', '\%', '\*\*',
+               '\+=', '-=', '\*=', '/=', '\%=',
+               '\^', '\|', '\&', '\~', '>>', '<<']
+
+  braces = ['\{', '\}', '\(', '\)', '\[', '\]']
+
+  formats = {'keyword': SyntaxFormat((200, 120, 50), 'bold'),
+             'operator': SyntaxFormat((150, 150, 150)),
+             'brace': SyntaxFormat('darkGray'),
+             'def': SyntaxFormat((220, 220, 255), 'bold'),
+             'string': SyntaxFormat((20, 110, 100)),
+             'comment': SyntaxFormat((128, 128, 128)),
+             'self': SyntaxFormat((150, 85, 140), 'italic'),
+             'number': SyntaxFormat((100, 150, 190))}
+
+  def __init__(self, document, *args, **kwargs):
+    super(SyntaxHighlighter, self).__init__(document, *args, **kwargs)
+
+    rules = [('self', r'\b(self)\b')]
+
+    # Keywords, operators and brace rules
+    rules += [('keyword', r'\b({})\b', kw) for kw in self.keywords]
+    rules += [('operator', r'({})', op) for op in self.operators]
+    rules += [('brace', r'({})', br) for br in self.braces]
+
+    # Double-quoted strings
+    rules += [('string', r'("[^"\\]*(\\.[^"\\]*)*")')]
+
+    # Single-quoted strings
+    rules += [('string', r"('[^'\\]*(\\.[^'\\]*)*')")]
+
+    # function and class name definitions
+    rules += [('def', r'\bdef\b\s*(\w+):'), ('def', r'\bclass\b\s*(\w+):')]
+
+    # comments
+    rules += [('comment', r'(#[^\n]*)')]
+
+    # numbers
+    rules += [('number', r'(\b[+-]?[0-9]+[lL]?\b)'),
+              ('number', r'(\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\b)'),
+              ('number',
+               r'(\b[+-]?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\b)')]
+
+    self.rules = [SyntaxRule(*rule) for rule in rules]
+
+  def highlightBlock(self, text):
+    for rule in self.rules:
+      for index, length, format_name in rule.match(text):
+        self.setFormat(index, length, self.formats[format_name])
+
+      # TODO: multiline string matching
 
 
 class FilterScriptDialog(gui.GuiDialog):
@@ -13,7 +106,8 @@ class FilterScriptDialog(gui.GuiDialog):
 
     self.scripts_path = utils.get_plugin_path('scripts')
 
-    self.script_txt = QtWidgets.QTextEdit()
+    self.script_txt = QtWidgets.QPlainTextEdit()
+    self.highlighter = SyntaxHighlighter(self.script_txt.document())
     self.status_lbl = QtWidgets.QLabel()
     self.status_lbl.setStyleSheet("color: red;")
     self.cb = QtWidgets.QComboBox()
@@ -29,7 +123,7 @@ class FilterScriptDialog(gui.GuiDialog):
       default_script = os.path.join(self.scripts_path, self.cb.itemText(0))
       with open(default_script, "r") as fh:
         data = fh.read()
-        self.script_txt.setText(data)
+        self.script_txt.setPlainText(data)
 
     self.new_btn = QtWidgets.QPushButton("&New")
     self.save_btn = QtWidgets.QPushButton("&Save")
