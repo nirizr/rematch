@@ -13,6 +13,8 @@ from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
 
+import functools
+
 
 class ViewSetOwnerMixin(object):
   permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
@@ -30,6 +32,22 @@ class ViewSetManyAllowedMixin(object):
         kwargs["many"] = True
 
     return super(ViewSetManyAllowedMixin, self).get_serializer(*args, **kwargs)
+
+
+def paginatable(serializer):
+  def decorator(f):
+    @functools.wraps(f)
+    def wraps(self, *args, **kwargs):
+      queryset = f(self, *args, **kwargs)
+      page = self.paginate_queryset(queryset)
+      if page is not None:
+        serialized = serializer(page, many=True)
+        return self.get_paginated_response(serialized.data)
+      else:
+        serialized = serializer(queryset, many=True)
+        return response.Response(serialized.data)
+    return wraps
+  return decorator
 
 
 class ProjectViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
@@ -89,6 +107,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
       serializer_class = TaskEditSerializer
     return serializer_class
 
+  @paginatable(SlimInstanceSerializer)
   @decorators.detail_route(url_path="locals")
   def locals(self, request, pk):
     del request
@@ -98,17 +117,9 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
 
     # include local matches (created for specified file_version and are a
     # 'from_instance' match). for those, include the match objects themselves
-    queryset = Instance.objects.filter(from_matches__task=task).distinct()
+    return Instance.objects.filter(from_matches__task=task).distinct()
 
-    # pagination code
-    page = self.paginate_queryset(queryset)
-    if page is not None:
-      serializer = SlimInstanceSerializer(page, many=True)
-      return self.get_paginated_response(serializer.data)
-
-    serializer = SlimInstanceSerializer(queryset, many=True)
-    return response.Response(serializer.data)
-
+  @paginatable(SlimInstanceSerializer)
   @decorators.detail_route(url_path="remotes")
   def remotes(self, request, pk):
     del request
@@ -118,17 +129,9 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
 
     # include remote matches (are a 'to_instance' match), those are referenced
     # by match records of local instances
-    queryset = Instance.objects.filter(to_matches__task=task).distinct()
+    return Instance.objects.filter(to_matches__task=task).distinct()
 
-    # pagination code
-    page = self.paginate_queryset(queryset)
-    if page is not None:
-      serializer = SlimInstanceSerializer(page, many=True)
-      return self.get_paginated_response(serializer.data)
-
-    serializer = SlimInstanceSerializer(queryset, many=True)
-    return response.Response(serializer.data)
-
+  @paginatable(MatchSerializer)
   @decorators.detail_route(url_path="matches")
   def matches(self, request, pk):
     del request
@@ -136,16 +139,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
 
     task = self.get_object()
 
-    queryset = Match.objects.filter(task=task)
-
-    # pagination code
-    page = self.paginate_queryset(queryset)
-    if page is not None:
-      serializer = MatchSerializer(page, many=True)
-      return self.get_paginated_response(serializer.data)
-
-    serializer = MatchSerializer(queryset, many=True)
-    return response.Response(serializer.data)
+    return Match.objects.filter(task=task)
 
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
@@ -194,4 +188,5 @@ class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
 class AnnotationViewSet(viewsets.ModelViewSet):
   queryset = Annotation.objects.all()
   serializer_class = AnnotationSerializer
+  permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('instance', 'type', 'data')
