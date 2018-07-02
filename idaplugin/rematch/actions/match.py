@@ -140,6 +140,8 @@ class MatchAction(base.BoundFileAction):
       q = network.QueryWorker("POST", "collab/instances/",
                               params=self.instance_set, json=True)
       q.start(self.progress_advance)
+      self.delayed_queries.append(q)
+
       self.instance_set = []
       self.pbar.setMaximum(self.pbar.maximum() + 1)
     self.progress_advance()
