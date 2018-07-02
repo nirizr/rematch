@@ -73,7 +73,7 @@ class DockableDialog(WidgetsDialog, PluginForm):
 
   def OnClose(self, form):
       del form
-      self.finish_base()
+      self.finish_base(QtWidgets.QDialog.Rejected)
 
   def accept(self):
     self.accpet_base()
