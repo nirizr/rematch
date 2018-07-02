@@ -1,4 +1,3 @@
-import itertools
 import json
 
 import numpy as np
@@ -8,12 +7,18 @@ import sklearn.feature_extraction  # noqa flake8 importing as a different name
 
 from . import matcher
 
+# python 2 & 3 compatibility
+try:
+  from itertools import izip
+except ImportError:
+  izip = zip
+
 
 class DictionaryMatcher(matcher.Matcher):
   @classmethod
   def format_data(cls, source, target):
-    source_rows = itertools.izip(*source.values_list('instance_id', 'data'))
-    target_rows = itertools.izip(*target.values_list('instance_id', 'data'))
+    source_rows = izip(*source.values_list('instance_id', 'data'))
+    target_rows = izip(*target.values_list('instance_id', 'data'))
 
     source_instance_ids, source_json = source_rows
     target_instance_ids, target_json = target_rows
