@@ -47,8 +47,22 @@ class NetNode(object):
       return False
 
   @property
-  @IdaKernelQueue(wait=True)
   def bound_file_id(self):
+    return self.getter_bound_file_id()
+
+  @bound_file_id.setter
+  def bound_file_id(self, file_id):
+    if file_id is None:
+      self.delete_bound_file_id()
+    else:
+      self.set_bound_file_id(file_id)
+
+  @bound_file_id.deleter
+  def bound_file_id(self):
+    self.delete_bound_file_id()
+
+  @IdaKernelQueue(wait=True)
+  def getter_bound_file_id(self):
     bound_file_id = self._nn.hashstr('bound_file_id')
     if not bound_file_id:
       return None
@@ -58,13 +72,6 @@ class NetNode(object):
 
     return int(bound_file_id)
 
-  @bound_file_id.setter
-  def bound_file_id(self, file_id):
-    if file_id is None:
-      self.del_bound_file_id()
-    else:
-      self.set_bound_file_id(file_id)
-
   @IdaKernelQueue(write=True, wait=True)
   def set_bound_file_id(self, file_id):
     success = self._nn.hashset("bound_file_id", str(file_id))
@@ -73,9 +80,8 @@ class NetNode(object):
     force_update()
     return success
 
-  @bound_file_id.deleter
   @IdaKernelQueue(write=True, wait=True)
-  def del_bound_file_id(self):
+  def delete_bound_file_id(self):
     success = self._nn.hashdel("bound_file_id")
     if success:
       self.del_bound_server()

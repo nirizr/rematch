@@ -61,7 +61,7 @@ class SettingsDialog(gui.GuiDialog):
     layout.addWidget(QtWidgets.QLabel("Bound file:"), 0, 0)
     self.bound_file = widgets.QItemSelect('files', 'name', 'id', 'description',
                                           allow_none=True,
-                                          selected=netnode.bound_file_id)
+                                          selected=[netnode.bound_file_id])
     layout.addWidget(self.bound_file, 0, 1)
 
     gbx = QtWidgets.QGroupBox("Bound details")

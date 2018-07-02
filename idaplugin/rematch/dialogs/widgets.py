@@ -59,6 +59,8 @@ class QItem(object):
 class QItemSelect(QItem, QtWidgets.QComboBox):
   def __init__(self, *args, **kwargs):
     self.allow_none = kwargs.pop('allow_none', False)
+    if self.allow_none:
+      kwargs['empty_disabled'] = False
     super(QItemSelect, self).__init__(*args, **kwargs)
 
     if self.selected and not self.found_selection:
