@@ -13,7 +13,8 @@ WORKDIR /rematch_server
 ADD ./server/ ./server/
 ADD ./tests/server/ ./tests/server/
 RUN pip install --upgrade pip
-RUN pip install -r /rematch_server/server/requirements.txt --only-binary scikit-learn
+RUN pip install scikit-learn[alldeps]
+RUN pip install -r /rematch_server/server/requirements.txt
 RUN pip install uwsgi
 RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
 RUN rm /etc/nginx/sites-enabled/default
