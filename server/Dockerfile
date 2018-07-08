@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy apt-utils
@@ -13,7 +13,6 @@ WORKDIR /rematch_server
 ADD ./server/ ./server/
 ADD ./tests/server/ ./tests/server/
 RUN pip install --upgrade pip
-RUN pip install scikit-learn[alldeps]
 RUN pip install -r /rematch_server/server/requirements.txt
 RUN pip install uwsgi
 RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
