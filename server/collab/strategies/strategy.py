@@ -6,8 +6,9 @@ from collab.matchers import matchers_list
 
 
 class Strategy(object):
-  def __init__(self, source_file, source_start, source_end,
+  def __init__(self, vector_cls, source_file, source_start, source_end,
                source_file_version, target_project, target_file, matchers):
+    self.vector_cls = vector_cls
     self.source_file = source_file
     self.source_start = source_start
     self.source_end = source_end
@@ -21,20 +22,20 @@ class Strategy(object):
       raise ValueError("Unfamiliar matchers were requested: {}"
                        "".format(self.matchers))
 
-  def get_source_filters(self):
+  def get_source_filter(self):
     # make sure vector belongs to the file_version (and therefore the file)
     # of the source
-    source_filters = Q(file_version_id=self.source_file_version)
+    source_filter = Q(file_version_id=self.source_file_version)
 
     # if provided with a source start and/or end, add additional limitations
     if self.source_start:
-      source_filters &= Q(instance__offset__gte=self.source_start)
+      source_filter &= Q(instance__offset__gte=self.source_start)
     if self.source_end:
-      source_filters &= Q(instance__offset__lte=self.source_end)
+      source_filter &= Q(instance__offset__lte=self.source_end)
 
-    return source_filters
+    return source_filter
 
-  def get_target_filters(self):
+  def get_target_filter(self):
     # Exclude source file inputs from the target
     target_filter = ~Q(file_version__file=self.source_file)
 

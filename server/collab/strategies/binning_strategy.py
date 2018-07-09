@@ -16,13 +16,15 @@ class BinningStrategy(Strategy):
   MINIMAL_BIN_SIZE = 16
   BIN_BASE = 2
 
-  def get_bins(self, matcher, source_vectors, target_vectors):
+  def get_bins(self, matcher):
     del matcher
 
-    source_sizes = source_vectors.aggregate(Min('instance__size'),
-                                            Max('instance__size'))
-    target_sizes = target_vectors.aggregate(Min('instance__size'),
-                                            Max('instance__size'))
+    source_sizes = (self.vector_cls.objects.filter(self.get_source_filter())
+                                           .aggregate(Min('instance__size'),
+                                                      Max('instance__size')))
+    target_sizes = (self.vector_cls.objects.filter(self.get_target_filter())
+                                           .aggregate(Min('instance__size'),
+                                                      Max('instance__size')))
 
     # find the common denomenator of sizes
     # or 0 parts are a trick to replce Nones with 0
@@ -59,13 +61,12 @@ class BinningStrategy(Strategy):
 
     return bins
 
-  def get_ordered_steps(self, source_vectors, target_vectors):
+  def get_ordered_steps(self):
     ordered_steps = list()
 
     for matcher in self.get_ordered_matchers():
-      matcher_bins = self.get_bins(matcher, source_vectors, target_vectors)
-      for bin_min, bin_max in matcher_bins:
-        step = BinningStrategyStep(matcher, bin_min, bin_max)
+      for bin_min, bin_max in self.get_bins(matcher):
+        step = BinningStrategyStep(self, matcher, bin_min, bin_max)
         ordered_steps.append(step)
 
     return ordered_steps

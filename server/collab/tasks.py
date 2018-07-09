@@ -20,14 +20,10 @@ def match(task_id):
                               source_file=F('source_file_version__file')).get()
 
     # create strategy instance
-    strategy = strategies.get_strategy(**task_values)
-
-    # build vector objects from strategy filters
-    source_vectors = Vector.objects.filter(strategy.get_source_filters())
-    target_vectors = Vector.objects.filter(strategy.get_target_filters())
+    strategy = strategies.get_strategy(vector_cls=Vector, **task_values)
 
     # building steps according to strategy
-    steps = strategy.get_ordered_steps(source_vectors, target_vectors)
+    steps = strategy.get_ordered_steps()
 
     # recording the task has started
     task.update(status=Task.STATUS_STARTED, task_id=match.request.id,
@@ -35,7 +31,7 @@ def match(task_id):
 
     print("Running task {}, strategy {}".format(match.request.id, strategy))
     for step in steps:
-      match_by_step(task_id, step, source_vectors, target_vectors)
+      match_by_step(task_id, step)
       task.update(progress=F('progress') + 1)
   except Exception:
     task.update(status=Task.STATUS_FAILED, finished=now())
@@ -60,10 +56,10 @@ def batch(iterable, size):
         yield chain([next(batchiter)], batchiter)
 
 
-def match_by_step(task_id, step, source_vectors, target_vectors):
+def match_by_step(task_id, step):
   start = now()
-  source_vectors = source_vectors.filter(step.get_source_filters())
-  target_vectors = target_vectors.filter(step.get_target_filters())
+  source_vectors = Vector.objects.filter(step.get_source_filter())
+  target_vectors = Vector.objects.filter(step.get_target_filter())
 
   source_count = source_vectors.count()
   target_count = target_vectors.count()
