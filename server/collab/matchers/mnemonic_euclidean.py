@@ -1,3 +1,6 @@
+from django.db.models import Q
+
+
 from . import euclidean_matcher
 
 
@@ -8,3 +11,7 @@ class MnemonicEuclideanMatcher(euclidean_matcher.EuclideanDictionaryMatcher):
   matcher_description = ("Matches functions according to their mnemonic "
                          "listing using histogram and an euclidean distance "
                          "metric.")
+
+  @staticmethod
+  def get_filter():
+    return Q(instance__count__gte=10)

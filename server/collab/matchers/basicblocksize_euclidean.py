@@ -1,3 +1,6 @@
+from django.db.models import Q
+
+
 from .euclidean_matcher import EuclideanDictionaryMatcher
 
 
@@ -8,3 +11,7 @@ class BasicBlockSizeEuclideanMatcher(EuclideanDictionaryMatcher):
   matcher_description = ("Matches functions according to their basic block "
                          "size listing using histogram and an euclidean "
                          "distance metric.")
+
+  @staticmethod
+  def get_filter():
+    return Q(instance__count__gte=5)

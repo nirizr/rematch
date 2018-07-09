@@ -22,9 +22,6 @@ class IdentityHashVector(vector.Vector):
     return h
 
   def data(self):
-    if self.inst_count() < 3:
-      return None
-
     h = self.keleven
     for ea in idautils.FuncItems(self.offset):
       h = self._cycle(h, idc.Byte(ea))

@@ -68,6 +68,7 @@ class Instance(models.Model):
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   offset = models.BigIntegerField()
   size = models.BigIntegerField()
+  count = models.BigIntegerField()
 
   matches = models.ManyToManyField('self', symmetrical=False, through='Match',
                                    related_name='related_to+')

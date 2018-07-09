@@ -103,7 +103,7 @@ class InstanceVectorSerializer(serializers.ModelSerializer):
   class Meta(object):
     model = Instance
     fields = ('id', 'owner', 'file', 'file_version', 'type', 'name', 'offset',
-              'size', 'vectors', 'annotations')
+              'size', 'count', 'vectors', 'annotations')
 
   def create(self, validated_data):
     vectors_data = validated_data.pop('vectors')

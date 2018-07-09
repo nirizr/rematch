@@ -9,7 +9,8 @@ class StrategyStep(object):
     return self.matcher.match_type
 
   def get_results_filter(self):
-    return Q(type=self.matcher.vector_type)
+    return (Q(type=self.matcher.vector_type) &
+            self.matcher.get_filter())
 
   def get_source_filters(self):
     return self.get_results_filter()

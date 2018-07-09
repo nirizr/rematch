@@ -26,6 +26,10 @@ class FunctionInstance(EmptyFunctionInstance):
     self.annotations |= {collectors.annotations.AssemblyAnnotation}
 
   def size(self):
-    """return the overall size of function by adding sizes of all indevidual
+    """return the overall size of function by adding sizes of all individual
     chunks"""
     return sum([chunk[1] - chunk[0] for chunk in idautils.Chunks(self.offset)])
+
+  def count(self):
+    """return the number of instructions contained in function"""
+    return len(list(idautils.FuncItems(self.offset)))
