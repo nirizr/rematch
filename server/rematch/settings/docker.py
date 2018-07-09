@@ -26,25 +26,6 @@ ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = "/rematch_server/server/static/"
 
-WSGI_APPLICATION = 'rematch.wsgi.application'
-
-
-# Django rest framework configuration
-REST_FRAMEWORK = {
-  'DEFAULT_AUTHENTICATION_CLASSES': (
-    'rest_framework.authentication.BasicAuthentication',
-    'rest_framework.authentication.TokenAuthentication',
-    'rest_framework.authentication.SessionAuthentication',
-  ),
-
-  'DEFAULT_FILTER_BACKENDS': (
-    'django_filters.rest_framework.DjangoFilterBackend',
-  ),
-
-  'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
-}
-
-REST_SESSION_LOGIN = False
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -62,15 +43,6 @@ DATABASES = {
         },
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
-STATIC_URL = '/static/'
-
 
 # docker conf
 RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq')
@@ -95,3 +67,24 @@ if not BROKER_URL:
 
 BROKER_POOL_LIMIT = 1
 BROKER_CONNECTION_TIMEOUT = 10
+
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/rematch/django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

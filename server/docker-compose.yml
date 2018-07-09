@@ -31,7 +31,6 @@ services:
     build:
       context: ..
       dockerfile: server/Dockerfile
-    command: bash -c "cd /rematch_server/server ; ./start_docker.sh"
     volumes:
       - /home/deb/rematch/
     ports:

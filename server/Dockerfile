@@ -8,13 +8,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq python-dev 
           mysql-client rabbitmq-server nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
-RUN mkdir /rematch_server
+RUN useradd --no-log-init -m -d /rematch_server rematch
 WORKDIR /rematch_server
-ADD ./server/ ./server/
-ADD ./tests/server/ ./tests/server/
-RUN pip install --upgrade pip
+ADD --chown=rematch:rematch ./server/ ./server/
+ADD --chown=rematch:rematch ./tests/server/ ./tests/server/
+RUN pip install --upgrade pip uwsgi
 RUN pip install -r /rematch_server/server/requirements.txt
-RUN pip install uwsgi
-RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
+RUN mkdir /var/log/rematch/ && chown rematch:rematch /var/log/rematch
 RUN rm /etc/nginx/sites-enabled/default
-RUN ln -sf /rematch_server/server/rematch_nginx.conf /etc/nginx/sites-enabled/default
+RUN ln -sf /rematch_server/server/nginx.conf /etc/nginx/sites-enabled/rematch
+USER rematch
+RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
+USER root
+CMD cd /rematch_server/server ; ./start_docker.sh
