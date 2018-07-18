@@ -2,10 +2,9 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq python-dev \
-          python-mysqldb build-essential default-libmysqlclient-dev python-pip \
-          python-numpy python-sklearn netcat-traditional \
-          mysql-client rabbitmq-server nginx
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
+          python-dev build-essential python-pip python-numpy python-sklearn \
+          netcat-traditional rabbitmq-server nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 RUN useradd --no-log-init -m -d /rematch_server rematch
