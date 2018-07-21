@@ -16,6 +16,11 @@ matchers_list = [InstructionHashMatcher, IdentityHashMatcher, NameHashMatcher,
                  MnemonicEuclideanMatcher, BasicBlockSizeEuclideanMatcher]
 
 
+def matcher_choices():
+  return [(m.matcher_type, m.matcher_name) for m in matchers_list
+            if not m.is_abstract()]
+
+
 __all__ = ['Matcher', 'HashMatcher', 'EuclideanDictionaryMatcher',
            'InstructionHashMatcher', 'IdentityHashMatcher',
            'AssemblyHashMatcher', 'MnemonicHashMatcher', 'NameHashMatcher',

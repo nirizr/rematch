@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 from .validators import idb_validator
 from .strategies import strategy_choices
+from .matchers import matcher_choices
 
 
 class Project(models.Model):
@@ -156,7 +157,7 @@ class Match(models.Model):
   task = models.ForeignKey(Task, models.CASCADE, db_index=True,
                            related_name='matches')
 
-  type = models.CharField(max_length=64, choices=Vector.TYPE_CHOICES)
+  type = models.CharField(max_length=64, choices=matcher_choices)
   score = models.FloatField()
 
 
