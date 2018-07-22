@@ -17,7 +17,7 @@ matchers_list = [InstructionHashMatcher, IdentityHashMatcher, NameHashMatcher,
 
 
 def matcher_choices():
-  return [(m.matcher_type, m.matcher_name) for m in matchers_list
+  return [(m.match_type, m.matcher_name) for m in matchers_list
             if not m.is_abstract()]
 
 

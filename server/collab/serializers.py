@@ -139,9 +139,16 @@ class VectorSerializer(serializers.ModelSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
+  annotation_count = serializers.SerializerMethodField()
+
   class Meta(object):
     model = Match
-    fields = ('from_instance', 'to_instance', 'task', 'type', 'score')
+    fields = ('from_instance', 'to_instance', 'task', 'type', 'score',
+              'annotation_count')
+
+  @staticmethod
+  def get_annotation_count(match):
+    return Annotation.objects.filter(instance=match.to_instance).count()
 
 
 class MatcherSerializer(serializers.Serializer):

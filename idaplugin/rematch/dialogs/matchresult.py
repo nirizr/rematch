@@ -19,7 +19,7 @@ class MatchResultDialog(gui.DockableDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
-  DOCUMENTATION_SCORE_COLUMN = 2
+  ANNOTATION_COUNT_COLUMN = 2
   MATCH_KEY_COLUMN = 3
 
   LOCAL_ELEMENT_COLOR = QtGui.QBrush(QtGui.QColor(0x42, 0x86, 0xF4))
@@ -72,11 +72,11 @@ class MatchResultDialog(gui.DockableDialog):
                                          match_column=self.MATCH_NAME_COLUMN)
 
     # tree columns
-    self.tree.setHeaderLabels(("Function", "Score", "Doc. Score", "Engine"))
+    self.tree.setHeaderLabels(("Function", "Score", "Annotation #", "Engine"))
 
     self.tree.header().setDefaultSectionSize(20)
     self.tree.resizeColumnToContents(self.MATCH_SCORE_COLUMN)
-    self.tree.resizeColumnToContents(self.DOCUMENTATION_SCORE_COLUMN)
+    self.tree.resizeColumnToContents(self.ANNOTATION_COUNT_COLUMN)
     self.tree.setColumnWidth(self.MATCH_NAME_COLUMN, 150)
 
     # other tree properties
@@ -281,7 +281,7 @@ class MatchResultDialog(gui.DockableDialog):
     return 'Filter' in context and context['Filter']
 
   def populate_tree(self):
-    self.tree.sortItems(self.DOCUMENTATION_SCORE_COLUMN,
+    self.tree.sortItems(self.ANNOTATION_COUNT_COLUMN,
                         QtCore.Qt.DescendingOrder)
     self.tree.setSortingEnabled(False)
 
@@ -332,8 +332,8 @@ class MatchResultDialog(gui.DockableDialog):
     if match_obj:
       tree_item.setText(self.MATCH_SCORE_COLUMN,
                           str(round(match_obj['score'], 2)))
-      tree_item.setText(self.DOCUMENTATION_SCORE_COLUMN,
-                          str(round(0, 2)))
+      tree_item.setText(self.ANNOTATION_COUNT_COLUMN,
+                          str(match_obj['annotation_count']))
       tree_item.setText(self.MATCH_KEY_COLUMN,
                           str(match_obj['type']))
       tree_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)

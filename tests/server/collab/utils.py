@@ -1,7 +1,8 @@
 from functools import partial
 
 from django.db import models
-from collab.models import Project, File, FileVersion, Task, Instance, Vector
+from collab.models import (Project, File, FileVersion, Task, Match, Instance,
+                           Vector)
 from collab.matchers import matchers_list
 
 import random
@@ -30,6 +31,7 @@ collab_models = {'projects': {'name': 'test_project_1', 'private': False,
                            'description': 'desc1'},
                  'file_versions': {'md5hash': 'J' * 32},
                  'tasks': {},
+                 'matches': {'score': 100, 'type': ''},
                  'instances': {'offset': 0, 'type': 'function', 'size': 0,
                                'count': 0, 'vectors': [], 'annotations': []},
                  'vectors': {'type': 'assembly_hash', 'type_version': 0,
@@ -42,6 +44,7 @@ collab_model_objects = {'projects': partial(Project, private=False),
                                          md5hash='H' * 32),
                         'file_versions': partial(FileVersion),
                         'tasks': partial(Task, matchers=requested_matchers),
+                        'matches': partial(Match, score=100, type=''),
                         'instances': partial(Instance, offset=0, size=0,
                                              count=0),
                         'vectors': partial(Vector, type='assembly_hash',
@@ -54,6 +57,8 @@ collab_model_reqs = {'projects': {},
                                        'md5hash': 'rand_hash'},
                      'tasks': {'target_project': 'projects',
                                'source_file_version': 'file_versions'},
+                     'matches': {'task': 'tasks', 'from_instance': 'instances',
+                                 'to_instance': 'instances'},
                      'instances': {'file_version': 'file_versions'},
                      'vectors': {'instance': 'instances',
                                  'file_version': 'file_versions'}}

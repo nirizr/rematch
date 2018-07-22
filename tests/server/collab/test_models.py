@@ -65,6 +65,12 @@ def test_model_creation(admin_api_client, admin_user, model_name):
                                    data=model_data,
                                    HTTP_ACCEPT='application/json')
 
+  # Manually handle matches, where API does not allow creation or
+  # modification of objects, as they're read only
+  if model_name == "matches":
+    assert_response(response, status.HTTP_405_METHOD_NOT_ALLOWED)
+    return
+
   assert_response(response, status.HTTP_201_CREATED)
   projects_created = [response.data]
 

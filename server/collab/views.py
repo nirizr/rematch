@@ -145,6 +145,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()
   serializer_class = MatchSerializer
+  permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('task', 'type', 'score')
 
   @staticmethod

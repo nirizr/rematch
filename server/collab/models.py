@@ -157,7 +157,7 @@ class Match(models.Model):
   task = models.ForeignKey(Task, models.CASCADE, db_index=True,
                            related_name='matches')
 
-  type = models.CharField(max_length=64, choices=matcher_choices)
+  type = models.CharField(max_length=64, choices=matcher_choices())
   score = models.FloatField()
 
 
