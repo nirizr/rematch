@@ -1,8 +1,8 @@
-import base
-import login
-import match
-import project
-import settings
+from . import base
+from . import login
+from . import match
+from . import project
+from . import settings
 
 
 __all__ = [base, login, match, project, settings]

@@ -4,6 +4,8 @@ matrix:
   include:
     - python: "2.7"
       env: PROJECT=idaplugin ENV=conda
+    - python: "3.6"
+      env: PROJECT=idaplugin ENV=conda
     - python: "2.7"
       env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.debug'
       services:
@@ -54,7 +56,7 @@ install:
       pip install --upgrade flake8 ;
     fi ;
   - if [ "${ENV}" = "conda" ]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh ;
+      wget "https://repo.continuum.io/miniconda/Miniconda${TRAVIS_PYTHON_VERSION:0:1}-latest-Linux-x86_64.sh" -O miniconda.sh ;
       bash ./miniconda.sh -b -p "${HOME}/miniconda" ;
       export PATH=${HOME}/miniconda/bin:$PATH ;
       conda info -a ;

@@ -1,4 +1,4 @@
-from idasix import QtCore, QtWidgets
+from .idasix import QtCore, QtWidgets
 
 import ida_idaapi
 
@@ -119,7 +119,7 @@ class RematchPlugin(ida_idaapi.plugin_t):
 
     app = QtWidgets.qApp
     widgets = [app.focusWidget(), app.activeWindow()] + app.topLevelWidgets()
-    mainwidgets = filter(None, map(self.search_mainwindow, widgets))
+    mainwidgets = list(filter(None, map(self.search_mainwindow, widgets)))
 
     if mainwidgets:
       self.mainwindow = mainwidgets[0]

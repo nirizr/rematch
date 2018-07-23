@@ -1,17 +1,22 @@
-from idasix import QtCore
+from .idasix import QtCore
 
 import urllib
-import urllib2
-from urlparse import urlparse
-from cookielib import CookieJar
+try:
+  import urllib2 as request
+  from urlparse import urlparse
+  from cookielib import CookieJar
+except ImportError:
+  from urllib import request
+  from urllib.parse import urlparse
+  from http.cookiejar import CookieJar
+
 from json import loads, dumps
 
-import exceptions
-from . import config, log, utils
+from . import config, log, utils, exceptions
 
 # building opener
 cookiejar = CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+opener = request.build_opener(request.HTTPCookieProcessor(cookiejar))
 
 _threadpool = QtCore.QThreadPool()
 _threadpool.setMaxThreadCount(config['network']['threadcount'])
@@ -175,11 +180,11 @@ def query(method, url, server=None, token=None, params=None, json=False):
     params = build_params(method, params)
 
     if method == "GET":
-      request = urllib2.Request(full_url + "?" + params, headers=headers)
+      req = request.Request(full_url + "?" + params, headers=headers)
     elif method == "POST":
-      request = urllib2.Request(full_url, data=params, headers=headers)
+      req = request.Request(full_url, data=params, headers=headers)
 
-    response = opener.open(request)
+    response = opener.open(req)
 
     # return response
     response_obj = response.read()

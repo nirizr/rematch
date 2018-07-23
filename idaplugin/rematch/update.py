@@ -9,7 +9,12 @@ from .version import __version__
 # builtin
 import os
 import shutil
-import urllib2
+
+try:
+  import urllib2 as request
+except ImportError:
+  from urllib import request
+
 import tempfile
 import zipfile
 from distutils.version import StrictVersion
@@ -73,7 +78,7 @@ def update_version(url):
   package_path = '/idaplugin/'
 
   log('update').info("New version package url: %s", url)
-  package_download = urllib2.urlopen(url)
+  package_download = request.urlopen(url)
   temp_zip = tempfile.TemporaryFile()
   temp_dir = tempfile.mkdtemp()
 

@@ -3,7 +3,7 @@ from . import network
 
 from . import config
 
-from utils import force_update
+from .utils import force_update
 
 
 class User(dict):

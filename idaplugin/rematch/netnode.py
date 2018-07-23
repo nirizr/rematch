@@ -1,5 +1,5 @@
 from . import config
-from utils import IdaKernelQueue, force_update
+from .utils import IdaKernelQueue, force_update
 
 import ida_netnode
 import ida_kernwin

@@ -16,7 +16,7 @@ def recurse_subclasses(classes):
 
 
 dialogs = recurse_subclasses({BaseDialog})
-dialogs = sorted(dialogs)
+dialogs = sorted(dialogs, key=lambda d: d.__class__.__name__)
 
 
 known_failing_dialogs = {'MatchDialog': AttributeError,

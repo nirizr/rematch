@@ -1,6 +1,11 @@
 import json
 
-from urllib2 import HTTPError, URLError
+# Try python 2 and then python 3
+try:
+  from urllib2 import HTTPError, URLError
+except ImportError:
+  from urllib.error import HTTPError, URLError
+
 from traceback import format_exc
 
 
