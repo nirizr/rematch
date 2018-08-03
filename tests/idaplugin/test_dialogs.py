@@ -19,7 +19,7 @@ dialogs = recurse_subclasses({BaseDialog})
 dialogs = sorted(dialogs, key=lambda d: d.__class__.__name__)
 
 
-known_failing_dialogs = {'MatchDialog': AttributeError,
+known_failing_dialogs = {'MatchDialog': (NotFoundException, AttributeError),
                          'AddFileDialog': NotFoundException,
                          'SettingsDialog': NotFoundException,
                          'MatchResultDialog': TypeError}
@@ -34,7 +34,7 @@ def test_dialog(dialog_entry, idapro_app):
     idapro_app.processEvents()
   except Exception as ex:
     if (dialog_entry.__name__ in known_failing_dialogs and
-        ex.__class__ == known_failing_dialogs[dialog_entry.__name__]):
+        isinstance(ex, known_failing_dialogs[dialog_entry.__name__])):
       import traceback
       pytest.xfail("Dialog {} which was expected to fail failed with "
                    "exception {}. {}".format(dialog_entry.__name__, str(ex),
