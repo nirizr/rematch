@@ -95,11 +95,11 @@ this run the following pip command line with any instance of pip:
 .. note:: IDA's plugins directory is located inside IDA's installation
    directory. For example if IDA is installed at:
 
-   `C:\Program Files (x86)\IDA 6.9`
+   :code:`C:\Program Files (x86)\IDA 6.9`
 
    Then the plugins directory will be:
 
-   `C:\Program Files (x86)\IDA 6.9\plugins`
+   :code:`C:\Program Files (x86)\IDA 6.9\plugins`
 
    and the executed command line should be:
 
