@@ -79,6 +79,18 @@ def test_model_creation(admin_api_client, admin_user, model_name):
   assert_eq(response.data, projects_created)
 
 
+def test_full_hierarchy(admin_api_client, admin_user):
+  dependency = create_model('dependencies', admin_user)
+  dependency.save()
+
+  response = admin_api_client.get('/collab/annotations/full_hierarchy/',
+                                  data={'ids': dependency.dependent.id},
+                                  HTTP_ACCEPT='application/json')
+
+  expected_response = [dependency.dependency, dependency.dependent]
+  assert_eq(response.data, expected_response)
+
+
 @pytest.mark.django_db
 def test_file_fileversion(admin_client, admin_user):
   file_obj = create_model('files', admin_user)

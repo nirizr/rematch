@@ -12,6 +12,7 @@ router.register(r'matches', views.MatchViewSet)
 router.register(r'instances', views.InstanceViewSet)
 router.register(r'vectors', views.VectorViewSet)
 router.register(r'annotations', views.AnnotationViewSet)
+router.register(r'dependencies', views.DependencyViewSet)
 
 urlpatterns = [
   url(r'^', include(router.urls)),

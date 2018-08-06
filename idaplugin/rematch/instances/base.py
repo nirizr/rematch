@@ -5,6 +5,7 @@ class BaseInstance(object):
   def __init__(self, file_version, offset):
     self.file_version = file_version
     self.offset = offset
+    self.items = [offset]
     self.vectors = {collectors.vectors.NameHashVector}
     self.annotations = {collectors.annotations.NameAnnotation}
 
@@ -17,8 +18,8 @@ class BaseInstance(object):
     return 0
 
   def serialize(self):
-    vectors = list(collectors.collect(self.vectors, self.offset))
-    annotations = list(collectors.collect(self.annotations, self.offset))
+    vectors = list(collectors.collect(self.vectors, self.items))
+    annotations = list(collectors.collect(self.annotations, self.items))
     size = self.size()
     count = self.count()
 

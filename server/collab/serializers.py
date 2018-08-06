@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
-                           Annotation, Match)
+                           Annotation, Match, Dependency)
 import json
 
 
@@ -68,6 +68,8 @@ class SlimInstanceSerializer(serializers.ModelSerializer):
 
   @staticmethod
   def get_name(instance):
+    if instance.type == Instance.TYPE_UNIVERSAL:
+      return "Universal File Instance"
     try:
       annotation = Annotation.objects.values_list('data')
       annotation_data = annotation.get(instance=instance, type='name')[0]
@@ -83,7 +85,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
     fields = ('id', 'instance', 'type', 'data')
 
 
-class InstanceVectorSerializer(serializers.ModelSerializer):
+class InstanceVectorSerializer(SlimInstanceSerializer):
   class NestedVectorSerializer(serializers.ModelSerializer):
     class Meta(object):
       model = Vector
@@ -96,7 +98,6 @@ class InstanceVectorSerializer(serializers.ModelSerializer):
 
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
-  name = serializers.SerializerMethodField()
   vectors = NestedVectorSerializer(many=True, required=True)
   annotations = NestedAnnotationSerializer(many=True, required=True)
 
@@ -119,14 +120,6 @@ class InstanceVectorSerializer(serializers.ModelSerializer):
                    for annotation_data in annotations_data)
     Annotation.objects.bulk_create(annotations)
     return obj
-
-  @staticmethod
-  def get_name(instance):
-    try:
-      annotation = Annotation.objects.values_list('data')
-      return annotation.get(instance=instance, type='name')[0]
-    except Annotation.DoesNotExist:
-      return "sub_{:X}".format(instance.offset)
 
 
 class VectorSerializer(serializers.ModelSerializer):
@@ -162,3 +155,9 @@ class StrategySerializer(serializers.Serializer):
   strategy_type = serializers.ReadOnlyField()
   strategy_name = serializers.ReadOnlyField()
   strategy_description = serializers.ReadOnlyField()
+
+
+class DependencySerializer(serializers.ModelSerializer):
+  class Meta(object):
+    model = Dependency
+    fields = ('dependent', 'dependency')

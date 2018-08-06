@@ -1,19 +1,25 @@
+import functools
+
 from rest_framework import (viewsets, permissions, mixins, decorators, status,
                             response)
+
+from django.db import models
+
+import django_cte
+
 from collab.models import (Project, File, FileVersion, Task, Instance, Vector,
-                           Match, Annotation)
+                           Match, Annotation, Dependency)
 from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
                                 SlimInstanceSerializer, AnnotationSerializer,
-                                MatcherSerializer, StrategySerializer)
+                                MatcherSerializer, StrategySerializer,
+                                DependencySerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
-
-import functools
 
 
 class ViewSetOwnerMixin(object):
@@ -107,8 +113,8 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
       serializer_class = TaskEditSerializer
     return serializer_class
 
-  @paginatable(SlimInstanceSerializer)
   @decorators.detail_route(url_path="locals")
+  @paginatable(SlimInstanceSerializer)
   def locals(self, request, pk):
     del request
     del pk
@@ -119,8 +125,8 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # 'from_instance' match). for those, include the match objects themselves
     return Instance.objects.filter(from_matches__task=task).distinct()
 
-  @paginatable(SlimInstanceSerializer)
   @decorators.detail_route(url_path="remotes")
+  @paginatable(SlimInstanceSerializer)
   def remotes(self, request, pk):
     del request
     del pk
@@ -131,8 +137,8 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # by match records of local instances
     return Instance.objects.filter(to_matches__task=task).distinct()
 
-  @paginatable(MatchSerializer)
   @decorators.detail_route(url_path="matches")
+  @paginatable(MatchSerializer)
   def matches(self, request, pk):
     del request
     del pk
@@ -191,3 +197,37 @@ class AnnotationViewSet(viewsets.ModelViewSet):
   serializer_class = AnnotationSerializer
   permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('instance', 'type', 'data')
+
+  @decorators.list_route()
+  @paginatable(AnnotationSerializer)
+  def full_hierarchy(self, request):
+    del self
+
+    annotation_ids = request.query_params.getlist('ids')
+
+    # TODO: perhaps only provide needed IDs here and fetch them using a
+    # second query?
+    def make_cte_subquery(cte):
+      value0 = models.expressions.Value(0, output_field=models.IntegerField())
+      value1 = models.expressions.Value(1, output_field=models.IntegerField())
+      return (Annotation.objects.filter(id__in=annotation_ids)
+              # .values("uuid", "instance", "type", "data",
+              .values("id", "uuid", depth=value0)
+              .union(cte.join(Annotation, dependents=cte.col.uuid)
+                        .values("id", "uuid", depth=cte.col.depth + value1),
+                     all=True))
+
+    cte = django_cte.With.recursive(make_cte_subquery)
+
+    annotations = (cte.join(Annotation, id=cte.col.id)
+                      .with_cte(cte)
+                      .annotate(depth=cte.col.depth)
+                      .order_by("-depth"))
+
+    return annotations
+
+
+class DependencyViewSet(viewsets.ModelViewSet):
+  queryset = Dependency.objects.all()
+  serializer_class = DependencySerializer
+  permission_classes = (permissions.IsAuthenticated,)

@@ -6,16 +6,17 @@ import inspect
 import json
 
 
-def collect(collectors, offset):
+def collect(collectors, items):
   for collector_cls in collectors:
-    try:
-      r = collector_cls(offset).serialize()
-      if r:
-        yield r
-    except UnicodeDecodeError:
-      log('annotation').error("Unicode decoding error during serializion of "
-                              "type %s at offset %x", collector_cls.type,
-                              offset)
+    for item in items:
+      try:
+        r = collector_cls(item).serialize()
+        if r:
+          yield r
+      except UnicodeDecodeError:
+        log('annotation').error("Unicode decoding error during serializion of "
+                                "type %s with item %s", collector_cls.type,
+                                item)
 
 
 def apply(offset, annotation):

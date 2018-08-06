@@ -4,7 +4,8 @@ import idautils
 from ..dialogs.match import MatchDialog
 from ..dialogs.matchresult import MatchResultDialog
 
-from ..instances import FunctionInstance
+from ..collectors.annotations import DependencyAnnotation
+from ..instances import FunctionInstance, UniversalInstance
 from .. import network, netnode, log
 from . import base
 
@@ -18,11 +19,11 @@ class MatchAction(base.BoundFileAction):
 
   def __init__(self, *args, **kwargs):
     super(MatchAction, self).__init__(*args, **kwargs)
-    self.functions = None
+    self.instances = None
     self.results = None
     self.task_id = None
     self.file_version_id = None
-    self.instance_set = []
+    self.instance_objs = []
 
     self.source = None
     self.source_single = None
@@ -67,10 +68,14 @@ class MatchAction(base.BoundFileAction):
     version_obj = []
     version_obj.append(('functions', [(offset, list(idautils.Chunks(offset)))
                                         for offset in idautils.Functions()]))
-    # TODO: This is a  little hackish way of getting the version of all vectors
+    # TODO: This is a little hackish way of getting the version of all vectors
     # of an instance. cannot make version a classmethod because vector sets are
     # only built by __init__ methods
-    version_obj.append(('vectors', FunctionInstance(None, None).version()))
+    func_vector_versions = FunctionInstance(None, None).version()
+    version_obj.append(('function_vector_versions', func_vector_versions))
+    # TODO: Add function annotations as part of the version, because they're
+    # also changing.
+    # TODO: Add universal instance related versions
 
     version_str = repr(version_obj)
     version_hash = hashlib.md5(version_str).hexdigest()
@@ -108,14 +113,17 @@ class MatchAction(base.BoundFileAction):
   def start_upload(self):
     log('match_action').info("Data upload started")
 
-    self.functions = set(idautils.Functions())
+    # TODO: Is this too slow? should we move this to perform_upload? or into a
+    # generator?
+    self.instances = set((FunctionInstance, f) for f in idautils.Functions())
+    self.instances.add((UniversalInstance, (s[0] for s in idautils.Structs())))
 
     self.pbar = QtWidgets.QProgressDialog()
     self.pbar.canceled.connect(self.cancel)
     self.pbar.rejected.connect(self.cancel)
     self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
                            "please avoid making any ground-breaking changes.")
-    self.pbar.setRange(0, len(self.functions))
+    self.pbar.setRange(0, len(self.instances))
     self.pbar.setValue(0)
     self.pbar.accepted.connect(self.accept_upload)
     self.pbar.show()
@@ -126,23 +134,23 @@ class MatchAction(base.BoundFileAction):
     return True
 
   def perform_upload(self):
-    if not self.functions:
+    if not self.instances:
       return
 
     # pop a function, serialize and add to the ready set
-    offset = self.functions.pop()
-    func = FunctionInstance(self.file_version_id, offset)
-    self.instance_set.append(func.serialize())
+    instance_cls, instance_data = self.instances.pop()
+    instance_obj = instance_cls(self.file_version_id, instance_data)
+    self.instance_objs.append(instance_obj.serialize())
 
-    # if ready set contains 100 or more functions, or if we just poped the last
+    # if ready set contains 100 or more instances, or if we just poped the last
     # function clear and upload entire ready set to the server.
-    if len(self.instance_set) >= 100 or not self.functions:
+    if len(self.instance_objs) >= 100 or not self.instances:
       q = network.QueryWorker("POST", "collab/instances/",
-                              params=self.instance_set, json=True)
+                              params=self.instance_objs, json=True)
       q.start(self.progress_advance)
       self.delayed_queries.append(q)
 
-      self.instance_set = []
+      self.instance_objs = []
       self.pbar.setMaximum(self.pbar.maximum() + 1)
     self.progress_advance()
 
@@ -157,6 +165,8 @@ class MatchAction(base.BoundFileAction):
   def accept_upload(self):
     log('match_action').info("Data upload completed successfully")
 
+    network.QueryWorker("POST", "collab/dependency", json=True,
+                        params=DependencyAnnotation.dependencies)
     self.clean()
     self.cancel_delayed()
 

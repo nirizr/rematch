@@ -35,6 +35,7 @@ class MatchResultDialog(gui.DockableDialog):
     self.matches = []
     self.apply_pbar = None
     self.matched_map = {}
+    self.applied_annotations = set()
 
     self.script_code = None
     self.script_compile = None
@@ -199,6 +200,7 @@ class MatchResultDialog(gui.DockableDialog):
 
   def apply_matches(self):
     self.matched_map = {}
+    self.applied_annotations = set()
 
     for local_item, remote_item in self.enumerate_items():
       if remote_item.checkState(self.CHECKBOX_COLUMN):
@@ -214,9 +216,9 @@ class MatchResultDialog(gui.DockableDialog):
 
     self.apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0, item_count)
 
-    q = network.QueryWorker("GET", "collab/annotations/", json=True,
+    q = network.QueryWorker("GET", "collab/annotations/full_hierarchy",
                             params={"instance": self.matched_map.keys()},
-                            splittable="instance")
+                            json=True, splittable="instance")
     q.start(self.handle_apply_matches, write=True)
 
   def handle_apply_matches(self, response):
@@ -224,9 +226,22 @@ class MatchResultDialog(gui.DockableDialog):
       remote_id = annotation['instance']
       local_offsets = self.matched_map[remote_id]
 
-      for local_offset in local_offsets:
-        collectors.apply(local_offset, annotation)
-        self.apply_pbar.setValue(self.apply_pbar.value() + 1)
+      # TODO: move dependency handling/applying loops and logic to the
+      # annotation apply code
+      for dependency in annotation['dependencies']:
+        self.apply_annotations(dependency, None)
+
+      self.apply_annotation(annotation, *local_offsets)
+      self.apply_pbar.setValue(self.apply_pbar.value() + len(local_offsets))
+
+  def apply_annotation(self, annotation, *local_offsets):
+    if annotation['id'] in self.applied_annotations:
+      return
+    self.applied_annotations.add(annotation['id'])
+
+    for local_offset in local_offsets:
+      collectors.apply(local_offset, annotation)
+      # TODO: raise exception on failure
 
   def clear_checks(self):
     for _, remote_item in self.enumerate_items():
