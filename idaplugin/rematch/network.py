@@ -71,6 +71,7 @@ class QueryWorker(QtCore.QRunnable):
     self.started = True
 
     if callback:
+      @QtCore.Slot('PyQt_PyObject')
       def callback_wrap(result):
         try:
           callback(result)
@@ -85,6 +86,7 @@ class QueryWorker(QtCore.QRunnable):
 
     if not exception_callback:
       exception_callback = default_exception_callback
+    exception_callback = QtCore.Slot('PyQt_PyObject')(exception_callback)
     self.signals.error.connect(exception_callback)
 
     _threadpool.start(self)
@@ -141,7 +143,9 @@ class QueryWorker(QtCore.QRunnable):
 
   def __del__(self):
     if self.running:
+      url = self.url if hasattr(self, 'url') else None
       log('network').warn('Worker deleted while running: %s', self.url)
+      raise Exception("Worker deleted while running: {}".format(url))
 
 
 def default_exception_callback(exception, traceback):
