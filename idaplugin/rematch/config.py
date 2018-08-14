@@ -64,7 +64,6 @@ class Config(dict):
   def __del__(self):
     try:
       self.save()
-      super(Config, self).__del__()
     except TypeError:
       pass
 
