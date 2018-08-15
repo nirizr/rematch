@@ -26,8 +26,6 @@ class RematchPlugin(ida_idaapi.plugin_t):
     self.update_checker = update.UpdateChecker()
     self.statusbar_label = None
     self.statusbar_timer = None
-    self.timespent_timer = None
-    self.timespent = None
 
   def init(self):
     self.setup()
@@ -70,21 +68,6 @@ class RematchPlugin(ida_idaapi.plugin_t):
     self.statusbar_timer.timeout.connect(self.update_statusbar)
     self.statusbar_timer.start()
 
-    self.timespent = QtWidgets.QProgressBar()
-    self.timespent.setMaximumHeight(32)
-    self.timespent.setMaximumWidth(250)
-    self.timespent.setRange(0, 60 * 60)
-    self.get_mainwindow().statusBar().addPermanentWidget(self.timespent)
-
-    self.timespent_timer = QtCore.QTimer()
-    self.timespent_timer.setInterval(1000)
-    timespent = self.timespent
-
-    def update_timespent():
-        timespent.setValue((timespent.value() + 1) % (60 * 60 + 1))
-    self.timespent_timer.timeout.connect(update_timespent)
-    self.timespent_timer.start()
-
     self.update_checker.check_update()
 
   def update_statusbar(self):
@@ -100,10 +83,6 @@ class RematchPlugin(ida_idaapi.plugin_t):
     pass
 
   def term(self):
-    if self.timespent_timer:
-      self.timespent_timer.stop()
-      self.timespent_timer = None
-
     if self.statusbar_timer:
       self.statusbar_timer.stop()
       self.statusbar_timer = None
