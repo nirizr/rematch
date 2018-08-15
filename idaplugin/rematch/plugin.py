@@ -22,13 +22,14 @@ class RematchPlugin(ida_idaapi.plugin_t):
     self.mainwindow = None
     self.toolbar = None
     self.menu = None
+
+    self.update_checker = update.UpdateChecker()
     self.statusbar_label = None
     self.statusbar_timer = None
     self.timespent_timer = None
     self.timespent = None
 
   def init(self):
-    update.check_update()
     self.setup()
 
     return ida_idaapi.PLUGIN_KEEP
@@ -83,6 +84,8 @@ class RematchPlugin(ida_idaapi.plugin_t):
         timespent.setValue((timespent.value() + 1) % (60 * 60 + 1))
     self.timespent_timer.timeout.connect(update_timespent)
     self.timespent_timer.start()
+
+    self.update_checker.check_update()
 
   def update_statusbar(self):
     if 'is_authenticated' in user and user['is_authenticated']:

@@ -62,6 +62,7 @@ def test_action_creation(idapro_action_entry, idapro_app):
 
 
 def test_update(idapro_app):
-  idaplugin.rematch.update.check_update()
-  time.sleep(1)
-  idapro_app.processEvents()
+  update_checker = idaplugin.rematch.update.UpdateChecker()
+  update_checker.check_update()
+  while update_checker.status == "pending":
+    idapro_app.processEvents()

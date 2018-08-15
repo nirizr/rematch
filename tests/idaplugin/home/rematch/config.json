@@ -1,25 +1,25 @@
 {
-    "debug": true,
+    "debug": true, 
     "login": {
-        "password": "",
-        "server": "https://devnull-as-a-service.com/",
+        "password": "", 
+        "server": "https://devnull-as-a-service.com/", 
         "username": ""
-    },
+    }, 
     "network": {
         "threadcount": 10
-    },
+    }, 
     "pypi": {
-        "package": "rematch-idaplugin",
+        "package": "rematch-idaplugin", 
         "server": "http://testpypi.python.org"
-    },
+    }, 
     "settings": {
         "login": {
-            "autologin": true,
+            "autologin": true, 
             "autologout": false
-        },
+        }, 
         "update": {
-            "autocheck": true,
-            "autoupdate": true,
+            "autocheck": true, 
+            "autoupdate": true, 
             "skipped": []
         }
     }

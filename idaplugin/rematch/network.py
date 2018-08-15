@@ -86,8 +86,12 @@ class QueryWorker(QtCore.QRunnable):
 
     if not exception_callback:
       exception_callback = default_exception_callback
-    exception_callback = QtCore.Slot('PyQt_PyObject')(exception_callback)
-    self.signals.error.connect(exception_callback)
+
+    @QtCore.Slot('PyQt_PyObject', str)
+    def exception_wrap(exception, traceback):
+        exception_callback(exception, traceback)
+
+    self.signals.error.connect(exception_wrap)
 
     _threadpool.start(self)
 
