@@ -2,7 +2,7 @@ version: '2'
 services:
   rabbitmq:
     image: rabbitmq
-    hostname: rabbit
+    hostname: rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=mypass
@@ -17,11 +17,10 @@ services:
     image: mariadb
     hostname: db
     environment:
-      - MYSQL_USER=root
       - MYSQL_ROOT_PASSWORD=qwe123
       - MYSQL_DATABASE=rematch
-      - MYSQL_REMATCH_HOST=db
-      - MYSQL_REMATCH_PORT=3306
+      - MYSQL_USER=rematch
+      - MYSQL_PASSWORD=rematchpassword
     expose:
      - 3306
     restart: always
@@ -38,11 +37,13 @@ services:
     expose:
       - "8000"
     environment:
-      - MYSQL_REMATCH_HOST=db
-      - MYSQL_REMATCH_PORT=3306
-      - MYSQL_ROOT_PASSWORD=qwe123
+      - MYSQL_HOST=db
       - MYSQL_DATABASE=rematch
-      - MYSQL_USER=root
+      - MYSQL_USER=rematch
+      - MYSQL_PASSWORD=rematchpassword
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASSWORD=mypass
       - DJANGO_SETTINGS_MODULE=rematch.settings.docker
     links:
       - "db:db"

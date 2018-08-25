@@ -10,13 +10,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 RUN useradd --no-log-init -m -d /rematch_server rematch
 WORKDIR /rematch_server
 ADD --chown=rematch:rematch ./server/ ./server/
-ADD --chown=rematch:rematch ./tests/server/ ./tests/server/
+ADD --chown=rematch:rematch ./tests/ ./tests/
 RUN pip install --upgrade pip uwsgi
 RUN pip install -r /rematch_server/server/requirements.txt
 RUN mkdir /var/log/rematch/ && chown rematch:rematch /var/log/rematch
-RUN rm /etc/nginx/sites-enabled/default
-RUN ln -sf /rematch_server/server/nginx.conf /etc/nginx/sites-enabled/rematch
+RUN chown rematch:rematch -R /var/lib/nginx/
 USER rematch
-RUN python /rematch_server/server/manage.py collectstatic --settings rematch.settings.docker --noinput
-USER root
 CMD cd /rematch_server/server ; ./start_docker.sh

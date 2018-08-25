@@ -8,5 +8,8 @@ https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 """
 
 from django.core.wsgi import get_wsgi_application
+import pymysql
+
+pymysql.install_as_MySQLdb()
 
 application = get_wsgi_application()

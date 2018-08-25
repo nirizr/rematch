@@ -23,50 +23,19 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = "/rematch_server/server/static/"
 
 
-# Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rematch',
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_ROOT_PASSWORD'),
-        'HOST': os.environ.get('MYSQL_REMATCH_HOST', 'db'),
-        'PORT': os.environ.get('MYSQL_REMATCH_PORT', 3306),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
-        },
-    }
-}
-
-# docker conf
-RABBIT_HOSTNAME = os.environ.get('RABBIT_PORT_5672_TCP', 'rabbitmq')
-
-if RABBIT_HOSTNAME.startswith('tcp://'):
-    RABBIT_HOSTNAME = RABBIT_HOSTNAME.split('//')[1]
-
-BROKER_URL = os.environ.get('BROKER_URL',
-                            '')
-if not BROKER_URL:
-    BROKER_URL = 'amqp://{user}:{password}@{hostname}/{vhost}/'.format(
-        user=os.environ.get('RABBIT_ENV_USER', 'admin'),
-        password=os.environ.get('RABBIT_ENV_RABBITMQ_PASS', 'mypass'),
-        hostname=RABBIT_HOSTNAME,
-        vhost=os.environ.get('RABBIT_ENV_VHOST', ''))
-
-# We don't want to have dead connections stored on rabbitmq
-# , so we have to negotiate using heartbeats
-# BROKER_HEARTBEAT = '?heartbeat=30'
-# if not BROKER_URL.endswith(BROKER_HEARTBEAT):
-#    BROKER_URL += BROKER_HEARTBEAT
-
-BROKER_POOL_LIMIT = 1
-BROKER_CONNECTION_TIMEOUT = 10
+# rabbitmq configuration
+if 'BROKER_URL' in os.environ:
+    BROKER_URL = os.environ['BROKER_URL']
+else:
+    BROKER_URL = 'amqp://{user}:{password}@{host}:{port}/{vhost}'.format(
+        user=os.environ['RABBITMQ_USER'],
+        password=os.environ['RABBITMQ_PASSWORD'],
+        host=os.environ['RABBITMQ_HOST'],
+        port=os.environ.get('RABBITMQ_PORT', 5672),
+        vhost=os.environ.get('RABBITMQ_VHOST', ''))
 
 
 # Logging configuration

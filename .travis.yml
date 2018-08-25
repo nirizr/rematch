@@ -45,24 +45,24 @@ before_install:
 install:
   - set +vx;
   - pip install --upgrade pip setuptools wheel
-  - if [ "${ENV}" = "docker" ]; then
+  - if [ "${ENV}" == "docker" ]; then
       service docker start ;
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
       if [ -f ./tests/${PROJECT}/requirements.txt ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install --upgrade -r ./tests/server/requirements.txt ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ./tests/server/requirements.txt ;
       fi ;
-      docker-compose -f ./${PROJECT}/docker-compose.yml exec web pip install --upgrade coveralls pytest-cov ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade coveralls pytest-cov ;
       pip install --upgrade flake8 ;
     fi ;
-  - if [ "${ENV}" = "conda" ]; then
+  - if [ "${ENV}" == "conda" ]; then
       wget "https://repo.continuum.io/miniconda/Miniconda${TRAVIS_PYTHON_VERSION:0:1}-latest-Linux-x86_64.sh" -O miniconda.sh ;
       bash ./miniconda.sh -b -p "${HOME}/miniconda" ;
       export PATH=${HOME}/miniconda/bin:$PATH ;
       conda info -a ;
       conda install --yes python=${TRAVIS_PYTHON_VERSION} pyqt ;
     fi ;
-  - if [ "${ENV}" = "data" ]; then
+  - if [ "${ENV}" == "data" ]; then
       pip install --upgrade --only-binary=numpy,scipy numpy scipy ;
     fi ;
   - if [ "${ENV}" != "docker" ]; then
@@ -74,29 +74,42 @@ install:
       fi ;
       pip install --upgrade flake8 coveralls pytest-cov ;
     fi ;
+  - if [ "${PROJECT}" == "interop" ] ; then
+      pip install --upgrade -r server/requirements.txt ;
+      pip install --upgrade -r server/requirements.txt ;
+    fi ;
+  - if [ "${PROJECT}" == "server" ] || [ "${PROJECT}" == "interop" ] ; then
+      export MYSQL_HOST=localhost ;
+      export MYSQL_DATABASE=rematch ;
+      export MYSQL_USER=root ;
+      export MYSQL_PASSWORD= ;
+      export RABBITMQ_HOST=localhost ;
+      export RABBITMQ_USER=guest ;
+      export RABBITMQ_PASSWORD=guest ;
+    fi ;
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
-      if [ "${ENV}" = "docker" ]; then
+      if [ "${ENV}" == "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=${PROJECT} ;" ;
-      elif [ "${PROJECT}" = "interop" ]; then
+      elif [ "${PROJECT}" == "interop" ]; then
         PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=server --cov=idaplugin ;
-      elif [ "${PROJECT}" = "server" ]; then
+      elif [ "${PROJECT}" == "server" ]; then
         PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=${PROJECT} ;
       else
         py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       fi ;
     fi ;
-  - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py server install ; fi ;
-  - if [ "${PROJECT}" = "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
-  - if [ "${PROJECT}" = "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
+  - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py server install ; fi ;
+  - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
+  - if [ "${PROJECT}" == "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
 
 after_script:
   - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" != "docker" ]; then
       coveralls ;
     fi ;
-  - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" = "docker" ]; then
+  - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" == "docker" ]; then
       docker-compose -f ./${PROJECT}/docker-compose.yml exec web env TRAVIS=${TRAVIS} TRAVIS_JOB_ID=${TRAVIS_JOB_ID} TRAVIS_BRANCH=${TRAVIS_BRANCH} TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} coveralls ;
     fi ;

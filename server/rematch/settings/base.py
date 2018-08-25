@@ -119,9 +119,14 @@ REST_SESSION_LOGIN = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rematch',
-        'USER': 'root',
-        'PASSWORD': ''
+        'NAME': os.environ['MYSQL_DATABASE'],
+        'USER': os.environ['MYSQL_USER'],
+        'PASSWORD': os.environ['MYSQL_PASSWORD'],
+        'HOST': os.environ['MYSQL_HOST'],
+        'PORT': os.environ.get('MYSQL_PORT', 3306),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
+        },
     }
 }
 
