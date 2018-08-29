@@ -4,7 +4,7 @@ import ida_funcs
 import ida_kernwin
 import idc
 
-from .. import network
+from ..network import QueryWorker
 
 
 class QItem(object):
@@ -22,11 +22,10 @@ class QItem(object):
     self.empty_disabled = empty_disabled
 
     self.found_selection = False
-    self.load()
+    self.query = QueryWorker("GET", "collab/{}/".format(self.item), json=True)
+    self.query.start(self.load)
 
-  def load(self):
-    response = network.query("GET", "collab/{}/".format(self.item), json=True)
-
+  def load(self, response):
     for i, obj in enumerate(response):
       if not obj:
         continue
