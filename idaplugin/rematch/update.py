@@ -115,6 +115,8 @@ class UpdateChecker(object):
     self.status = "success"
 
   def handle_exception(self, exception, traceback):
+    del traceback
+
     self.q = None
     self.status = "error"
 
