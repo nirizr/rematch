@@ -77,7 +77,9 @@ class User(dict):
     force_update()
 
   @staticmethod
-  def handle_refresh_failure(exception):
+  def handle_refresh_failure(exception, traceback):
+    del traceback
+
     if isinstance(exception, exceptions.AuthenticationException):
       del config['login']['token']
 

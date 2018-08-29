@@ -44,7 +44,9 @@ class LoginAction(base.UnauthAction):
 
     self.ui.accept()
 
-  def handle_exception(self, exception):
+  def handle_exception(self, exception, traceback):
+    del traceback
+
     if isinstance(exception, (exceptions.ConnectionException,
                               exceptions.ServerException)):
       self.ui.statusLbl.setText("Connection to server failed.")
