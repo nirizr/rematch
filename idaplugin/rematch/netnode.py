@@ -12,36 +12,38 @@ class NetNode(object):
 
   @IdaKernelQueue(write=True, wait=True)
   def set_bound_server(self):
-    self._nn.hashset("bound_server", str(config['login']['server']))
-    force_update()
+    if self.validate_bound_server():
+      self._nn.hashset("bound_server", str(config['login']['server']))
+      force_update()
 
   @IdaKernelQueue(write=True, wait=True)
   def del_bound_server(self):
     self._nn.hashdel("bound_server")
     force_update()
 
-  @IdaKernelQueue(wait=True)
+  @IdaKernelQueue(write=True, wait=True)
   def validate_bound_server(self):
     bound_server = self._nn.hashstr('bound_server')
+
+    # If no bound server is set for idb, we can surely set the current server
     if not bound_server:
-      self.set_bound_server()
       return True
 
+    # If bound server matches current configuration, lets play along and set it
+    # to the same value
     if bound_server == config['login']['server']:
       return True
 
-    msg = ("Current server is '{}' while bound server for opened IDB is '{}'."
-           "Would you like to proceed using currently connected server?\n"
+    # otherwise, we gotta ask the user and let her decide
+    msg = ("Current server is '{new_server}' while bound server for opened "
+           "IDB is '{bound_server}'. Would you like to override bound server "
+           "and start using currently connected server?\n"
            "This assumes data from bound server was copied to the current one."
-           "\nclick Yes to bind current server. no to proceed as if file was "
-           "never bound or once to proceed just once using current server."
-           "".format(config['login']['server'], bound_server))
-    r = ida_kernwin.askbuttons_c("Yes", "No", "Once", ida_kernwin.ASKBTN_YES,
-                                 msg)
+           "\nclick Yes to bind current server or no to proceed as if file "
+           "was never bound.".format(new_server=config['login']['server'],
+                                     bound_server=bound_server))
+    r = ida_kernwin.askbuttons_c(ida_kernwin.ASKBTN_YES, "HIDECANCEL\n" + msg)
     if r == ida_kernwin.ASKBTN_YES:
-      self.set_bound_server()
-      return True
-    elif r == ida_kernwin.ASKBTN_BTN3:
       return True
     elif r == ida_kernwin.ASKBTN_NO:
       return False
@@ -67,9 +69,6 @@ class NetNode(object):
     if not bound_file_id:
       return None
 
-    if not self.validate_bound_server():
-      return None
-
     return int(bound_file_id)
 
   @IdaKernelQueue(write=True, wait=True)
@@ -77,7 +76,6 @@ class NetNode(object):
     success = self._nn.hashset("bound_file_id", str(file_id))
     if success:
       self.set_bound_server()
-    force_update()
     return success
 
   @IdaKernelQueue(write=True, wait=True)
