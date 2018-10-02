@@ -4,8 +4,6 @@ import functools
 import idc
 import ida_kernwin
 
-from . import log
-
 
 def get_plugin_base(*path):
   return os.path.join(idc.GetIdaDirectory(), "plugins", *path)
@@ -74,5 +72,3 @@ def force_update():
   IDA's awareness"""
   iwid_all = 0xFFFFFFFF
   ida_kernwin.request_refresh(iwid_all)
-  ida_kernwin.refresh_idaview_anyway()
-  log("utils").info("Requested forceful gui update")
