@@ -165,10 +165,12 @@ class MatchAction(base.BoundFileAction):
   def accept_upload(self):
     log('match_action').info("Data upload completed successfully")
 
-    network.QueryWorker("POST", "collab/dependency", json=True,
-                        params=DependencyAnnotation.dependencies)
     self.clean()
     self.cancel_delayed()
+    q = network.QueryWorker("POST", "collab/dependency", json=True,
+                            params=DependencyAnnotation.dependencies)
+    q.start()
+    self.delayed_queries.append(q)
 
     self.start_task()
 
