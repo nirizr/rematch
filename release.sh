@@ -23,13 +23,6 @@ if [ "$(git rev-parse $BRANCH)" != "$(git ls-remote $REMOTE -h refs/heads/$BRANC
 fi ;
 
 
-echo "Building the IDAPLUGIN package"
-REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist --dist-dir=./dist/idaplugin --formats=zip,gztar bdist_wheel --dist-dir=./dist/idaplugin
-
-echo "Building the SERVER package"
-REMATCH_SETUP_PACKAGE=server ./setup.py sdist --dist-dir=./dist/server --formats=zip,gztar bdist_wheel --dist-dir=./dist/server
-
-
 echo "Generating changelog"
 latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null ) ;
 
@@ -40,13 +33,23 @@ else
     changelog+=$(git log "$latest_tag..HEAD" --oneline --no-merges) ;
 fi ;
 
-echo "Commiting changelog and creating release tag"
-
 echo $changelog >> CHANGELOG.rst
 
+
+echo "Commiting changelog and creating release tag"
 git commit -am "Release $release_version"
 git tag "release_$release_version" -m "$release_annotation"
 git push origin "release_$release_version"
 
+
+echo "Building the IDAPLUGIN package"
+REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist --dist-dir=./dist/idaplugin --formats=zip,gztar bdist_wheel --dist-dir=./dist/idaplugin
+
+echo "Building the SERVER package"
+REMATCH_SETUP_PACKAGE=server ./setup.py sdist --dist-dir=./dist/server --formats=zip,gztar bdist_wheel --dist-dir=./dist/server
+
+
+echo "Uploading packages"
+twine upload --repository-url "https://test.pypi.org/legacy/" dist/*
 
 # git-release "$(REPO)" "$(new_version)" "$(branch_name)" "$(changelog)" 'dist/*/*'
