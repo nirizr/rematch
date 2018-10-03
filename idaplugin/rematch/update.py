@@ -123,4 +123,5 @@ class UpdateChecker(object):
     if isinstance(exception, exceptions.NotFoundException):
       log('update').info("Couldn't find latest release for plugin")
     else:
-      raise exception
+      log('update').error("Unknown error requesting update info",
+                          exc_info=exception)
