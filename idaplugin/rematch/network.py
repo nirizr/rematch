@@ -70,28 +70,29 @@ class QueryWorker(QtCore.QRunnable):
     self.running = True
     self.started = True
 
-    if callback:
-      @QtCore.Slot('PyQt_PyObject')
-      def callback_wrap(result):
-        try:
-          callback(result)
-        except Exception:
-          import traceback
-          traceback.print_exc()
-
-      ida_kernel_enqueue = utils.IdaKernelQueue(write=write, wait=wait)
-      callback_wrap = ida_kernel_enqueue(callback_wrap)
-
-      self.signals.result.connect(callback_wrap)
-
+    # Set up exception-handling callback
     if not exception_callback:
       exception_callback = default_exception_callback
 
     @QtCore.Slot('PyQt_PyObject', str)
+    @utils.IdaKernelQueue(write=write, wait=wait)
     def exception_wrap(exception, traceback):
         exception_callback(exception, traceback)
 
     self.signals.error.connect(exception_wrap)
+
+    # Set up response-handling callback
+    if callback:
+      @QtCore.Slot('PyQt_PyObject')
+      @utils.IdaKernelQueue(write=write, wait=wait)
+      def callback_wrap(result):
+        try:
+          callback(result)
+        except Exception as ex:
+          import traceback
+          self.signals.error.emit(ex, traceback.format_exc())
+
+      self.signals.result.connect(callback_wrap)
 
     _threadpool.start(self)
 
