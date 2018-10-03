@@ -40,12 +40,13 @@ else
     changelog+=$(git log "$latest_tag..HEAD" --oneline --no-merges) ;
 fi ;
 
-echo "Commting changelog and creating release branch"
+echo "Commiting changelog and creating release tag"
 
 echo $changelog >> CHANGELOG.rst
 
-git checkout -b "release/$release_version"
-git commit -am "Updating changelog for release $release_version"
-git push --set-upstream origin "release/$release_version"
+git commit -am "Release $release_version"
+git tag "release_$release_version" -m "$release_annotation"
+git push origin "release_$release_version"
+
 
 # git-release "$(REPO)" "$(new_version)" "$(branch_name)" "$(changelog)" 'dist/*/*'
