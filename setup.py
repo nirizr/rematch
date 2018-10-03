@@ -153,12 +153,3 @@ if __name__ == '__main__':
     build_setup_server()
   elif package == 'idaplugin':
     build_setup_idaplugin()
-
-  # If all packages are available, allow a 'release' command that would push
-  # all packages to pypi
-#  if package == 'release' and packages == expected_packages:
-#    script_args = ['sdist', '--dist-dir=./dist', '--formats=zip', 'upload']
-#    if not (len(sys.argv) >= 3 and sys.argv[2] == 'official'):
-#      script_args += ['-r', 'pypitest']
-#    build_setup_server(script_args=script_args)
-#    build_setup_idaplugin(script_args=script_args)
