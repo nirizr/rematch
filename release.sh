@@ -34,7 +34,7 @@ echo "Building the IDAPLUGIN package"
 REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist --dist-dir=./dist/idaplugin --formats=zip,gztar bdist_wheel --dist-dir=./dist/idaplugin
 
 echo "Building the SERVER package"
-REMATCH_SETUP_PACKAGE=idaplugin ./setup.py sdist --dist-dir=./dist/server --formats=zip,gztar bdist_wheel --dist-dir=./dist/server
+REMATCH_SETUP_PACKAGE=server ./setup.py sdist --dist-dir=./dist/server --formats=zip,gztar bdist_wheel --dist-dir=./dist/server
 
 
 echo "Generating changelog"
