@@ -15,6 +15,7 @@ class User(dict):
 
     self.success_callback = None
     self.server = None
+    self.q = None
     self.update(self.LOGGEDOUT_USER)
 
     # only attempt user auto login if configured
@@ -32,11 +33,14 @@ class User(dict):
     self.success_callback = success_callback
     self.server = server
 
+    if self.q:
+        self.q.cancel()
+
     # authenticate
     login_params = {'username': username, 'password': password}
-    q = network.QueryWorker("POST", "accounts/login/", params=login_params,
-                            server=server, token="", json=True)
-    q.start(self.handle_login, exception_callback)
+    self.q = network.QueryWorker("POST", "accounts/login/", json=True,
+                                 params=login_params, server=server, token="")
+    self.q.start(self.handle_login, exception_callback)
 
   def handle_login(self, response):
     config['login']['token'] = response['key']
@@ -46,8 +50,11 @@ class User(dict):
     self.refresh()
 
   def logout(self):
-    q = network.QueryWorker("POST", "accounts/logout/", json=True)
-    q.start()
+    if self.q:
+        self.q.cancel()
+
+    self.q = network.QueryWorker("POST", "accounts/logout/", json=True)
+    self.q.start()
     if 'login' in config and 'token' in config['login']:
       del config['login']['token']
     self.clear()
@@ -64,8 +71,11 @@ class User(dict):
             config['login']['server']):
       return
 
-    q = network.QueryWorker("GET", "accounts/profile/", json=True)
-    q.start(self.handle_refresh, self.handle_refresh_failure)
+    if self.q:
+        self.q.cancel()
+
+    self.q = network.QueryWorker("GET", "accounts/profile/", json=True)
+    self.q.start(self.handle_refresh, self.handle_refresh_failure)
 
   def handle_refresh(self, response):
     self.clear()

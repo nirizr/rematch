@@ -9,6 +9,7 @@ class BaseDialog(object):
     self.submit_handler = submit_handler
     self.response_handler = response_handler
     self.exception_handler = exception_handler
+    self.q = None
 
   def accept_base(self):
     if self.accept_handler:
@@ -42,6 +43,7 @@ class BaseDialog(object):
       return
 
     # if received a query_worker, execute it and handle response
+    self.q = query_worker
     query_worker.start(self.response_base, self.exception_base)
 
   def response_base(self, response):
