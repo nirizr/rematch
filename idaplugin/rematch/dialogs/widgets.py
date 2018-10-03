@@ -42,8 +42,10 @@ class QItem(object):
       self.addWidget(item, i / self.columns, i % self.columns)
 
       if self.selected:
-        selected = (item_name in self.selected or item_id in self.selected or
-                    self.selected == "all")
+        selected = self.selected == "all"
+        selected = selected or self.selected in (item_name, item_id)
+        if not selected and hasattr(self.selected, '__contains__'):
+          selected = item_name in self.selected or item_id in self.selected
         self.set_selected(i, selected)
         if selected:
           self.found_selection = True
