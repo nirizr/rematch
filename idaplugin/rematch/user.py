@@ -91,7 +91,8 @@ class User(dict):
     del traceback
 
     if isinstance(exception, exceptions.AuthenticationException):
-      del config['login']['token']
+      if 'login' in config and 'token' in config['login']:
+        del config['login']['token']
 
   def __setitem__(self, key, value):
     raise RuntimeError("User is a read only dict")
