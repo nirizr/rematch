@@ -16,6 +16,7 @@ class User(dict):
     self.success_callback = None
     self.server = None
     self.q = None
+    self.oldq = None
     self.update(self.LOGGEDOUT_USER)
 
     # only attempt user auto login if configured
@@ -52,6 +53,7 @@ class User(dict):
   def logout(self):
     if self.q:
         self.q.cancel()
+        self.oldq = self.q
 
     self.q = network.QueryWorker("POST", "accounts/logout/", json=True)
     self.q.start()
