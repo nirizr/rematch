@@ -24,7 +24,7 @@ matrix:
       env: PROJECT=setup.py
     - python: "3.6"
       env: PROJECT=docs
-    - python: 2.7
+    - python: "2.7"
       env: PROJECT=interop ENV=conda DJANGO_SETTINGS_MODULE='rematch.settings.debug'
 
 branches:
@@ -98,6 +98,8 @@ script:
         PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=server --cov=idaplugin ;
       elif [ "${PROJECT}" == "server" ]; then
         PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=${PROJECT} ;
+      elif [ "${PROJECT}" == "idaplugin" ] && [ "${TRAVIS_PYTHON_VERSION:0:1}" == "2" ]; then
+        py.test -rapP ./${PROJECT} ./tests/${PROJECT} --ida-replay ./tests/idaplugin/replay_empty.json --verbose --cov-report= --cov=${PROJECT} ;
       else
         py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       fi ;
