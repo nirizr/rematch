@@ -61,11 +61,5 @@ class Config(dict):
     except Exception:
       log('config').exception("Could not save configuration file")
 
-  def __del__(self):
-    try:
-      self.save()
-    except TypeError:
-      pass
-
 
 config = Config()
