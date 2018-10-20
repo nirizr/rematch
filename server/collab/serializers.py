@@ -98,8 +98,8 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
 
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
-  vectors = NestedVectorSerializer(many=True, required=True)
-  annotations = NestedAnnotationSerializer(many=True, required=True)
+  vectors = NestedVectorSerializer(many=True, required=False)
+  annotations = NestedAnnotationSerializer(many=True, required=False)
 
   class Meta(object):
     model = Instance
@@ -107,8 +107,8 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
               'size', 'count', 'vectors', 'annotations')
 
   def create(self, validated_data):
-    vectors_data = validated_data.pop('vectors')
-    annotations_data = validated_data.pop('annotations')
+    vectors_data = validated_data.pop('vectors', [])
+    annotations_data = validated_data.pop('annotations', [])
     file_version = validated_data['file_version']
 
     obj = self.Meta.model.objects.create(**validated_data)
