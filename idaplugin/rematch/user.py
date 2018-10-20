@@ -60,8 +60,6 @@ class User(dict):
     self.clear()
     self.update(self.LOGGEDOUT_USER)
 
-    force_update()
-
   def refresh(self):
     if not ('login' in config and 'token' in config['login'] and
             config['login']['token']):
