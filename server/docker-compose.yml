@@ -3,26 +3,22 @@ services:
   rabbitmq:
     image: rabbitmq
     hostname: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
+    env_file:
+      - .env
     expose:
       - 5672
       - 15672
     depends_on:
-      - db
+      - database
     restart: always
 
-  db:
-    image: mariadb
-    hostname: db
-    environment:
-      - MYSQL_ROOT_PASSWORD=qwe123
-      - MYSQL_DATABASE=rematch
-      - MYSQL_USER=rematch
-      - MYSQL_PASSWORD=rematchpassword
+  database:
+    image: postgres
+    hostname: database
+    env_file:
+      - .env
     expose:
-     - 3306
+     - 5432
     restart: always
 
   web:
@@ -31,24 +27,22 @@ services:
       context: ..
       dockerfile: server/Dockerfile
     volumes:
-      - /home/deb/rematch/
+      - ./logs:/var/log/rematch
     ports:
       - "8000:8000"
     expose:
       - "8000"
+    env_file:
+      - .env
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_DATABASE=rematch
-      - MYSQL_USER=rematch
-      - MYSQL_PASSWORD=rematchpassword
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
       - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USER=admin
-      - RABBITMQ_PASSWORD=mypass
       - DJANGO_SETTINGS_MODULE=rematch.settings.docker
     links:
-      - "db:db"
+      - "database:database"
       - "rabbitmq:rabbitmq"
     depends_on:
-      - db
+      - database
       - rabbitmq
     restart: always

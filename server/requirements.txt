@@ -12,4 +12,4 @@ django-filter <2.0 ; python_version < '3.0' # since v2, django-filter supports
                                             # python 3.4 and above only
 django-filter ; python_version >= '3.0'     # install any version on python3
 django-cte
-pymysql
+psycopg2-binary

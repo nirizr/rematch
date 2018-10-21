@@ -22,19 +22,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECRET_KEY must be kept secret, so it is not included in the repository for
 # production servers and instead auto-generated and saved to disk on first run
-SECRET_KEY_PATH = os.path.join(BASE_DIR, '.rematch_secret.key')
-if not os.path.isfile(SECRET_KEY_PATH):
-  fd = os.open(SECRET_KEY_PATH, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-  try:
+# specifying the SECRET_KEY using an environment variable takes priority over
+# file based SECRET_KEY
+SECRET_KEY = os.environ.get('SECRET_KEY', None)
+if not SECRET_KEY:
+  SECRET_KEY_PATH = os.path.join(BASE_DIR, '.rematch_secret.key')
+  if not os.path.isfile(SECRET_KEY_PATH):
+    fd = os.open(SECRET_KEY_PATH, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w') as fh:
       import django.core.management.utils
       fh.write(django.core.management.utils.get_random_secret_key())
-  except Exception:
-    os.unlink(SECRET_KEY_PATH)
-    raise
 
-with open(SECRET_KEY_PATH, 'r') as fh:
-  SECRET_KEY = fh.read()
+  with open(SECRET_KEY_PATH, 'r') as fh:
+    SECRET_KEY = fh.read()
 assert len(SECRET_KEY) > 20
 
 
@@ -118,15 +118,12 @@ REST_SESSION_LOGIN = False
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['MYSQL_DATABASE'],
-        'USER': os.environ['MYSQL_USER'],
-        'PASSWORD': os.environ['MYSQL_PASSWORD'],
-        'HOST': os.environ['MYSQL_HOST'],
-        'PORT': os.environ.get('MYSQL_PORT', 3306),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES';",
-        },
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME', 'rematch'),
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
+        'PORT': os.environ.get('POSTGRES_PORT', 5432)
     }
 }
 
@@ -184,3 +181,11 @@ worker_prefetch_multiplier = 1
 # worker childs after a small amount of tasks and doing so may mitigate any
 # object leaks
 worker_max_tasks_per_child = 100
+
+# rabbitmq configuration for celery
+BROKER_URL = 'amqp://{user}:{password}@{host}:{port}/{vhost}'.format(
+    user=os.environ.get('RABBITMQ_DEFAULT_USER', 'guest'),
+    password=os.environ.get('RABBITMQ_DEFAULT_PASS', 'guest'),
+    host=os.environ['RABBITMQ_HOST'],
+    port=os.environ.get('RABBITMQ_PORT', 5672),
+    vhost=os.environ.get('RABBITMQ_VHOST', ''))

@@ -35,6 +35,7 @@ the webservice's docker image by executing the following command:
 
 .. code-block:: console
 
+   $ vim ./server/.env # this file holds passwords, change them!
    $ docker-compose -f ./server/docker-compose.yml build ;
    $ docker-compose -f ./server/docker-compose.yml up -d ;
 
