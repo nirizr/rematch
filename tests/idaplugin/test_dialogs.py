@@ -2,7 +2,6 @@ import pytest
 
 from idaplugin.rematch.dialogs.base import BaseDialog
 from idaplugin.rematch.dialogs.widgets import QItem
-from idaplugin.rematch.exceptions import NotFoundException
 
 
 def recurse_subclasses(classes):
@@ -20,9 +19,7 @@ dialogs = recurse_subclasses({BaseDialog})
 dialogs = sorted(dialogs, key=lambda d: d.__class__.__name__)
 
 
-known_failing_dialogs = {'MatchDialog': (NotFoundException, AttributeError),
-                         'AddFileDialog': NotFoundException,
-                         'SettingsDialog': NotFoundException,
+known_failing_dialogs = {'MatchDialog': AttributeError,
                          'MatchResultDialog': TypeError}
 
 
