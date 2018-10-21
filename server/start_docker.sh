@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Waiting for database to start..."
-while ! nc -z $MYSQL_HOST $MYSQL_PORT ; do sleep 2; done
+while ! nc -z $POSTGRES_HOST $POSTGRES_PORT ; do sleep 2; done
 
 if [[ ! -d './rematch/migrations' ]];
 then

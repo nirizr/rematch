@@ -10,10 +10,12 @@ matrix:
       env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.debug'
       services:
         - rabbitmq
+        - postgresql
     - python: "3.6"
       env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.production'
       services:
         - rabbitmq
+        - postgresql
     - python: "2.7"
       env: PROJECT=server ENV=docker DJANGO_SETTINGS_MODULE='rematch.settings.docker'
       services:
@@ -26,13 +28,13 @@ matrix:
       env: PROJECT=docs
     - python: "2.7"
       env: PROJECT=interop ENV=conda DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+      services:
+        - rabbitmq
+        - postgresql
 
 branches:
   only:
     - master
-
-addons:
-  mariadb: '10.3'
 
 # Handle git submodules ourselves to replace ssh login with https login
 git:
@@ -79,13 +81,12 @@ install:
       pip install --upgrade -r server/requirements.txt ;
     fi ;
   - if [ "${PROJECT}" == "server" ] || [ "${PROJECT}" == "interop" ] ; then
-      export MYSQL_HOST=localhost ;
-      export MYSQL_DATABASE=rematch ;
-      export MYSQL_USER=root ;
-      export MYSQL_PASSWORD= ;
+      export POSTGRES_HOST=localhost ;
+      export POSTGRES_USER=postgres ;
+      export POSTGRES_PASSWORD= ;
       export RABBITMQ_HOST=localhost ;
-      export RABBITMQ_USER=guest ;
-      export RABBITMQ_PASSWORD=guest ;
+      export RABBITMQ_DEFAULT_USER=guest ;
+      export RABBITMQ_DEFAULT_PASS=guest ;
     fi ;
 
 script:
@@ -93,11 +94,11 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" == "docker" ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=${PROJECT} ;" ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;" ;
       elif [ "${PROJECT}" == "interop" ]; then
-        PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=server --cov=idaplugin ;
+        PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} --verbose --cov-report= --cov=server --cov=idaplugin ;
       elif [ "${PROJECT}" == "server" ]; then
-        PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} -p tests.server.pymysql_mysqldb --verbose --cov-report= --cov=${PROJECT} ;
+        PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       elif [ "${PROJECT}" == "idaplugin" ] && [ "${TRAVIS_PYTHON_VERSION:0:1}" == "2" ]; then
         py.test -rapP ./${PROJECT} ./tests/${PROJECT} --ida-replay ./tests/idaplugin/replay_empty.json --verbose --cov-report= --cov=${PROJECT} ;
       else

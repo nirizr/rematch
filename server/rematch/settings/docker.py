@@ -26,18 +26,6 @@ ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
 STATIC_ROOT = "/rematch_server/server/static/"
 
 
-# rabbitmq configuration
-if 'BROKER_URL' in os.environ:
-    BROKER_URL = os.environ['BROKER_URL']
-else:
-    BROKER_URL = 'amqp://{user}:{password}@{host}:{port}/{vhost}'.format(
-        user=os.environ['RABBITMQ_USER'],
-        password=os.environ['RABBITMQ_PASSWORD'],
-        host=os.environ['RABBITMQ_HOST'],
-        port=os.environ.get('RABBITMQ_PORT', 5672),
-        vhost=os.environ.get('RABBITMQ_VHOST', ''))
-
-
 # Logging configuration
 LOGGING = {
     'version': 1,
