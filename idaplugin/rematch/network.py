@@ -143,6 +143,7 @@ class QueryWorker(QtCore.QRunnable):
         self.signals.result.emit(response)
     except Exception as ex:
       import traceback
+      log('network').info("emitting exception: %s", ex)
       self.signals.error.emit(ex, traceback.format_exc())
 
     self.running = False
