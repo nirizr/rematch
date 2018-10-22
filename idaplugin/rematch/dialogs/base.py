@@ -1,36 +1,29 @@
 class BaseDialog(object):
-  def __init__(self, accept_handler=None, reject_handler=None,
-               finish_handler=None, submit_handler=None, response_handler=None,
-               exception_handler=None, **kwargs):
+  def __init__(self, action=None, **kwargs):
     super(BaseDialog, self).__init__(**kwargs)
-    self.accept_handler = accept_handler
-    self.reject_handler = reject_handler
-    self.finish_handler = finish_handler
-    self.submit_handler = submit_handler
-    self.response_handler = response_handler
-    self.exception_handler = exception_handler
+    self.action = action
     self.q = None
 
   def accept_base(self):
-    if self.accept_handler:
-      self.accept_handler()
+    if self.action and self.action.accept_handler:
+      self.action.accept_handler()
 
   def reject_base(self):
-    if self.reject_handler:
-      self.reject_handler()
+    if self.action and self.action.reject_handler:
+      self.action.reject_handler()
 
   def finish_base(self, status):
-    if self.finish_handler:
-      self.finish_handler(status)
+    if self.action and self.action.finish_handler:
+      self.action.finish_handler(status)
 
   def submit_base(self):
     # if no submit_handler, assume dialog is finished
-    if not self.submit_handler:
+    if not self.action and self.action.submit_handler:
       self.accept()
       return
 
     # let submit_handler handle submission and get optional query_worker
-    query_worker = self.submit_handler(**self.data())
+    query_worker = self.action.submit_handler(**self.data())
 
     # if instead of query_worker True returned, submission is successful
     # and dialog is finished
@@ -48,15 +41,15 @@ class BaseDialog(object):
 
   def response_base(self, response):
     # if no response_handler, assume dialog is finished
-    if not self.response_handler:
+    if not self.action and self.action.response_handler:
       self.accept()
       return
 
     # if response_handler returned True, assume dialog is finished
-    response_result = self.response_handler(response)
+    response_result = self.action.response_handler(response)
     if response_result:
       self.accept()
 
   def exception_base(self, exception, traceback):
-    if self.exception_handler:
-      self.exception_handler(exception, traceback)
+    if self.action and self.action.exception_handler:
+      self.action.exception_handler(exception, traceback)
