@@ -1,10 +1,8 @@
 FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy apt-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
-          python-dev build-essential python-pip python-numpy python-sklearn \
-          netcat-traditional nginx
+          netcat-openbsd nginx
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 
@@ -20,8 +18,9 @@ RUN chown rematch:rematch -R /var/log/rematch/
 RUN chown rematch:rematch -R /var/lib/nginx/
 
 # Install python requirements
-RUN pip install --upgrade pip uwsgi librabbitmq
+RUN pip install --upgrade pip uwsgi
 RUN pip install -r /rematch_server/server/requirements.txt
 
-# Downgrade to the rematch user and start server
+# Downgrade to the rematch user and set server up
+# USER rematch
 CMD cd /rematch_server/server ; ./start_docker.sh
