@@ -127,12 +127,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     self._running = True
 
     if callable(self.ui_class):
-      self.ui = self.ui_class(accept_handler=self.accept_handler,
-                              reject_handler=self.reject_handler,
-                              finish_handler=self.finish_handler,
-                              submit_handler=self.submit_handler,
-                              response_handler=self.response_handler,
-                              exception_handler=self.exception_handler)
+      self.ui = self.ui_class(self)
       self.ui.show()
     else:
       raise NotImplementedError("activation called on an action class with no "
