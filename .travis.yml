@@ -51,9 +51,7 @@ install:
       service docker start ;
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
-      if [ -f ./tests/${PROJECT}/requirements.txt ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ./tests/server/requirements.txt ;
-      fi ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ./tests/${PROJECT}/requirements.txt ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade coveralls pytest-cov ;
       pip install --upgrade flake8 ;
     fi ;
