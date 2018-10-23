@@ -37,16 +37,25 @@ class Strategy(object):
 
   def get_target_filter(self):
     # Exclude source file inputs from the target
-    target_filter = ~Q(file_version__file=self.source_file)
+    fv_filter = ~Q(file=self.source_file)
 
     # if provided with a target file make sure to filter by it, else limit to
     # provided project or not at all
     if self.target_file:
-      target_filter &= Q(file_version__file=self.target_file)
+      fv_filter &= Q(file=self.target_file)
     elif self.target_project:
-      target_filter &= Q(file_version__file__project_id=self.target_project)
+      fv_filter &= Q(file__project_id=self.target_project)
 
-    return target_filter
+    # TODO: this currently requires importing models.FileVersion which creates
+    # a cyclic import, so this hacky import is a way to handle that until we
+    # come up with a better solution.
+    # By itself, this selects the single newest file version for every file
+    from collab.models import FileVersion
+    file_versions = (FileVersion.objects.filter(fv_filter)
+                                        .order_by('file', '-created')
+                                        .distinct('file'))
+
+    return Q(file_version__in=file_versions)
 
   def get_ordered_matchers(self):
     # return matchers in self.matchers ordered by the order they appear in
