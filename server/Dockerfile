@@ -22,5 +22,5 @@ RUN pip install --upgrade pip uwsgi
 RUN pip install -r /rematch_server/server/requirements.txt
 
 # Downgrade to the rematch user and set server up
-USER rematch
+# USER rematch
 CMD cd /rematch_server/server ; ./start_docker.sh
