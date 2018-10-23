@@ -9,20 +9,24 @@ class StrategyStep(object):
   def get_match_type(self):
     return self.matcher.match_type
 
-  def get_results_filter(self):
+  def get_filter(self):
     return (Q(type=self.matcher.vector_type) &
             self.matcher.get_filter())
 
   def get_source_filter(self):
-    return (self.get_results_filter() &
+    return (self.get_filter() &
             self.strategy.get_source_filter())
 
   def get_target_filter(self):
-    return (self.get_results_filter() &
+    return (self.get_filter() &
             self.strategy.get_target_filter())
 
   def gen_matches(self, source_vectors, target_vectors):
     return self.matcher.match(source_vectors, target_vectors)
+
+  def __repr__(self):
+      return "<{}; Matcher={}>".format(self.__class__.__name__,
+                                       self.matcher.match_type)
 
 
 class BinningStrategyStep(StrategyStep):

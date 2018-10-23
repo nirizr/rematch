@@ -71,13 +71,15 @@ def match_by_step(task_id, step):
   print("Matching {} local vectors to {} remote vectors by {}"
         "".format(source_count, target_count, step))
 
+  match_count = 0
   match_objs = gen_match_objs(task_id, step, source_vectors, target_vectors)
   for b in batch(match_objs, 10000):
+    # bulk_create turns b into a list regardless, so lets make it useful
+    b = list(b)
+    match_count += len(b)
     Match.objects.bulk_create(b)
-  matches_count = Match.objects.filter(task_id=task_id)
-  matches_count = matches_count.filter(step.get_results_filter()).count()
   print("Took {} and resulted in {} match objects".format(now() - start,
-                                                          matches_count))
+                                                          match_count))
 
 
 def gen_match_objs(task_id, step, source_vectors, target_vectors):
