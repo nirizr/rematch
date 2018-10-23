@@ -143,6 +143,7 @@ class QueryWorker(QtCore.QRunnable):
         self.signals.result.emit(response)
     except Exception as ex:
       import traceback
+      log('network').info("emitting exception: %s", ex)
       self.signals.error.emit(ex, traceback.format_exc())
 
     self.running = False
@@ -155,7 +156,7 @@ class QueryWorker(QtCore.QRunnable):
 
 def default_exception_callback(exception, traceback):
   del exception
-  log('main').warn("callback exception: %s", traceback)
+  log('main').warning("callback exception: %s", traceback)
 
 
 def build_params(method, params):

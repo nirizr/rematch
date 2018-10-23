@@ -37,6 +37,7 @@ class MatchAction(base.BoundFileAction):
 
     self.delayed_queries = []
 
+    # TODO: use a single PBD and reset() it
     self.pbar = None
     self.timer = QtCore.QTimer()
 
@@ -51,17 +52,16 @@ class MatchAction(base.BoundFileAction):
       self.pbar.accepted.disconnect()
     except TypeError:
       pass
+    self.pbar.close()
     self.pbar = None
 
-  def cancel_delayed(self):
     for delayed in self.delayed_queries:
       delayed.cancel()
     self.delayed_queries = []
 
   def cancel(self):
-    log('match_action').info("match action cancelled")
+    log('match_action').info("match action cancelled by user")
     self.clean()
-    self.cancel_delayed()
 
   @staticmethod
   def calc_file_version_hash():
@@ -166,11 +166,9 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("Data upload completed successfully")
 
     self.clean()
-    self.cancel_delayed()
-    q = network.QueryWorker("POST", "collab/dependency", json=True,
-                            params=DependencyAnnotation.dependencies)
-    q.start()
-    self.delayed_queries.append(q)
+    # TODO: make this a delayed query
+    network.query("POST", "collab/dependencies", json=True,
+                  params=DependencyAnnotation.dependencies)
 
     self.start_task()
 
@@ -218,8 +216,8 @@ class MatchAction(base.BoundFileAction):
       progress = int(r['progress'])
       status = r['status']
       if status == 'failed':
-        self.cancel()
-        # TODO: task failed, print a message box saying so
+        self.clean()
+        log('match_action').error("Task failed!")
       elif progress_max:
         self.pbar.setMaximum(progress_max)
         if progress >= progress_max:
@@ -227,7 +225,7 @@ class MatchAction(base.BoundFileAction):
         else:
           self.pbar.setValue(progress)
     except Exception:
-      self.cancel()
+      self.clean()
       log('match_action').exception("perform update failed")
       raise
 
@@ -235,7 +233,6 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("Remote task completed successfully")
 
     self.clean()
-    self.cancel_delayed()
 
     self.start_results()
 
@@ -313,6 +310,5 @@ class MatchAction(base.BoundFileAction):
     # log('match_action').info("Result download completed successfully")
 
     self.clean()
-    self.cancel_delayed()
 
     self.results.show()
