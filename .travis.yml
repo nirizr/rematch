@@ -76,7 +76,6 @@ install:
     fi ;
   - if [ "${PROJECT}" == "interop" ] ; then
       pip install --upgrade -r server/requirements.txt ;
-      pip install --upgrade -r server/requirements.txt ;
     fi ;
   - if [ "${PROJECT}" == "server" ] || [ "${PROJECT}" == "interop" ] ; then
       export POSTGRES_HOST=localhost ;
