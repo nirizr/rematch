@@ -156,7 +156,7 @@ class QueryWorker(QtCore.QRunnable):
 
 def default_exception_callback(exception, traceback):
   del exception
-  log('main').warn("callback exception: %s", traceback)
+  log('main').warning("callback exception: %s", traceback)
 
 
 def build_params(method, params):

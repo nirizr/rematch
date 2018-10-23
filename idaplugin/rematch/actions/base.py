@@ -102,7 +102,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
   def register(self):
     r = ida_kernwin.register_action(self.get_desc())
     if not r:
-      log('actions').warn("failed registering %s: %s", self, r)
+      log('actions').warning("failed registering %s: %s", self, r)
       return
     ida_kernwin.attach_action_to_menu(
         self.get_action_path(),
