@@ -18,7 +18,7 @@ class BaseDialog(object):
 
   def submit_base(self):
     # if no submit_handler, assume dialog is finished
-    if not self.action and self.action.submit_handler:
+    if not self.action and not self.action.submit_handler:
       self.accept()
       return
 
@@ -41,7 +41,7 @@ class BaseDialog(object):
 
   def response_base(self, response):
     # if no response_handler, assume dialog is finished
-    if not self.action and self.action.response_handler:
+    if not self.action and not self.action.response_handler:
       self.accept()
       return
 
