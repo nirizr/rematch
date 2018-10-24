@@ -151,7 +151,7 @@ class QRadioExtraLayout(QRadioLayout):
                                                       item_description)
     self.set_selected(i, selected)
 
-    if item_extra:
+    if item_extra is not None:
       self.update_item_extra(item, item_extra)
       self.addWidget(item_extra, i, 1, QtCore.Qt.AlignTop)
 
