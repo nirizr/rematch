@@ -31,7 +31,7 @@ nginx, mysql, rabbitmq and celery micro components. This makes server
 deployment a lot easier, however a docker installation and roughly 600 MB of free
 space are required.
 
-.. warning:: The docker setup uses the file :code:`.server/.env` to set passwords.
+.. warning:: The docker setup uses the file :code:`./server/.env` to set passwords.
    We highly recommand changing those before building your docker.
 
 If you wish to build your own docker image from source, the docker-compose
