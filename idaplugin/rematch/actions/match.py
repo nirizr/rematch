@@ -1,15 +1,11 @@
 from ..idasix import QtCore, QtWidgets
-import idautils
 
 from ..dialogs.match import MatchDialog
 from ..dialogs.matchresult import MatchResultDialog
 
-from ..collectors.annotations import DependencyAnnotation
-from ..instances import FunctionInstance, UniversalInstance
 from .. import network, netnode, log
 from . import base
 
-import hashlib
 import json
 
 
@@ -63,27 +59,6 @@ class MatchAction(base.BoundFileAction):
     log('match_action').info("match action cancelled by user")
     self.clean()
 
-  @staticmethod
-  def calc_file_version_hash():
-    version_obj = []
-    version_obj.append(('functions', [(offset, list(idautils.Chunks(offset)))
-                                        for offset in idautils.Functions()]))
-    # TODO: This is a little hackish way of getting the version of all vectors
-    # of an instance. cannot make version a classmethod because vector sets are
-    # only built by __init__ methods
-    func_vector_versions = FunctionInstance(None, None).version()
-    version_obj.append(('function_vector_versions', func_vector_versions))
-    # TODO: Add function annotations as part of the version, because they're
-    # also changing.
-    # TODO: Add universal instance related versions
-
-    version_str = repr(version_obj)
-    version_hash = hashlib.md5(version_str).hexdigest()
-
-    log('match_action').info("file version string: %s", version_str)
-    log('match_action').info("file version hash: %s", version_hash)
-    return version_hash
-
   def submit_handler(self, source, source_single, source_range, target,
                      target_project, target_file, strategy, matchers):
     self.source = source
@@ -95,6 +70,8 @@ class MatchAction(base.BoundFileAction):
     self.strategy = strategy
     self.matchers = matchers
 
+    # TODO: this should only CHECK a file version was already created and then
+    # submit
     file_version_hash = self.calc_file_version_hash()
     uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
                                                     file_version_hash)
@@ -104,73 +81,11 @@ class MatchAction(base.BoundFileAction):
     self.file_version_id = file_version['id']
 
     if file_version['newly_created']:
-      self.start_upload()
+      log('match_action').error("Task not created because no data was "
+                                "uploaded")
     else:
       self.start_task()
-
-    return True
-
-  def start_upload(self):
-    log('match_action').info("Data upload started")
-
-    # TODO: Is this too slow? should we move this to perform_upload? or into a
-    # generator?
-    self.instances = set((FunctionInstance, f) for f in idautils.Functions())
-    self.instances.add((UniversalInstance, (s[0] for s in idautils.Structs())))
-
-    self.pbar = QtWidgets.QProgressDialog()
-    self.pbar.canceled.connect(self.cancel)
-    self.pbar.rejected.connect(self.cancel)
-    self.pbar.setLabelText("Processing IDB... You may continue working,\nbut "
-                           "please avoid making any ground-breaking changes.")
-    self.pbar.setRange(0, len(self.instances))
-    self.pbar.setValue(0)
-    self.pbar.accepted.connect(self.accept_upload)
-    self.pbar.show()
-
-    self.timer.timeout.connect(self.perform_upload)
-    self.timer.start(0)
-
-    return True
-
-  def perform_upload(self):
-    if not self.instances:
-      return
-
-    # pop a function, serialize and add to the ready set
-    instance_cls, instance_data = self.instances.pop()
-    instance_obj = instance_cls(self.file_version_id, instance_data)
-    self.instance_objs.append(instance_obj.serialize())
-
-    # if ready set contains 100 or more instances, or if we just poped the last
-    # function clear and upload entire ready set to the server.
-    if len(self.instance_objs) >= 100 or not self.instances:
-      q = network.QueryWorker("POST", "collab/instances/",
-                              params=self.instance_objs, json=True)
-      q.start(self.progress_advance)
-      self.delayed_queries.append(q)
-
-      self.instance_objs = []
-      self.pbar.setMaximum(self.pbar.maximum() + 1)
-    self.progress_advance()
-
-  def progress_advance(self, result=None):
-    del result
-    new_value = self.pbar.value() + 1
-    if new_value >= self.pbar.maximum():
-      self.pbar.accept()
-    else:
-      self.pbar.setValue(new_value)
-
-  def accept_upload(self):
-    log('match_action').info("Data upload completed successfully")
-
-    self.clean()
-    # TODO: make this a delayed query
-    network.query("POST", "collab/dependencies", json=True,
-                  params=DependencyAnnotation.dependencies)
-
-    self.start_task()
+      return True
 
   def start_task(self):
     if self.source == 'idb':
@@ -300,9 +215,9 @@ class MatchAction(base.BoundFileAction):
       self.pbar.setValue(self.pbar.value() + 1)
 
     self.pbar.setValue(self.pbar.value() + len(response['results']))
-    # log('match_action').info("result download progress: {} / {} with {}"
-    #                        "".format(self.pbar.value(), self.pbar.maximum(),
-    #                                  self.seen))
+    log('match_action').info("result download progress: {} / {} with {}"
+                             "".format(self.pbar.value(), self.pbar.maximum(),
+                                       self.seen))
     if self.pbar.value() >= self.pbar.maximum():
       self.pbar.accept()
 

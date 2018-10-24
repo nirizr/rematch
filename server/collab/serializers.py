@@ -109,10 +109,10 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
   def create(self, validated_data):
     vectors_data = validated_data.pop('vectors', [])
     annotations_data = validated_data.pop('annotations', [])
-    file_version = validated_data['file_version']
 
     obj = self.Meta.model.objects.create(**validated_data)
-    vectors = (Vector(instance=obj, file_version=file_version,
+    vectors = (Vector(instance=obj,
+                      file_version=validated_data['file_version'],
                       **vector_data)
                for vector_data in vectors_data)
     Vector.objects.bulk_create(vectors)

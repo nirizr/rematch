@@ -17,9 +17,12 @@ class BaseInstance(object):
   def count():
     return 0
 
-  def serialize(self):
+  def serialize(self, include_annotations):
     vectors = list(collectors.collect(self.vectors, self.items))
-    annotations = list(collectors.collect(self.annotations, self.items))
+    if include_annotations:
+      annotations = list(collectors.collect(self.annotations, self.items))
+    else:
+      annotations = []
     size = self.size()
     count = self.count()
 

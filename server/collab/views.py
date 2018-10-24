@@ -179,6 +179,26 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
   serializer_class = InstanceVectorSerializer
   filterset_fields = ('owner', 'file_version', 'type')
 
+  def create(self, request, *args, **kwargs):
+    # If force update flag was sent, we'll delete all submitted values before
+    # they're actually submitted and before they're fully validated.
+    # this is because validation will fail for uniqueness and that is percisely
+    # what this is trying to avoid.
+    # An alternative approach could be upserting instead of creating (but
+    # django doesn't easily support that) or skip creating the instances and
+    # just updating all vectors and annotations.
+    if request.GET.get('force_update', False):
+      data = request.data if isinstance(request.data, list) else [request.data]
+      q = models.Q()
+      for item in data:
+        offset = item['offset']
+        if offset is not None:
+          offset = int(offset)
+        q |= models.Q(file_version=int(item['file_version']),
+                      offset=offset)
+      self.queryset.filter(q).delete()
+    return super(InstanceViewSet, self).create(request, *args, **kwargs)
+
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Vector.objects.all()
