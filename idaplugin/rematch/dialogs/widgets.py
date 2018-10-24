@@ -64,6 +64,9 @@ class QItemSelect(QItem, QtWidgets.QComboBox):
       kwargs['empty_disabled'] = False
     super(QItemSelect, self).__init__(*args, **kwargs)
 
+  def load(self, response):
+    super(QItemSelect, self).load(response)
+
     if self.selected and not self.found_selection:
       self.insertItem(0, "UNKNOWN ({})".format(self.selected), self.selected)
       self.set_selected(0, True)
