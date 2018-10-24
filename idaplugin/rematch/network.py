@@ -105,6 +105,8 @@ class QueryWorker(QtCore.QRunnable):
 
   def run_query(self):
     while self.running:
+      # TODO: Make pageable and/or splittable parallelable. meaning split pages
+      # to multiple queries to split to multiple concurrently executing queries
       # if we're running a splittable query, only send SPLIT parameters for the
       # splittable variable
       if self.splittable:
