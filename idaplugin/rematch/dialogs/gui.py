@@ -42,6 +42,7 @@ class WidgetsDialog(BaseDialog):
     else:
       exception_string = str(exception)
     self.statusLbl.setText("Error(s) occured:\n{}".format(exception_string))
+    self.statusLbl.setToolTip(traceback)
     self.statusLbl.setStyleSheet("color: red;")
 
 
