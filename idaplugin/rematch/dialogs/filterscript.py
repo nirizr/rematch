@@ -45,11 +45,13 @@ class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
               'pass', 'print', 'raise', 'return', 'try', 'while', 'yield',
               'None', 'True', 'False']
 
+  # Regular-expression escape characters
   operators = ['=', '==', '!=', '<', '<=', '>', '>=', r'\+', '-', r'\*', '/',
                '//', r'\%', r'\*\*', r'\+=', r'-=', r'\*=', r'/=', r'\%=',
                r'\^', r'\|', r'\&', r'\~', '>>', '<<']
 
-  braces = ['\{', '\}', '\(', '\)', '\[', '\]']
+  # Regular-expression escape characters
+  braces = [r'\{', r'\}', r'\(', r'\)', r'\[', r'\]']
 
   formats = {'keyword': SyntaxFormat((200, 120, 50), 'bold'),
              'operator': SyntaxFormat((150, 150, 150)),
