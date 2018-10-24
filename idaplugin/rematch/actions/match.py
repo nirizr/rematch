@@ -266,7 +266,7 @@ class MatchAction(base.BoundFileAction):
 
     matches_url = "collab/tasks/{}/matches/".format(self.task_id)
     q = network.QueryWorker("GET", matches_url, json=True, pageable=True,
-                            params={'limit': 100})
+                            params={'limit': 200})
     q.start(self.handle_matches)
     self.delayed_queries.append(q)
 

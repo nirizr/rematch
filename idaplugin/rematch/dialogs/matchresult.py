@@ -114,11 +114,18 @@ class MatchResultDialog(gui.DockableDialog):
     self.matches = []
 
   def show(self, *args, **kwargs):
+    # TODO: perform the following while data comes in instead of after it
+    # arrived. Also, schedule execution using a timer to not hang
     self.finalize_matches()
     self.populate_tree()
     self.set_checks()
     self.graph_dialog.Show()
     super(MatchResultDialog, self).show(*args, **kwargs)
+
+  def reset_focus(self):
+    # calling graph_dialog.show gave it focus. taking it back now
+    super(MatchResultDialog, self).show()
+    self.tree.setFocus()
 
   def get_obj(self, obj_id):
     if obj_id in self.locals:
@@ -133,6 +140,9 @@ class MatchResultDialog(gui.DockableDialog):
     if not self.tree.selectedItems():
       return
 
+    if len(self.tree.selectedItems()) != 1:
+      return
+
     item = self.tree.selectedItems()[0]
     if item.parent() is None:
       local_item = item
@@ -142,7 +152,7 @@ class MatchResultDialog(gui.DockableDialog):
 
     if local_item:
       ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
-      self.graph_dialog.Show()
+      self.reset_focus()
 
     if remote_item:
       # TODO: change graph to a "loading..." message
@@ -157,6 +167,8 @@ class MatchResultDialog(gui.DockableDialog):
 
     nodes = json.loads(response[0]['data'])
     self.graph_dialog.SetNodes(nodes)
+    self.graph_dialog.Show()
+    self.reset_focus()
 
   def item_changed(self, item, column):
     if not column == self.CHECKBOX_COLUMN:
@@ -166,9 +178,11 @@ class MatchResultDialog(gui.DockableDialog):
     if parent is None:
       return
 
+    self.tree.blockSignals(True)
     for curr_child in self.enumerate_children(parent):
       if item != curr_child:
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
+    self.tree.blockSignals(False)
 
   def show_script(self):
     self.script_dialog = filterscript.FilterScriptDialog()
@@ -256,8 +270,9 @@ class MatchResultDialog(gui.DockableDialog):
           checked = True
           break
 
+      # If no child/remote item is checked, check the first one
       if not checked and local_item.childCount():
-        remote_item = local_item.child(local_item.childCount() - 1)
+        remote_item = local_item.child(0)
         remote_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Checked)
 
   def build_context(self, local, match=None, remote=None):
@@ -296,9 +311,7 @@ class MatchResultDialog(gui.DockableDialog):
     return 'Filter' in context and context['Filter']
 
   def populate_tree(self):
-    self.tree.sortItems(self.ANNOTATION_COUNT_COLUMN,
-                        QtCore.Qt.DescendingOrder)
-    self.tree.setSortingEnabled(False)
+    self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
 
     for local_obj in self.locals.values():
       context = self.build_context(local_obj)
