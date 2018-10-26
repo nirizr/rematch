@@ -20,6 +20,8 @@ services:
     expose:
      - 5432
     restart: always
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
 
   web:
     hostname: web
