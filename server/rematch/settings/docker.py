@@ -16,32 +16,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEBUG = False
-
-
 # Accept all hosts by default, this isn't the most secure
 ALLOWED_HOSTS = ['*']  # TODO: this should be your hostname
 
 
 STATIC_ROOT = "/rematch_server/server/static/"
-
-
-# Logging configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/rematch/django.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}

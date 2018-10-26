@@ -1,5 +1,9 @@
 language: python
 
+env:
+  global:
+    - DJANGO_LOG_FILE="/dev/null"
+
 matrix:
   include:
     - python: "2.7"
@@ -7,12 +11,12 @@ matrix:
     - python: "3.6"
       env: PROJECT=idaplugin ENV=conda
     - python: "2.7"
-      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.base'
       services:
         - rabbitmq
         - postgresql
     - python: "3.6"
-      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.production'
+      env: PROJECT=server ENV=data DJANGO_SETTINGS_MODULE='rematch.settings.base'
       services:
         - rabbitmq
         - postgresql
@@ -27,7 +31,7 @@ matrix:
     - python: "3.6"
       env: PROJECT=docs
     - python: "2.7"
-      env: PROJECT=interop ENV=conda DJANGO_SETTINGS_MODULE='rematch.settings.debug'
+      env: PROJECT=interop ENV=conda DJANGO_SETTINGS_MODULE='rematch.settings.base'
       services:
         - rabbitmq
         - postgresql

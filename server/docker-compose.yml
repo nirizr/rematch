@@ -41,6 +41,7 @@ services:
       - POSTGRES_PORT=5432
       - RABBITMQ_HOST=rabbitmq
       - DJANGO_SETTINGS_MODULE=rematch.settings.docker
+      - DJANGO_LOG_FILE=/var/log/rematch/django.log
     links:
       - "database:database"
       - "rabbitmq:rabbitmq"
