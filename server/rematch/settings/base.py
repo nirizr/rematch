@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import logging.config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,6 +47,45 @@ assert len(SECRET_KEY) > 20
 # https://docs.djangoproject.com/en/1.10/topics/security/#host-headers-virtual-hosting
 ALLOWED_HOSTS = []
 
+
+# Debug
+DEBUG = os.getenv('DJANGO_DEBUG', False)
+
+# Logging configuration
+# We cannot use django's configuation, for more details see
+# https://stackoverflow.com/q/20282521/1146713
+LOGGING_CONFIG = None
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': "%(asctime)s %(levelname)-8s %(name)-15s %(message)s",
+            'datefmt': "%Y-%m-%d %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.getenv('DJANGO_LOG_FILE',
+                                  '/var/log/django.log'),
+            'formatter': 'default',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file', 'console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'formatter': "default",
+        },
+    },
+}
+logging.config.dictConfig(LOGGING)
 
 # Application definition
 
