@@ -59,14 +59,14 @@ def paginatable(serializer):
 class ProjectViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Project.objects.all()
   serializer_class = ProjectSerializer
-  filter_fields = ('created', 'owner', 'name', 'description', 'private')
+  filterset_fields = ('created', 'owner', 'name', 'description', 'private')
 
 
 class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = File.objects.all()
   serializer_class = FileSerializer
-  filter_fields = ('created', 'owner', 'project', 'name', 'description',
-                   'md5hash')
+  filterset_fields = ('created', 'owner', 'project', 'name', 'description',
+                      'md5hash')
 
   @decorators.action(detail=True, methods=['GET', 'POST'],
                      url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)")
@@ -93,7 +93,7 @@ class FileVersionViewSet(viewsets.ModelViewSet):
   queryset = FileVersion.objects.all()
   serializer_class = FileVersionSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filter_fields = ('id', 'file', 'md5hash')
+  filterset_fields = ('id', 'file', 'md5hash')
 
 
 class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
@@ -101,7 +101,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
   queryset = Task.objects.all()
   permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
-  filter_fields = ('task_id', 'created', 'finished', 'owner', 'status')
+  filterset_fields = ('task_id', 'created', 'finished', 'owner', 'status')
 
   def perform_create(self, serializer):
     task = serializer.save(owner=self.request.user)
@@ -152,7 +152,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()
   serializer_class = MatchSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filter_fields = ('task', 'type', 'score')
+  filterset_fields = ('task', 'type', 'score')
 
   @staticmethod
   @decorators.action(detail=False)
@@ -177,14 +177,14 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
   serializer_class = InstanceVectorSerializer
-  filter_fields = ('owner', 'file_version', 'type')
+  filterset_fields = ('owner', 'file_version', 'type')
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Vector.objects.all()
   serializer_class = VectorSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filter_fields = ('instance', 'file_version', 'type', 'type_version')
+  filterset_fields = ('instance', 'file_version', 'type', 'type_version')
 
   @staticmethod
   def perform_create(serializer):
@@ -196,7 +196,7 @@ class AnnotationViewSet(viewsets.ModelViewSet):
   queryset = Annotation.objects.all()
   serializer_class = AnnotationSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filter_fields = ('instance', 'type', 'data')
+  filterset_fields = ('instance', 'type', 'data')
 
   @decorators.action(detail=False)
   @paginatable(AnnotationSerializer)
