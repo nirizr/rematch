@@ -84,7 +84,7 @@ install:
 
 script:
   - flake8 ./${PROJECT} --show-source --statistics
-  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source ; fi ;
+  - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source --statistics ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" == "docker" ]; then
         docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;" ;
