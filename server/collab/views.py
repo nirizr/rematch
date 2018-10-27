@@ -68,8 +68,8 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   filter_fields = ('created', 'owner', 'project', 'name', 'description',
                    'md5hash')
 
-  @decorators.detail_route(url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)",
-                           methods=['GET', 'POST'])
+  @decorators.action(detail=True, methods=['GET', 'POST'],
+                     url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)")
   def file_version(self, request, pk, md5hash):
     del pk
     file_obj = self.get_object()
@@ -113,7 +113,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
       serializer_class = TaskEditSerializer
     return serializer_class
 
-  @decorators.detail_route(url_path="locals")
+  @decorators.action(detail=True, url_path="locals")
   @paginatable(SlimInstanceSerializer)
   def locals(self, request, pk):
     del request
@@ -125,7 +125,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # 'from_instance' match). for those, include the match objects themselves
     return Instance.objects.filter(from_matches__task=task).distinct()
 
-  @decorators.detail_route(url_path="remotes")
+  @decorators.action(detail=True, url_path="remotes")
   @paginatable(SlimInstanceSerializer)
   def remotes(self, request, pk):
     del request
@@ -137,7 +137,7 @@ class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     # by match records of local instances
     return Instance.objects.filter(to_matches__task=task).distinct()
 
-  @decorators.detail_route(url_path="matches")
+  @decorators.action(detail=True, url_path="matches")
   @paginatable(MatchSerializer)
   def matches(self, request, pk):
     del request
@@ -155,7 +155,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   filter_fields = ('task', 'type', 'score')
 
   @staticmethod
-  @decorators.list_route()
+  @decorators.action(detail=False)
   def matchers(request):
     del request
     if any((m.is_abstract() for m in matchers_list)):
@@ -164,7 +164,7 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
     return response.Response(serializer.data)
 
   @staticmethod
-  @decorators.list_route()
+  @decorators.action(detail=False)
   def strategies(request):
     del request
     if any((s.is_abstract() for s in strategies_list)):
@@ -198,7 +198,7 @@ class AnnotationViewSet(viewsets.ModelViewSet):
   permission_classes = (permissions.IsAuthenticated,)
   filter_fields = ('instance', 'type', 'data')
 
-  @decorators.list_route()
+  @decorators.action(detail=False)
   @paginatable(AnnotationSerializer)
   def full_hierarchy(self, request):
     del self
