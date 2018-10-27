@@ -54,6 +54,7 @@ def batch(iterable, size):
     while True:
         batchiter = islice(sourceiter, size)
         yield chain([next(batchiter)], batchiter)
+    return
 
 
 def match_by_step(task_id, step):
