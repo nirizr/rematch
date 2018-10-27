@@ -92,6 +92,7 @@ logging.config.dictConfig(LOGGING)
 INSTALLED_APPS = [
     'accounts',
     'collab',
+    'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',

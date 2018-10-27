@@ -1,6 +1,7 @@
+from logging import getLogger
 import functools
 
-from rest_framework import (viewsets, permissions, mixins, decorators, status,
+from rest_framework import (viewsets, permissions, mixins, decorators,
                             response)
 
 from django.db import models
@@ -68,32 +69,22 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   filterset_fields = ('created', 'owner', 'project', 'name', 'description',
                       'md5hash')
 
-  @decorators.action(detail=True, methods=['GET', 'POST'],
-                     url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)")
-  def file_version(self, request, pk, md5hash):
-    del pk
-    file_obj = self.get_object()
-
-    if request.method == 'POST':
-      file_version, created = \
-        FileVersion.objects.get_or_create(md5hash=md5hash, file=file_obj)
-    else:
-      file_version = FileVersion.objects.get(md5hash=md5hash, file=file_obj)
-      created = False
-
-    serializer = FileVersionSerializer(file_version)
-
-    resp_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-    response_data = serializer.data
-    response_data['newly_created'] = created
-    return response.Response(response_data, status=resp_status)
-
 
 class FileVersionViewSet(viewsets.ModelViewSet):
   queryset = FileVersion.objects.all()
   serializer_class = FileVersionSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filterset_fields = ('id', 'file', 'md5hash')
+  filterset_fields = ('id', 'file', 'md5hash', 'complete')
+
+  def create(self, request, *args, **kwargs):
+    # Delete file verion if force creation was requested
+    if request.GET.get('force', False):
+      internal_val = self.get_serializer().to_internal_value(data=request.data)
+      r = self.queryset.filter(file=internal_val['file'],
+                               md5hash=internal_val['md5hash']).delete()
+      getLogger('fileversion.create').info("deletion: %s", r)
+
+    return super(FileVersionViewSet, self).create(request, *args, **kwargs)
 
 
 class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
@@ -178,26 +169,6 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
   queryset = Instance.objects.all()
   serializer_class = InstanceVectorSerializer
   filterset_fields = ('owner', 'file_version', 'type')
-
-  def create(self, request, *args, **kwargs):
-    # If force update flag was sent, we'll delete all submitted values before
-    # they're actually submitted and before they're fully validated.
-    # this is because validation will fail for uniqueness and that is percisely
-    # what this is trying to avoid.
-    # An alternative approach could be upserting instead of creating (but
-    # django doesn't easily support that) or skip creating the instances and
-    # just updating all vectors and annotations.
-    if request.GET.get('force_update', False):
-      data = request.data if isinstance(request.data, list) else [request.data]
-      q = models.Q()
-      for item in data:
-        offset = item['offset']
-        if offset is not None:
-          offset = int(offset)
-        q |= models.Q(file_version=int(item['file_version']),
-                      offset=offset)
-      self.queryset.filter(q).delete()
-    return super(InstanceViewSet, self).create(request, *args, **kwargs)
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):

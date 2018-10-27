@@ -60,22 +60,24 @@ class UploadAction(base.BoundFileAction):
     return version_hash
 
   def submit_handler(self, force_update, upload_annotations):
-    self.force_update = force_update
     self.upload_annotations = upload_annotations
 
-    file_version_hash = self.calc_file_version_hash()
-    uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
-                                                    file_version_hash)
-    return network.QueryWorker("POST", uri, json=True)
+    self.ui.statusLbl.setText("Uploading...")
+    self.ui.statusLbl.setToolTip("")
+    self.ui.statusLbl.setStyleSheet("color: black;")
+
+    endpoint = "collab/file_versions/"
+    if force_update:
+      endpoint += "?force=True"
+    params = {'file': netnode.bound_file_id, 'complete': False,
+              'md5hash': self.calc_file_version_hash()}
+    return network.QueryWorker("POST", endpoint, json=True, params=params)
 
   def response_handler(self, file_version):
     self.file_version_id = file_version['id']
 
-    if file_version['newly_created'] or self.force_update:
-      self.start_upload()
-    else:
-      log('uplaod_action').info("Version up to date, no upload required")
-      return True
+    # if we successfully created a file_version we will start the data upload
+    self.start_upload()
 
   def start_upload(self):
     log('upload_action').info("Data upload started")
@@ -116,12 +118,19 @@ class UploadAction(base.BoundFileAction):
     del result
     self.ui.advance()
 
-  def accept_upload(self):
+  def accept_handler(self):
     self.clean()
 
-    # TODO: make this a delayed query?
-    network.query("POST", "collab/dependencies", json=True,
-                  params=DependencyAnnotation.dependencies)
+    # TODO: make these delayed queries?
+    # Upload dependencies if there are any
+    dependencies = DependencyAnnotation.get_dependencies()
+    if dependencies:
+      network.query("POST", "collab/dependencies/", json=True,
+                    params=dependencies)
+
+    # mark file version as complete
+    endpoint = "collab/file_versions/{}/".format(self.file_version_id)
+    network.query("PATCH", endpoint, json=True, params={'complete': True})
 
     log('upload_action').info("Data upload completed successfully")
 

@@ -70,22 +70,17 @@ class MatchAction(base.BoundFileAction):
     self.strategy = strategy
     self.matchers = matchers
 
-    # TODO: this should only CHECK a file version was already created and then
-    # submit
     file_version_hash = self.calc_file_version_hash()
-    uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
-                                                    file_version_hash)
-    return network.QueryWorker("POST", uri, json=True)
+    return network.QueryWorker("GET", "collab/file_versions/", json=True,
+                               params={'md5hash': file_version_hash,
+                                       'complete': True,
+                                       'file': netnode.bound_file_id})
 
   def response_handler(self, file_version):
     self.file_version_id = file_version['id']
 
-    if file_version['newly_created']:
-      log('match_action').error("Task not created because no data was "
-                                "uploaded")
-    else:
-      self.start_task()
-      return True
+    self.start_task()
+    return True
 
   def start_task(self):
     if self.source == 'idb':

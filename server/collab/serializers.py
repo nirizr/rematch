@@ -27,7 +27,7 @@ class FileSerializer(serializers.ModelSerializer):
 class FileVersionSerializer(serializers.ModelSerializer):
   class Meta(object):
     model = FileVersion
-    fields = ('id', 'created', 'file', 'md5hash')
+    fields = ('id', 'created', 'file', 'md5hash', 'complete')
 
 
 class TaskSerializer(serializers.ModelSerializer):

@@ -47,6 +47,7 @@ class FileVersion(models.Model):
   file = models.ForeignKey(File, models.CASCADE, related_name='versions')
   md5hash = models.CharField(max_length=32,
                              validators=[MinLengthValidator(32)])
+  complete = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = (('file', 'md5hash'),)
