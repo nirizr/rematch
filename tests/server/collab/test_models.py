@@ -89,3 +89,20 @@ def test_full_hierarchy(admin_api_client, admin_user):
 
   expected_response = [dependency.dependency, dependency.dependent]
   assert_eq(response.data, expected_response)
+
+
+@pytest.mark.django_db
+def test_file_fileversion(admin_client, admin_user):
+  fv_obj = create_model('file_versions', admin_user)
+  fv_obj.save()
+
+  url = '/collab/files/{}/file_version/{}/'.format(fv_obj.file_id,
+                                                   fv_obj.md5hash)
+
+  response = admin_client.get(url, content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, fv_obj)
+
+  fv_obj.complete = True
+  fv_obj.save()
+  response = admin_client.get(url, content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, fv_obj)
