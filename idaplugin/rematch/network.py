@@ -157,8 +157,10 @@ class QueryWorker(QtCore.QRunnable):
 
 
 def default_exception_callback(exception, traceback):
+  # WARN: cannot log here (because we're Queued into IDA kernel)?
+  # Gotta print instead
   del exception
-  log('main').warning("callback exception: %s", traceback)
+  print("callback exception: {}".format(traceback))
 
 
 def build_params(method, params):
