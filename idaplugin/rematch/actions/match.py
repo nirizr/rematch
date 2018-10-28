@@ -78,10 +78,6 @@ class MatchAction(base.BoundFileAction):
     return network.QueryWorker("GET", uri, json=True)
 
   def response_handler(self, file_version):
-    if not file_version:
-      raise Exception("Current version file was never uploaded to the server. "
-                      "Please upload at least once before matching.")
-
     self.file_version_id = file_version['id']
 
     self.start_task()
