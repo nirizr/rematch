@@ -3,6 +3,8 @@ from ..idasix import QtCore, QtWidgets
 from ..dialogs.match import MatchDialog
 from ..dialogs.matchresult import MatchResultDialog
 
+from .upload import UploadAction
+
 from .. import network, netnode, log
 from . import base
 
@@ -70,13 +72,16 @@ class MatchAction(base.BoundFileAction):
     self.strategy = strategy
     self.matchers = matchers
 
-    file_version_hash = self.calc_file_version_hash()
-    return network.QueryWorker("GET", "collab/file_versions/", json=True,
-                               params={'md5hash': file_version_hash,
-                                       'complete': True,
-                                       'file': netnode.bound_file_id})
+    file_version_hash = UploadAction.calc_file_version_hash()
+    uri = "collab/files/{}/file_version/{}/".format(netnode.bound_file_id,
+                                                    file_version_hash)
+    return network.QueryWorker("GET", uri, json=True)
 
   def response_handler(self, file_version):
+    if not file_version:
+      raise Exception("Current version file was never uploaded to the server. "
+                      "Please upload at least once before matching.")
+
     self.file_version_id = file_version['id']
 
     self.start_task()

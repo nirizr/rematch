@@ -69,6 +69,17 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   filterset_fields = ('created', 'owner', 'project', 'name', 'description',
                       'md5hash')
 
+  @staticmethod
+  @decorators.action(detail=True,
+                     url_path="file_version/(?P<md5hash>[0-9A-Fa-f]{32})")
+  def current(request, pk, md5hash):
+    del request
+    file_version = (FileVersion.objects.filter(md5hash=md5hash, file=pk,
+                                               complete=True)
+                                       .order_by('-created').first())
+    serializer = FileVersionSerializer(instance=file_version)
+    return response.Response(data=serializer.data)
+
 
 class FileVersionViewSet(viewsets.ModelViewSet):
   queryset = FileVersion.objects.all()
