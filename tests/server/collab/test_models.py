@@ -1,7 +1,7 @@
 import pytest
 from rest_framework import status
 
-from utils import (create_model, setup_model, assert_eq, assert_response,
+from utils import (create_model, setup_model, assert_response,
                    collab_models_keys)
 
 
@@ -76,7 +76,7 @@ def test_model_creation(admin_api_client, admin_user, model_name):
 
   response = admin_api_client.get('/collab/{}/'.format(model_name),
                                   HTTP_ACCEPT="application/json")
-  assert_eq(response.data, projects_created)
+  assert_response(response, status.HTTP_200_OK, projects_created)
 
 
 def test_full_hierarchy(admin_api_client, admin_user):
@@ -88,7 +88,7 @@ def test_full_hierarchy(admin_api_client, admin_user):
                                   HTTP_ACCEPT='application/json')
 
   expected_response = [dependency.dependency, dependency.dependent]
-  assert_eq(response.data, expected_response)
+  assert_response(response, status.HTTP_200_OK, expected_response)
 
 
 @pytest.mark.django_db
@@ -100,7 +100,7 @@ def test_file_fileversion(admin_client, admin_user):
                                                    fv_obj.md5hash)
 
   response = admin_client.get(url, content_type="application/json")
-  assert_response(response, status.HTTP_200_OK, fv_obj)
+  assert_response(response, status.HTTP_404_NOT_FOUND)
 
   fv_obj.complete = True
   fv_obj.save()

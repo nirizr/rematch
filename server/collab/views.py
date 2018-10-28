@@ -5,6 +5,7 @@ from rest_framework import (viewsets, permissions, mixins, decorators,
                             response)
 
 from django.db import models
+from django.http import Http404
 
 import django_cte
 
@@ -77,6 +78,8 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
     file_version = (FileVersion.objects.filter(md5hash=md5hash, file=pk,
                                                complete=True)
                                        .order_by('-created').first())
+    if file_version is None:
+      raise Http404("No matching complete FileVersion available")
     serializer = FileVersionSerializer(instance=file_version)
     return response.Response(data=serializer.data)
 
