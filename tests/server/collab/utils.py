@@ -182,7 +182,7 @@ def assert_response(response, status, data=None):
   assert response.status_code == status
   if data is None:
     pass
-  elif isinstance(data, (list, dict)):
+  elif isinstance(data, (list, dict, models.Model)):
     if 'results' in response.data:
       assert_eq(response.data['results'], data)
     else:

@@ -54,6 +54,7 @@ class RematchPlugin(ida_idaapi.plugin_t):
                                      AddProjectDialog).register()
     actions.project.AddFileAction(dialogs.project.AddFileDialog).register()
 
+    actions.upload.UploadAction(dialogs.upload.UploadDialog).register()
     actions.match.MatchAction(dialogs.match.MatchDialog).register()
 
     actions.settings.SettingsAction(dialogs.settings.SettingsDialog).register()

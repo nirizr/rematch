@@ -47,6 +47,7 @@ class FileVersion(models.Model):
   file = models.ForeignKey(File, models.CASCADE, related_name='versions')
   md5hash = models.CharField(max_length=32,
                              validators=[MinLengthValidator(32)])
+  complete = models.BooleanField(default=False)
 
   class Meta(object):
     unique_together = (('file', 'md5hash'),)
@@ -79,6 +80,9 @@ class Instance(models.Model):
   matches = models.ManyToManyField('self', symmetrical=False, through='Match',
                                    related_name='related_to+')
 
+  class Meta(object):
+    unique_together = (('file_version', 'offset'),)
+
   def __unicode__(self):
     return "{} instance {} of {}".format(self.get_type_display(), self.offset,
                                          self.file_version.file.name)
@@ -108,6 +112,9 @@ class Vector(models.Model):
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)
   type_version = models.IntegerField()
   data = models.TextField()
+
+  class Meta(object):
+    unique_together = (('instance', 'type'),)
 
   def __unicode__(self):
     return "{} vector version {} for {}".format(self.get_type_display(),

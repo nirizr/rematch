@@ -127,8 +127,13 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     self._running = True
 
     if callable(self.ui_class):
-      self.ui = self.ui_class(action=self)
-      self.ui.show()
+      try:
+        self.ui = self.ui_class(action=self)
+        self.ui.show()
+      except Exception:
+        log('actions').exception("Exception thrown while showing dialog")
+        self._running = False
+        self.ui = None
     else:
       raise NotImplementedError("activation called on an action class with no "
                                 "ui_class defined")

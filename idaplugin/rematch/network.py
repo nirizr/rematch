@@ -157,8 +157,10 @@ class QueryWorker(QtCore.QRunnable):
 
 
 def default_exception_callback(exception, traceback):
+  # WARN: cannot log here (because we're Queued into IDA kernel)?
+  # Gotta print instead
   del exception
-  log('main').warning("callback exception: %s", traceback)
+  print("callback exception: {}".format(traceback))
 
 
 def build_params(method, params):
@@ -166,7 +168,7 @@ def build_params(method, params):
   if not params:
     return ""
 
-  if method == "POST" and isinstance(params, (list, dict)):
+  if method in ("POST", "PATCH") and isinstance(params, (list, dict)):
     return dumps(params)
   elif method == "GET" and isinstance(params, dict):
     return urllib.urlencode(params, doseq=True)
@@ -175,7 +177,7 @@ def build_params(method, params):
 
 
 def query(method, url, server=None, token=None, params=None, json=False):
-  if method not in ("GET", "POST"):
+  if method not in ("GET", "POST", "PATCH"):
     raise exceptions.QueryException()
 
   server_url = get_server(server)
@@ -193,8 +195,10 @@ def query(method, url, server=None, token=None, params=None, json=False):
 
     if method == "GET":
       req = request.Request(full_url + "?" + params, headers=headers)
-    elif method == "POST":
+    elif method in ("POST", "PATCH"):
       req = request.Request(full_url, data=params, headers=headers)
+    if method == "PATCH":
+      req.get_method = lambda: "PATCH"
 
     response = opener.open(req)
 

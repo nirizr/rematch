@@ -1,9 +1,11 @@
+from logging import getLogger
 import functools
 
-from rest_framework import (viewsets, permissions, mixins, decorators, status,
+from rest_framework import (viewsets, permissions, mixins, decorators,
                             response)
 
 from django.db import models
+from django.http import Http404
 
 import django_cte
 
@@ -68,32 +70,35 @@ class FileViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   filterset_fields = ('created', 'owner', 'project', 'name', 'description',
                       'md5hash')
 
-  @decorators.action(detail=True, methods=['GET', 'POST'],
-                     url_path="file_version/(?P<md5hash>[0-9A-Fa-f]+)")
-  def file_version(self, request, pk, md5hash):
-    del pk
-    file_obj = self.get_object()
-
-    if request.method == 'POST':
-      file_version, created = \
-        FileVersion.objects.get_or_create(md5hash=md5hash, file=file_obj)
-    else:
-      file_version = FileVersion.objects.get(md5hash=md5hash, file=file_obj)
-      created = False
-
-    serializer = FileVersionSerializer(file_version)
-
-    resp_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-    response_data = serializer.data
-    response_data['newly_created'] = created
-    return response.Response(response_data, status=resp_status)
+  @staticmethod
+  @decorators.action(detail=True,
+                     url_path="file_version/(?P<md5hash>[0-9A-Fa-f]{32})")
+  def current(request, pk, md5hash):
+    del request
+    file_version = (FileVersion.objects.filter(md5hash=md5hash, file=pk,
+                                               complete=True)
+                                       .order_by('-created').first())
+    if file_version is None:
+      raise Http404("No matching complete FileVersion available")
+    serializer = FileVersionSerializer(instance=file_version)
+    return response.Response(data=serializer.data)
 
 
 class FileVersionViewSet(viewsets.ModelViewSet):
   queryset = FileVersion.objects.all()
   serializer_class = FileVersionSerializer
   permission_classes = (permissions.IsAuthenticated,)
-  filterset_fields = ('id', 'file', 'md5hash')
+  filterset_fields = ('id', 'file', 'md5hash', 'complete')
+
+  def create(self, request, *args, **kwargs):
+    # Delete file verion if force creation was requested
+    if request.GET.get('force', False):
+      internal_val = self.get_serializer().to_internal_value(data=request.data)
+      r = self.queryset.filter(file=internal_val['file'],
+                               md5hash=internal_val['md5hash']).delete()
+      getLogger('fileversion.create').info("deletion: %s", r)
+
+    return super(FileVersionViewSet, self).create(request, *args, **kwargs)
 
 
 class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,

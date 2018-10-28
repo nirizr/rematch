@@ -1,8 +1,8 @@
 import pytest
 from rest_framework import status
 
-from utils import (rand_hash, create_model, setup_model, assert_eq,
-                   assert_response, collab_models_keys)
+from utils import (create_model, setup_model, assert_response,
+                   collab_models_keys)
 
 
 @pytest.mark.django_db
@@ -76,7 +76,7 @@ def test_model_creation(admin_api_client, admin_user, model_name):
 
   response = admin_api_client.get('/collab/{}/'.format(model_name),
                                   HTTP_ACCEPT="application/json")
-  assert_eq(response.data, projects_created)
+  assert_response(response, status.HTTP_200_OK, projects_created)
 
 
 def test_full_hierarchy(admin_api_client, admin_user):
@@ -88,21 +88,21 @@ def test_full_hierarchy(admin_api_client, admin_user):
                                   HTTP_ACCEPT='application/json')
 
   expected_response = [dependency.dependency, dependency.dependent]
-  assert_eq(response.data, expected_response)
+  assert_response(response, status.HTTP_200_OK, expected_response)
 
 
 @pytest.mark.django_db
 def test_file_fileversion(admin_client, admin_user):
-  file_obj = create_model('files', admin_user)
-  file_obj.save()
+  fv_obj = create_model('file_versions', admin_user)
+  fv_obj.save()
 
-  file_version = rand_hash(32)
-  url = '/collab/files/{}/file_version/{}/'.format(file_obj.id, file_version)
-
-  response = admin_client.post(url, content_type="application/json")
-  obj = {'newly_created': True, 'md5hash': file_version, 'file': file_obj.id}
-  assert_response(response, status.HTTP_201_CREATED, obj)
+  url = '/collab/files/{}/file_version/{}/'.format(fv_obj.file_id,
+                                                   fv_obj.md5hash)
 
   response = admin_client.get(url, content_type="application/json")
-  obj = {'newly_created': False, 'md5hash': file_version, 'file': file_obj.id}
-  assert_response(response, status.HTTP_200_OK, obj)
+  assert_response(response, status.HTTP_404_NOT_FOUND)
+
+  fv_obj.complete = True
+  fv_obj.save()
+  response = admin_client.get(url, content_type="application/json")
+  assert_response(response, status.HTTP_200_OK, fv_obj)

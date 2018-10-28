@@ -51,3 +51,7 @@ class DependencyAnnotation(Annotation):
     cls.dependencies.add({'dependent': str(dependent.uuid),
                           'dependency': str(dependency_uuid)})
     return dependency_uuid
+
+  @classmethod
+  def get_dependencies(cls):
+    return cls.dependencies
