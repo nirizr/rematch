@@ -15,7 +15,7 @@ from . import filterscript
 from . import serializedgraph
 
 
-class MatchResultDialog(gui.DockableDialog):
+class ResultDialog(gui.DockableDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
@@ -26,10 +26,9 @@ class MatchResultDialog(gui.DockableDialog):
   LOCAL_ELEMENT_TOOLTIP = "Local function"
   REMOTE_ELEMENT_TOOLTIP = "Remote function"
 
-  def __init__(self, task_id, *args, **kwargs):
-    super(MatchResultDialog, self).__init__(*args, **kwargs)
+  def __init__(self, *args, **kwargs):
+    super(ResultDialog, self).__init__(*args, **kwargs)
 
-    self.task_id = task_id
     self.locals = {}
     self.remotes = {}
     self.matches = []
@@ -86,9 +85,15 @@ class MatchResultDialog(gui.DockableDialog):
     self.tree.setSortingEnabled(True)
     self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
 
+    # prgoress bar
+    self.progress = QtWidgets.QProgressBar
+    self.statusLbl = QtWidgets.QLabel()
+
     # base layout
     self.base_layout.addWidget(self.tree)
     self.base_layout.addWidget(self.search_box)
+    self.base_layout.addWidget(self.statusLbl)
+    self.base_layout.addWidget(self.progress)
     self.base_layout.addLayout(self.hlayoutButtons)
 
     # connect events to handle
@@ -120,11 +125,11 @@ class MatchResultDialog(gui.DockableDialog):
     self.populate_tree()
     self.set_checks()
     self.graph_dialog.Show()
-    super(MatchResultDialog, self).show(*args, **kwargs)
+    super(ResultDialog, self).show(*args, **kwargs)
 
   def reset_focus(self):
     # calling graph_dialog.show gave it focus. taking it back now
-    super(MatchResultDialog, self).show()
+    super(ResultDialog, self).show()
     self.tree.setFocus()
 
   def get_obj(self, obj_id):
