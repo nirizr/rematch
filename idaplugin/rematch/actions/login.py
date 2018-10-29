@@ -34,8 +34,7 @@ class LoginAction(base.UnauthAction):
   def handle_login(self, response):
     del response
 
-    self.ui.statusLbl.setText("Connected!")
-    self.ui.statusLbl.setStyleSheet("color: green;")
+    self.ui.set_status("Connected!", color="green")
 
     config['login']['username'] = self.username
     config['login']['server'] = self.server
@@ -52,12 +51,10 @@ class LoginAction(base.UnauthAction):
 
     if isinstance(exception, (exceptions.ConnectionException,
                               exceptions.ServerException)):
-      self.ui.statusLbl.setText("Connection to server failed.")
-      self.ui.statusLbl.setStyleSheet("color: blue;")
+      self.ui.set_status("Connection to server failed.", color="blue")
     elif isinstance(exception, (exceptions.QueryException,
                                 exceptions.AuthenticationException)):
-      self.ui.statusLbl.setText("Invalid user name or password.")
-      self.ui.statusLbl.setStyleSheet("color: red;")
+      self.ui.set_status("Invalid user name or password.", color="red")
 
 
 class LogoutAction(base.AuthAction):

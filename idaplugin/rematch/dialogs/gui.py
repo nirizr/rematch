@@ -41,9 +41,18 @@ class WidgetsDialog(BaseDialog):
       exception_string = exception.message
     else:
       exception_string = str(exception)
-    self.statusLbl.setText("Error(s) occured:\n{}".format(exception_string))
-    self.statusLbl.setToolTip(traceback)
-    self.statusLbl.setStyleSheet("color: red;")
+    self.set_status("Error(s) occured:\n{}".format(exception_string),
+                    tooltip=traceback, color="red")
+
+  def set_status(self, text, tooltip="", color="black"):
+    if not self.statusLbl:
+      log('dialog.gui').warning("set_status called without a statusLbl "
+                                "defined")
+      return
+
+    self.statusLbl.setText(text)
+    self.statusLbl.setToolTip(tooltip)
+    self.statusLbl.setStyleSheet("color: {};".format(color))
 
 
 class GuiDialog(WidgetsDialog, QtWidgets.QDialog):

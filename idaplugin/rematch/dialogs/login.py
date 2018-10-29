@@ -46,6 +46,5 @@ class LoginDialog(gui.GuiDialog):
             'remember': self.remember_pwd.isChecked()}
 
   def submit_base(self):
-    self.statusLbl.setText("Connecting...")
-    self.statusLbl.setStyleSheet("color: black;")
+    self.set_status("Connecting...")
     super(LoginDialog, self).submit_base()

@@ -62,9 +62,7 @@ class UploadAction(base.BoundFileAction):
   def submit_handler(self, force_update, upload_annotations):
     self.upload_annotations = upload_annotations
 
-    self.ui.statusLbl.setText("Uploading...")
-    self.ui.statusLbl.setToolTip("")
-    self.ui.statusLbl.setStyleSheet("color: black;")
+    self.ui.set_status("Uploading...")
 
     endpoint = "collab/file_versions/"
     if force_update:
