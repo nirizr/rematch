@@ -1,8 +1,7 @@
 from logging import getLogger
 import functools
 
-from rest_framework import (viewsets, permissions, mixins, decorators,
-                            response)
+from rest_framework import (viewsets, permissions, decorators, response)
 
 from django.db import models
 from django.http import Http404
@@ -19,7 +18,6 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 MatcherSerializer, StrategySerializer,
                                 DependencySerializer)
 from collab.permissions import IsOwnerOrReadOnly
-from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
 
@@ -42,18 +40,20 @@ class ViewSetManyAllowedMixin(object):
     return super(ViewSetManyAllowedMixin, self).get_serializer(*args, **kwargs)
 
 
-def paginatable(serializer):
+def paginatable(serializer_cls):
   def decorator(f):
     @functools.wraps(f)
-    def wraps(self, *args, **kwargs):
-      queryset = f(self, *args, **kwargs)
-      page = self.paginate_queryset(queryset)
-      if page is not None:
-        serialized = serializer(page, many=True)
-        return self.get_paginated_response(serialized.data)
+    def wraps(self, request, *args, **kwargs):
+      queryset = f(self, request=request, *args, **kwargs)
+      paged = self.paginate_queryset(queryset)
+      if paged is not None:
+        serializer = serializer_cls(paged, many=True,
+                                    context={'request': request})
+        return self.get_paginated_response(serializer.data)
       else:
-        serialized = serializer(queryset, many=True)
-        return response.Response(serialized.data)
+        serializer = serializer_cls(queryset, many=True,
+                                    context={'request': request})
+        return response.Response(serializer.data)
     return wraps
   return decorator
 
@@ -101,18 +101,12 @@ class FileVersionViewSet(viewsets.ModelViewSet):
     return super(FileVersionViewSet, self).create(request, *args, **kwargs)
 
 
-class TaskViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
-                  mixins.DestroyModelMixin, mixins.ListModelMixin,
-                  viewsets.GenericViewSet):
+class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Task.objects.all()
-  permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
   filterset_fields = ('task_id', 'created', 'finished', 'owner', 'status')
 
-  def perform_create(self, serializer):
-    task = serializer.save(owner=self.request.user)
-    tasks.match.delay(task_id=task.id)
-
   def get_serializer_class(self):
+    # Limit editable fields if performing an update
     serializer_class = TaskSerializer
     if self.request.method in ('PATCH', 'PUT'):
       serializer_class = TaskEditSerializer
