@@ -31,19 +31,19 @@ class QueryWorker(QtCore.QRunnable):
   SPLIT = 900
 
   def __init__(self, method, url, server=None, token=None, params=None,
-               json=False, pageable=False, splittable=None):
+               json=False, paginated=False, splittable=None):
     super(QueryWorker, self).__init__()
 
-    if pageable and splittable:
+    if paginated and splittable:
       raise ValueError("QueryWorker can only be one of splittable and"
-                       "pageable, not both.")
+                       "paginated, not both.")
 
-    if (pageable or splittable) and not isinstance(params, dict):
-      raise ValueError("QueryWorker can only be pageable or splittable when"
+    if (paginated or splittable) and not isinstance(params, dict):
+      raise ValueError("QueryWorker can only be paginated or splittable when"
                        "params is a dictionary.")
 
-    if pageable and not json:
-      raise Exception("pageable=True must accompany json=True")
+    if paginated and not json:
+      raise Exception("paginated=True must accompany json=True")
 
     self.method = method
     self.url = url
@@ -51,7 +51,7 @@ class QueryWorker(QtCore.QRunnable):
     self.token = token
     self.params = params
     self.json = json
-    self.pageable = pageable
+    self.paginated = paginated
     self.splittable = splittable
     if self.splittable:
       self.splittable_values = self.params[self.splittable]
@@ -105,10 +105,6 @@ class QueryWorker(QtCore.QRunnable):
 
   def run_query(self):
     while self.running:
-      # TODO: Make pageable and/or splittable parallelable. meaning split pages
-      # to multiple queries to split to multiple concurrently executing queries
-      # if we're running a splittable query, only send SPLIT parameters for the
-      # splittable variable
       if self.splittable:
         self.params[self.splittable] = self.splittable_values[:self.SPLIT]
         self.splittable_values = self.splittable_values[self.SPLIT:]
@@ -118,11 +114,11 @@ class QueryWorker(QtCore.QRunnable):
 
       yield response
 
-      # if request is pageabled and was successful, automatically request
+      # if request is paginated and was successful, automatically request
       # next page if specified. otherwise, break out of the loop
-      if self.pageable:
+      if self.paginated:
         if not isinstance(response, dict):
-          raise ValueError("pageabled response object is not a json dict")
+          raise ValueError("paginated response object is not a json dict")
 
         if 'next' in response and response['next']:
           url_obj = urlparse(response['next'])
