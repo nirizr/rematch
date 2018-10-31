@@ -160,6 +160,7 @@ class Task(models.Model):
 
 
 class Match(models.Model):
+  created = models.DateTimeField(auto_now_add=True)
   from_instance = models.ForeignKey(Instance, models.CASCADE,
                                     related_name='from_matches')
   to_instance = models.ForeignKey(Instance, models.CASCADE,

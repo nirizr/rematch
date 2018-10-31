@@ -86,6 +86,10 @@ def match_by_step(task_id, step):
 def gen_match_objs(task_id, step, source_vectors, target_vectors):
   matches = step.gen_matches(source_vectors, target_vectors)
   for source_instance, target_instance, score in matches:
+    if not np.isfinite(score):
+      print("Infinite score detected: {} in step {} between {} and {}"
+            "".format(score, step, source_instance, target_instance))
+      continue
     if score < 50:
       continue
     mat = Match(task_id=task_id, from_instance_id=source_instance,

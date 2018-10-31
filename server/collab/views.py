@@ -1,7 +1,8 @@
 from logging import getLogger
 import functools
 
-from rest_framework import (viewsets, permissions, decorators, response)
+from rest_framework import (viewsets, permissions, decorators, response,
+                            pagination)
 
 from django.db import models
 from django.http import Http404
@@ -39,6 +40,11 @@ class ViewSetManyAllowedMixin(object):
         kwargs["many"] = True
 
     return super(ViewSetManyAllowedMixin, self).get_serializer(*args, **kwargs)
+
+
+class DefaultPagination(pagination.CursorPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
 
 
 def paginatable(serializer_cls):
@@ -141,22 +147,12 @@ class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
     # by match records of local instances
     return Instance.objects.filter(to_matches__task=task).distinct()
 
-  @decorators.action(detail=True, url_path="matches")
-  @paginatable(MatchSerializer)
-  def matches(self, request, pk):
-    del request
-    del pk
-
-    task = self.get_object()
-
-    return Match.objects.filter(task=task)
-
-
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()
   serializer_class = MatchSerializer
   permission_classes = (permissions.IsAuthenticated,)
   filterset_fields = ('task', 'type', 'score')
+  pagination_class = DefaultPagination
 
   @staticmethod
   @decorators.action(detail=False)

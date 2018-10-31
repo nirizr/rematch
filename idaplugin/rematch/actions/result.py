@@ -54,7 +54,7 @@ class ResultAction(base.BoundFileAction):
     q.start(self.handle_remotes)
     self.delayed_queries.append(q)
 
-    matches_url = "collab/tasks/{}/matches/".format(self.task_id)
+    matches_url = "collab/matches/?task={}".format(self.task_id)
     q = network.QueryWorker("GET", matches_url, json=True, pageable=True,
                             params={'limit': 200})
     q.start(self.handle_matches)
