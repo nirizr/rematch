@@ -87,7 +87,7 @@ class CountInstanceSerializer(SlimInstanceSerializer):
 
   @staticmethod
   def get_annotation_count(instance):
-    return Annotation.objects.filter(instance=instance).count()
+    return instance.annotations.count()
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
