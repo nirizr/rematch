@@ -15,9 +15,9 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
-                                SlimInstanceSerializer, CountInstanceSerializer,
-                                AnnotationSerializer, MatcherSerializer,
-                                StrategySerializer, DependencySerializer)
+                                SlimInstanceSerializer, AnnotationSerializer,
+                                MatcherSerializer, StrategySerializer,
+                                DependencySerializer, CountInstanceSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
@@ -146,6 +146,7 @@ class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
     # include remote matches (are a 'to_instance' match), those are referenced
     # by match records of local instances
     return Instance.objects.filter(to_matches__task=task).distinct()
+
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()

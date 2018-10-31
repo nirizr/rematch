@@ -1,9 +1,9 @@
 from ..idasix import QtCore, QtWidgets
 
 from ..dialogs.match import MatchDialog
-from ..dialogs.matchresult import MatchResultDialog
 
 from .upload import UploadAction
+from .result import ResultAction
 
 from .. import network, netnode, log
 from . import base

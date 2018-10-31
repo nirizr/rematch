@@ -3,6 +3,8 @@ from ..idasix import QtWidgets
 from ida_kernwin import PluginForm
 from .base import BaseDialog
 
+from .. import log
+
 
 class WidgetsDialog(BaseDialog):
   def __init__(self, **kwargs):

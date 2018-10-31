@@ -1,11 +1,14 @@
-from django.utils.timezone import now
-from django.db.models import F
+from itertools import islice, chain
+
 from collab.models import Task, Vector, Match
 from collab import strategies
 
 from celery import shared_task
 
-from itertools import islice, chain
+from django.utils.timezone import now
+from django.db.models import F
+
+import numpy as np
 
 
 @shared_task

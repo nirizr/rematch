@@ -86,8 +86,8 @@ class CountInstanceSerializer(SlimInstanceSerializer):
     fields = SlimInstanceSerializer.Meta.fields + ('annotation_count',)
 
   @staticmethod
-  def get_annotation_count(match):
-    return Annotation.objects.filter(instance=match.to_instance).count()
+  def get_annotation_count(instance):
+    return Annotation.objects.filter(instance=instance).count()
 
 
 class AnnotationSerializer(serializers.ModelSerializer):

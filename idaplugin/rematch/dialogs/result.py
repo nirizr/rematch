@@ -118,14 +118,14 @@ class ResultDialog(gui.DockableDialog):
 
     self.matches = []
 
-  def show(self, *args, **kwargs):
+  def show(self):
     # TODO: perform the following while data comes in instead of after it
     # arrived. Also, schedule execution using a timer to not hang
     self.finalize_matches()
     self.populate_tree()
     self.set_checks()
     self.graph_dialog.Show()
-    super(ResultDialog, self).show(*args, **kwargs)
+    super(ResultDialog, self).show()
 
   def reset_focus(self):
     # calling graph_dialog.show gave it focus. taking it back now
@@ -366,7 +366,7 @@ class ResultDialog(gui.DockableDialog):
       tree_item.setText(self.MATCH_SCORE_COLUMN,
                           str(round(match_obj['score'], 2)))
       tree_item.setText(self.ANNOTATION_COUNT_COLUMN,
-                          str(tem_obj['annotation_count']))
+                          str(item_obj['annotation_count']))
       tree_item.setText(self.MATCH_KEY_COLUMN,
                           str(match_obj['type']))
       tree_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)

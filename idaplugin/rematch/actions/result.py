@@ -1,11 +1,9 @@
-from ..idasix import QtCore, QtWidgets
+from ..idasix import QtCore
 
 from ..dialogs.result import ResultDialog
 
-from .. import network, netnode, log
+from .. import network, log
 from . import base
-
-import json
 
 
 class ResultAction(base.BoundFileAction):
