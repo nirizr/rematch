@@ -40,12 +40,12 @@ class ResultAction(base.BoundFileAction):
     self.seen = set()
 
     log('match_action').info("Result download started")
-    locals_url = "collab/tasks/{}/locals/".format(self.task_id)
+    locals_url = "collab/instances/?from_matches__task={}".format(self.task_id)
     q = network.QueryWorker("GET", locals_url, json=True, paginated=True)
     q.start(self.handle_locals)
     self.delayed_queries.append(q)
 
-    remotes_url = "collab/tasks/{}/remotes/".format(self.task_id)
+    remotes_url = "collab/instances/?to_matches__task={}".format(self.task_id)
     q = network.QueryWorker("GET", remotes_url, json=True, paginated=True)
     q.start(self.handle_remotes)
     self.delayed_queries.append(q)

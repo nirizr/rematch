@@ -1,19 +1,6 @@
 import pytest
-from rest_framework import status
 
-from utils import create_model, assert_response
-
-
-@pytest.mark.parametrize('limit', [None, 10])
-@pytest.mark.parametrize('resource', ['locals', 'remotes'])
-def test_task_resource_empty(resource, limit, admin_client, admin_user):
-  task = create_model('tasks', admin_user)
-  task.save()
-
-  data = {'limit': limit} if limit else {}
-  response = admin_client.get('/collab/tasks/{}/{}/'.format(task.id, resource),
-                              data=data, content_type="application/json")
-  assert_response(response, status.HTTP_200_OK, [])
+from utils import create_model
 
 
 @pytest.mark.parametrize('params', [{},

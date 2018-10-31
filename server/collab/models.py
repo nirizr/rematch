@@ -69,6 +69,7 @@ class Instance(models.Model):
                   (TYPE_FUNCTION, "Function"),
                   (TYPE_UNIVERSAL, "Universal"))
 
+  created = models.DateTimeField(auto_now_add=True)
   owner = models.ForeignKey(User, models.CASCADE, db_index=True)
   file_version = models.ForeignKey(FileVersion, models.CASCADE,
                                    related_name='instances')
