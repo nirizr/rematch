@@ -366,7 +366,7 @@ class ResultDialog(gui.DockableDialog):
       tree_item.setText(self.MATCH_SCORE_COLUMN,
                           str(round(match_obj['score'], 2)))
       tree_item.setText(self.ANNOTATION_COUNT_COLUMN,
-                          str(match_obj['annotation_count']))
+                          str(tem_obj['annotation_count']))
       tree_item.setText(self.MATCH_KEY_COLUMN,
                           str(match_obj['type']))
       tree_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)

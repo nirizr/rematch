@@ -79,6 +79,17 @@ class SlimInstanceSerializer(serializers.ModelSerializer):
       return "sub_{:X}".format(instance.offset)
 
 
+class CountInstanceSerializer(SlimInstanceSerializer):
+  annotation_count = serializers.SerializerMethodField()
+
+  class Meta(SlimInstanceSerializer.Meta):
+    fields = SlimInstanceSerializer.Meta.fields + ('annotation_count',)
+
+  @staticmethod
+  def get_annotation_count(match):
+    return Annotation.objects.filter(instance=match.to_instance).count()
+
+
 class AnnotationSerializer(serializers.ModelSerializer):
   uuid = serializers.ReadOnlyField()
 
@@ -134,16 +145,9 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
-  annotation_count = serializers.SerializerMethodField()
-
   class Meta(object):
     model = Match
-    fields = ('from_instance', 'to_instance', 'task', 'type', 'score',
-              'annotation_count')
-
-  @staticmethod
-  def get_annotation_count(match):
-    return Annotation.objects.filter(instance=match.to_instance).count()
+    fields = ('from_instance', 'to_instance', 'task', 'type', 'score')
 
 
 class MatcherSerializer(serializers.Serializer):

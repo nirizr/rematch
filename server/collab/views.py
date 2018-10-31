@@ -15,9 +15,9 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 FileVersionSerializer, TaskSerializer,
                                 TaskEditSerializer, InstanceVectorSerializer,
                                 VectorSerializer, MatchSerializer,
-                                SlimInstanceSerializer, AnnotationSerializer,
-                                MatcherSerializer, StrategySerializer,
-                                DependencySerializer)
+                                SlimInstanceSerializer, CountInstanceSerializer,
+                                AnnotationSerializer, MatcherSerializer,
+                                StrategySerializer, DependencySerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
@@ -136,7 +136,7 @@ class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
     return Instance.objects.filter(from_matches__task=task).distinct()
 
   @decorators.action(detail=True, url_path="remotes")
-  @paginatable(SlimInstanceSerializer)
+  @paginatable(CountInstanceSerializer)
   def remotes(self, request, pk):
     del request
     del pk
