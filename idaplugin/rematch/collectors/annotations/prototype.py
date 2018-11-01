@@ -12,11 +12,11 @@ class PrototypeAnnotation(annotation.Annotation):
     t = ida_typeinf.idc_get_type(self.offset)
     # if failed getting type, there's no annotation here
     if t is None:
-      return False
+      return None
 
     # if type equals guessed type, no need to save annotation
     if t == ida_typeinf.idc_guess_type(self.offset):
-      return False
+      return None
 
     return {'prototype': t}
 
