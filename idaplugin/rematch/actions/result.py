@@ -45,7 +45,8 @@ class ResultAction(base.BoundFileAction):
     q.start(self.handle_locals)
     self.delayed_queries.append(q)
 
-    remotes_url = "collab/instances/?to_matches__task={}".format(self.task_id)
+    remotes_url = ("collab/instances/?to_matches__task={}"
+                   "&annotation_count=true".format(self.task_id))
     q = network.QueryWorker("GET", remotes_url, json=True, paginated=True)
     q.start(self.handle_remotes)
     self.delayed_queries.append(q)

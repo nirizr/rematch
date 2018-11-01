@@ -153,10 +153,18 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
-  serializer_class = SlimInstanceSerializer
   filterset_fields = ('owner', 'file_version', 'type', 'from_matches__task',
                       'to_matches__task')
   pagination_class = DefaultPagination
+
+  def get_serializer_class(self):
+    # use full instance serializer when receiving data
+    if self.request.GET.get('annotation_count', False):
+      return CountInstanceSerializer
+    elif (self.request.method in ('PATCH', 'PUT', 'POST') or
+          self.request.GET.get('full', True)):
+      return InstanceVectorSerializer
+    return SlimInstanceSerializer
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
