@@ -2,7 +2,7 @@ from logging import getLogger
 import functools
 
 from rest_framework import (viewsets, permissions, decorators, response,
-                            pagination)
+                            pagination, status)
 
 from django.db import models
 from django.http import Http404
@@ -165,6 +165,16 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
           self.request.GET.get('full', True)):
       return InstanceVectorSerializer
     return SlimInstanceSerializer
+
+  def create(self, request, *args, **kwargs):
+    # Create as we're supposed to, but avoid triggering a serializer.data
+    # access, as those require pulling a lot of data from the db as well as
+    # serializing and sending a lot of data
+    del args, kwargs
+    serializer = self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    self.perform_create(serializer)
+    return response.Response({}, status=status.HTTP_201_CREATED)
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
