@@ -100,3 +100,4 @@ Thumbs.db
 # server private key file
 server/rematch/.rematch_secret.key
 server/postgres-data/
+release/dist/
