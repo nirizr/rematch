@@ -16,7 +16,7 @@ def test_plugin_creation(idapro_plugin_entry, idapro_app):
 
 
 def test_action_creation(idapro_action_entry, idapro_app):
-  action = idapro_action_entry(None)
+  action = idapro_action_entry()
 
   if hasattr(idapro_action_entry, 'name'):
     action.register()

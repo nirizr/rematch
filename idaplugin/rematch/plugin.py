@@ -4,7 +4,6 @@ import ida_idaapi
 
 from . import config, user
 from . import actions
-from . import dialogs
 from . import update
 
 
@@ -47,17 +46,16 @@ class RematchPlugin(ida_idaapi.plugin_t):
     self.menu = QtWidgets.QMenu("Rematch")
     self.get_mainwindow().menuWidget().addMenu(self.menu)
 
-    actions.login.LoginAction(dialogs.login.LoginDialog).register()
-    actions.login.LogoutAction(None).register()
+    actions.login.LoginAction().register()
+    actions.login.LogoutAction().register()
 
-    actions.project.AddProjectAction(dialogs.project.
-                                     AddProjectDialog).register()
-    actions.project.AddFileAction(dialogs.project.AddFileDialog).register()
+    actions.project.AddProjectAction().register()
+    actions.project.AddFileAction().register()
 
-    actions.upload.UploadAction(dialogs.upload.UploadDialog).register()
-    actions.match.MatchAction(dialogs.match.MatchDialog).register()
+    actions.upload.UploadAction().register()
+    actions.match.MatchAction().register()
 
-    actions.settings.SettingsAction(dialogs.settings.SettingsDialog).register()
+    actions.settings.SettingsAction().register()
 
     # set up status bar
     self.statusbar_label = QtWidgets.QLabel("Rematch loaded")
