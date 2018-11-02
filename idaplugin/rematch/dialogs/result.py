@@ -86,7 +86,7 @@ class ResultDialog(gui.DockableDialog):
     self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
 
     # prgoress bar
-    self.progress = QtWidgets.QProgressBar
+    self.progress = QtWidgets.QProgressBar()
     self.statusLbl = QtWidgets.QLabel()
 
     # base layout
