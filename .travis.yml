@@ -25,9 +25,9 @@ matrix:
       services:
         - docker
     - python: "2.7"
-      env: PROJECT=setup.py
+      env: PROJECT=release
     - python: "3.6"
-      env: PROJECT=setup.py
+      env: PROJECT=release
     - python: "3.6"
       env: PROJECT=docs
     - python: "2.7"
@@ -98,8 +98,8 @@ script:
         py.test -rapP ./${PROJECT} ./tests/${PROJECT} --verbose --cov-report= --cov=${PROJECT} ;
       fi ;
     fi ;
-  - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py server install ; fi ;
-  - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
+  - if [ "${PROJECT}" == "release" ]; then python ./release server install ; fi ;
+  - if [ "${PROJECT}" == "release" ]; then python ./release idaplugin install ; fi ;
   - if [ "${PROJECT}" == "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
 
 after_script:
