@@ -31,8 +31,7 @@ def build_setup(package_base, package_name, version_path,
     package_data = {}
 
   # generate install_requires based on requirements.txt
-  base_path = os.path.abspath(os.path.dirname(__file__))
-  requirements_path = os.path.join(base_path, package_base, "requirements.txt")
+  requirements_path = os.path.join(package_base, "requirements.txt")
   if os.path.exists(requirements_path):
     install_requires = get_requirements(requirements_path)
     # include requirementst.txt as part of package
@@ -42,14 +41,14 @@ def build_setup(package_base, package_name, version_path,
   else:
     install_requires = []
 
-  test_requirements_path = os.path.join(base_path, "tests", package_base,
+  test_requirements_path = os.path.join("tests", package_base,
                                         "requirements.txt")
   extras_require = {}
   if os.path.exists(test_requirements_path):
     extras_require['test'] = get_requirements(test_requirements_path)
 
-  version_path = os.path.join(base_path, package_base, version_path)
-  readme_path = os.path.join(base_path, "README.rst")
+  version_path = os.path.join(package_base, version_path)
+  readme_path = "README.rst"
   setup(
     script_args=script_args,
     name=package_name,
@@ -90,6 +89,7 @@ def build_setup_idaplugin(script_args=None):
 
 
 if __name__ == '__main__':
+  print(os.getcwd())
   expected_packages = {'server', 'idaplugin'}
   packages = set(os.listdir('.')) & expected_packages
 
