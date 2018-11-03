@@ -34,13 +34,15 @@ class QueryWorker(QtCore.QRunnable):
                json=False, paginated=False, splittable=None):
     super(QueryWorker, self).__init__()
 
+    # TODO: conside making paginated infered from response
+    # TODO: consider removing the single use of splittable
     if paginated and splittable:
       raise ValueError("QueryWorker can only be one of splittable and"
                        "paginated, not both.")
 
-    if (paginated or splittable) and not isinstance(params, dict):
-      raise ValueError("QueryWorker can only be paginated or splittable when"
-                       "params is a dictionary.")
+    if splittable and not isinstance(params, dict):
+      raise ValueError("QueryWorker can only be splittable when params is a "
+                       "dictionary.")
 
     if paginated and not json:
       raise Exception("paginated=True must accompany json=True")

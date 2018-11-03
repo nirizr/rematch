@@ -235,6 +235,7 @@ class ResultDialog(gui.DockableDialog):
 
     self.apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0, item_count)
 
+    # TODO: optimize this query
     q = network.QueryWorker("GET", "collab/annotations/full_hierarchy",
                             params={"instance": self.matched_map.keys()},
                             json=True, splittable="instance")
