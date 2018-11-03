@@ -2,7 +2,7 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 RUN DEBIAN_FRONTEND=noninteractive apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
-          netcat-openbsd nginx
+          netcat-openbsd nginx postgresql-client
 RUN DEBIAN_FRONTEND=noninteractive apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
 
