@@ -3,9 +3,12 @@ import idaapi
 from . import base
 from .. import config, netnode
 
+from ..dialogs.settings import SettingsDialog
+
 
 class SettingsAction(base.IDAAction):
   name = "&Settings"
+  dialog = SettingsDialog
 
   @staticmethod
   def submit_handler(autocheck, autoupdate, autologin, autologout, debug,

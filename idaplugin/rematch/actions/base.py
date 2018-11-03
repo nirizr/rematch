@@ -21,7 +21,7 @@ class Action(object):
     self._running = False
 
   def __repr__(self):
-    return "<Action: {}>".format(self.dialog)
+    return "<{}: {}>".format(self.__class__.__name__, self.dialog)
 
   def running(self):
     return self._running
@@ -34,9 +34,6 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
   def __init__(self, *args, **kwargs):
     super(IDAAction, self).__init__(*args, **kwargs)
     self._icon = None
-
-  def __repr__(self):
-    return "<{}: {}>".format(self.__class__.__name__, self.dialog)
 
   def __del__(self):
     try:
@@ -137,7 +134,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
         self._running = False
         self.ui = None
     else:
-      raise NotImplementedError("activation called on an action class with no "
+      raise NotImplementedError("Activation called on an action class with no "
                                 "dialog defined")
 
   def finish_handler(self, status):
