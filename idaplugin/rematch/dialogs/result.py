@@ -27,7 +27,7 @@ class ResultDialog(gui.DockableDialog):
   REMOTE_ELEMENT_TOOLTIP = "Remote function"
 
   def __init__(self, *args, **kwargs):
-    super(ResultDialog, self).__init__(*args, **kwargs)
+    super(ResultDialog, self).__init__(title="Match results", *args, **kwargs)
 
     self.locals = {}
     self.remotes = {}

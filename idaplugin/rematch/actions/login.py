@@ -62,6 +62,6 @@ class LogoutAction(base.AuthAction):
   group = "User"
 
   @staticmethod
-  def activate(ctx):
+  def activate(ctx=None):
     del ctx
     user.logout()

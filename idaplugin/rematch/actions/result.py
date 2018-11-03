@@ -16,10 +16,14 @@ class ResultAction(base.BoundFileAction):
     self.results = None
     self.task_id = task_id
     self.file_version_id = None
+    self.seen = set()
 
     self.delayed_queries = []
 
     self.timer = QtCore.QTimer()
+
+  def activate(self, ctx=None):
+    super(ResultAction, self).activate(ctx)
 
     # if we got a task id, lets start pulling results. Otherwise, we'll wait
     # for submit_handler to be called from ResultDialog
@@ -34,12 +38,9 @@ class ResultAction(base.BoundFileAction):
   def start_results(self):
     self.ui.set_status("Receiving match results...")
     self.ui.progress.setRange(0, 3)  # 3 end points (locals, remotes, matches)
-    self.pbar.setValue(0)
-    self.pbar.accepted.connect(self.accept_results)
+    self.ui.progress.setValue(0)
 
-    self.seen = set()
-
-    log('match_action').info("Result download started")
+    log('result').info("Result download started")
     locals_url = "collab/instances/?from_matches__task={}".format(self.task_id)
     q = network.QueryWorker("GET", locals_url, json=True, paginated=True)
     q.start(self.handle_locals)
@@ -82,16 +83,18 @@ class ResultAction(base.BoundFileAction):
   def handle_page(self, response, page_type):
     if page_type not in self.seen:
       self.seen.add(page_type)
-      self.pbar.setMaximum(self.pbar.maximum() + response['count'])
-      self.pbar.setValue(self.pbar.value() + 1)
+      self.ui.progress.setMaximum(self.ui.progress.maximum() +
+                                  response['count'])
+      self.ui.progress.setValue(self.ui.progress.value() + 1)
 
-    self.pbar.setValue(self.pbar.value() + len(response['results']))
-    log('match_action').info("result download progress: {} / {} with {}"
-                             "".format(self.pbar.value(), self.pbar.maximum(),
-                                       self.seen))
-    if self.pbar.value() >= self.pbar.maximum():
-      self.pbar.accept()
+    self.ui.progress.setValue(self.ui.progress.value() +
+                              len(response['results']))
+    log('result').info("result download progress: {} / {} with {}"
+                       "".format(self.ui.progress.value(),
+                                 self.ui.progress.maximum(), self.seen))
+    if self.ui.progress.value() >= self.ui.progress.maximum():
+      self.download_complete()
 
-  def accept_results(self):
-    # log('match_action').info("Result download completed successfully")
-    pass
+  def download_complete(self):
+    log('result').info("Result download completed successfully")
+    self.ui.set_status("Result download complete")
