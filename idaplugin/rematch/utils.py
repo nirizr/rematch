@@ -72,3 +72,11 @@ def force_update():
   IDA's awareness"""
   iwid_all = 0xFFFFFFFF
   ida_kernwin.request_refresh(iwid_all)
+
+
+def safe_disconnect(signal):
+  while True:
+    try:
+      signal.disconnect()
+    except TypeError:
+      break

@@ -5,7 +5,7 @@ from ..dialogs.match import MatchDialog
 from .upload import UploadAction
 from .result import ResultAction
 
-from .. import network, netnode, log
+from .. import network, netnode, log, utils
 from . import base
 
 import json
@@ -40,16 +40,12 @@ class MatchAction(base.BoundFileAction):
     self.timer = QtCore.QTimer()
 
   def clean(self):
-    self.timer.stop()
-    try:
-      self.timer.timeout.disconnect()
-    except TypeError:
-      pass
+    utils.safe_disconnect(self.timer.timeout)
+    utils.safe_disconnect(self.pbar.accepted)
+    utils.safe_disconnect(self.pbar.canceled)
+    utils.safe_disconnect(self.pbar.rejected)
 
-    try:
-      self.pbar.accepted.disconnect()
-    except TypeError:
-      pass
+    self.timer.stop()
     self.pbar.close()
     self.pbar = None
 
