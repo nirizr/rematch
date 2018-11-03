@@ -18,6 +18,7 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 MatcherSerializer, StrategySerializer,
                                 DependencySerializer)
 from collab.permissions import IsOwnerOrReadOnly
+from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
 
@@ -104,6 +105,10 @@ class FileVersionViewSet(viewsets.ModelViewSet):
 class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
   queryset = Task.objects.all()
   filterset_fields = ('task_id', 'created', 'finished', 'owner', 'status')
+
+  def perform_create(self, serializer):
+    task = serializer.save(owner=self.request.user)
+    tasks.match.delay(task_id=task.id)
 
   def get_serializer_class(self):
     # Limit editable fields if performing an update
