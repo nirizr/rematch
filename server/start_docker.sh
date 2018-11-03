@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Waiting for database to start..."
-while ! nc -z $POSTGRES_HOST $POSTGRES_PORT ; do sleep 2; done
+while ! pg_isready --host $POSTGRES_HOST --port $POSTGRES_PORT --timeout 10 ; do sleep 2; done
 
 echo "Migrating"
 python manage.py makemigrations collab
@@ -12,11 +12,12 @@ python manage.py collectstatic --settings rematch.settings.docker --noinput
 python -c "import django; django.setup();
 from django.contrib.auth import get_user_model;
 user_model = get_user_model()
-if user_model.objects.filter(username='${REMATCH_SU_NAME}').count():
-    user_model.objects.filter(username='${REMATCH_SU_NAME}').update(
-        email='${REMATCH_SU_EMAIL}',
-        password='${REMATCH_SU_PASSWORD}')
-else:
+try:
+    user = user_model.objects.get(username='${REMATCH_SU_NAME}')
+    user.email = '${REMATCH_SU_EMAIL}'
+    user.set_password('${REMATCH_SU_PASSWORD}')
+    user.save()
+except user_model.DoesNotExist:
     user_model.objects.create_superuser(
         username='${REMATCH_SU_NAME}',
         email='${REMATCH_SU_EMAIL}',
