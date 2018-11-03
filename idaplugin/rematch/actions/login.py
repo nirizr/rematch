@@ -3,10 +3,13 @@ from .. import user
 from .. import config
 from .. import exceptions
 
+from ..dialogs.login import LoginDialog
+
 
 class LoginAction(base.UnauthAction):
   name = "&Login"
   group = "User"
+  dialog = LoginDialog
 
   def __init__(self, *args, **kwargs):
     super(LoginAction, self).__init__(*args, **kwargs)
