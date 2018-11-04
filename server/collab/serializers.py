@@ -80,21 +80,32 @@ class SlimInstanceSerializer(serializers.ModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
+  uuid = serializers.ReadOnlyField()
+
   class Meta(object):
     model = Annotation
-    fields = ('id', 'instance', 'type', 'data')
+    fields = ('id', 'uuid', 'instance', 'type', 'data')
+
+
+class VectorSerializer(serializers.ModelSerializer):
+  file = serializers.ReadOnlyField(source='file_version.file_id')
+
+  class Meta(object):
+    model = Vector
+    fields = ('id', 'file', 'file_version', 'instance', 'type', 'type_version',
+              'data')
 
 
 class InstanceVectorSerializer(SlimInstanceSerializer):
-  class NestedVectorSerializer(serializers.ModelSerializer):
+  class NestedVectorSerializer(VectorSerializer):
     class Meta(object):
       model = Vector
       fields = ('id', 'type', 'type_version', 'data')
 
-  class NestedAnnotationSerializer(serializers.ModelSerializer):
+  class NestedAnnotationSerializer(AnnotationSerializer):
     class Meta(object):
       model = Annotation
-      fields = ('id', 'type', 'data')
+      fields = ('id', 'uuid', 'type', 'data')
 
   owner = serializers.ReadOnlyField(source='owner.username')
   file = serializers.ReadOnlyField(source='file_version.file_id')
@@ -120,15 +131,6 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
                    for annotation_data in annotations_data)
     Annotation.objects.bulk_create(annotations)
     return obj
-
-
-class VectorSerializer(serializers.ModelSerializer):
-  file = serializers.ReadOnlyField(source='file_version.file_id')
-
-  class Meta(object):
-    model = Vector
-    fields = ('id', 'file', 'file_version', 'instance', 'type', 'type_version',
-              'data')
 
 
 class MatchSerializer(serializers.ModelSerializer):

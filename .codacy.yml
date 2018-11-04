@@ -1,0 +1,2 @@
+exclude_paths:
+  - 'server/collab/migrations/*'

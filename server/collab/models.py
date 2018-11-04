@@ -133,8 +133,7 @@ class Task(models.Model):
                     (STATUS_DONE, "Done!"),
                     (STATUS_FAILED, "Failure"))
 
-  task_id = models.UUIDField(db_index=True, null=True, unique=True,
-                             editable=False)
+  task_id = models.UUIDField(db_index=True, null=True, unique=True)
 
   # store matched objects
   created = models.DateTimeField(auto_now_add=True)
@@ -184,7 +183,7 @@ class Annotation(models.Model):
                   (TYPE_PROTOTYPE, "Prototype"),
                   (TYPE_STRUCTURE, "Structure"))
 
-  uuid = models.UUIDField(null=True, unique=True, editable=False)
+  uuid = models.UUIDField(null=True, unique=True)
   instance = models.ForeignKey(Instance, models.CASCADE,
                                related_name='annotations')
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)

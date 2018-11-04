@@ -4,7 +4,6 @@ echo "Waiting for database to start..."
 while ! pg_isready --host $POSTGRES_HOST --port $POSTGRES_PORT --timeout 10 ; do sleep 2; done
 
 echo "Migrating"
-python manage.py makemigrations collab
 python manage.py migrate
 
 python manage.py collectstatic --settings rematch.settings.docker --noinput
