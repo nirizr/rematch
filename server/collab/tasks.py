@@ -37,7 +37,7 @@ def match(task_id):
       local_count, remote_count, match_count = match_by_step(task_id, step)
       task.update(progress=F('progress') + 1,
                   local_count=F('local_count') + local_count,
-                  target_count=F('remote_count') + remote_count,
+                  remote_count=F('remote_count') + remote_count,
                   match_count=F('match_count') + match_count)
 
     # sanity checks
@@ -74,15 +74,15 @@ def match_by_step(task_id, step):
   source_vectors = Vector.objects.filter(step.get_source_filter())
   target_vectors = Vector.objects.filter(step.get_target_filter())
 
-  source_count = source_vectors.count()
-  target_count = target_vectors.count()
-  if not source_count or not target_count:
+  local_count = source_vectors.count()
+  remote_count = target_vectors.count()
+  if not local_count or not remote_count:
     print("Skipped step {} with {} local vectors and {} remote vectors"
-          "".format(step, source_count, target_count))
-    return source_count, target_count, 0
+          "".format(step, local_count, remote_count))
+    return local_count, remote_count, 0
 
   print("Matching {} local vectors to {} remote vectors by {}"
-        "".format(source_count, target_count, step))
+        "".format(local_count, remote_count, step))
 
   match_count = 0
   match_objs = gen_match_objs(task_id, step, source_vectors, target_vectors)
@@ -94,7 +94,7 @@ def match_by_step(task_id, step):
   print("Took {} and resulted in {} match objects".format(now() - start,
                                                           match_count))
 
-  return source_count, target_count, match_count
+  return local_count, remote_count, match_count
 
 
 def gen_match_objs(task_id, step, source_vectors, target_vectors):
