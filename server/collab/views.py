@@ -162,7 +162,7 @@ class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
     if self.request.GET.get('annotation_count', False):
       return CountInstanceSerializer
     elif (self.request.method in ('PATCH', 'PUT', 'POST') or
-          self.request.GET.get('full', True)):
+          self.request.GET.get('full', False)):
       return InstanceVectorSerializer
     return SlimInstanceSerializer
 

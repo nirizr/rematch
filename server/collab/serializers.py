@@ -39,13 +39,17 @@ class TaskSerializer(serializers.ModelSerializer):
   status = serializers.ReadOnlyField()
   progress = serializers.ReadOnlyField()
   progress_max = serializers.ReadOnlyField()
+  local_count = serializers.ReadOnlyField()
+  remote_count = serializers.ReadOnlyField()
+  match_count = serializers.ReadOnlyField()
 
   class Meta(object):
     model = Task
     fields = ('id', 'task_id', 'created', 'finished', 'owner', 'status',
               'target_project', 'target_file', 'source_file',
               'source_file_version', 'source_start', 'source_end', 'matchers',
-              'progress', 'progress_max', 'strategy')
+              'progress', 'progress_max', 'strategy', 'local_count',
+              'remote_count', 'match_count')
 
 
 class TaskEditSerializer(TaskSerializer):

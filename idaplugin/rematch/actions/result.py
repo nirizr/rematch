@@ -10,17 +10,28 @@ class ResultAction(base.BoundFileAction):
   name = "&Result"
   dialog = ResultDialog
 
-  def __init__(self, task_id=None, *args, **kwargs):
+  def __init__(self, task_data=None, *args, **kwargs):
     super(ResultAction, self).__init__(*args, **kwargs)
     self.instances = None
-    self.results = None
-    self.task_id = task_id
     self.file_version_id = None
-    self.seen = set()
+    self.locals = {}
+    self.remotes = {}
+    self.matches = []
+
+    self.task_id = None
+    self.local_count, self.local_count, self.local_count = 0, 0, 0
+    if task_data:
+      self.set_task_data(task_data)
 
     self.delayed_queries = []
 
     self.timer = QtCore.QTimer()
+
+  def set_task_data(self, task_data):
+    self.task_id = task_data['id']
+    self.local_count = task_data['local_count']
+    self.remote_count = task_data['remote_count']
+    self.match_count = task_data['match_count']
 
   def activate(self, ctx=None):
     super(ResultAction, self).activate(ctx)
@@ -30,14 +41,10 @@ class ResultAction(base.BoundFileAction):
     if self.task_id:
       self.start_results()
 
-  def submit_handler(self, task_id):
-    self.task_id = task_id
-
-    self.start_results()
-
   def start_results(self):
     self.ui.set_status("Receiving match results...")
-    self.ui.progress.setRange(0, 3)  # 3 end points (locals, remotes, matches)
+    self.ui.progress.setRange(0, (self.local_count + self.remote_count +
+                                  self.match_count))
     self.ui.progress.setValue(0)
 
     log('result').info("Result download started")
@@ -58,43 +65,56 @@ class ResultAction(base.BoundFileAction):
     self.delayed_queries.append(q)
 
   def handle_locals(self, response):
-    new_locals = {obj['id']: obj for obj in response['results']}
-    self.results.add_locals(new_locals)
+    for obj in response['results']:
+      # if local item was already created for a match result, update it with
+      # actual local item information while keeping any matches, otherwise
+      # create an empty matches list and assign object
+      if obj['id'] in self.locals:
+        self.locals[obj['id']].update(obj)
+      else:
+        self.locals[obj['id']] = obj
+        self.locals['matches'] = []
 
-    self.handle_page(response, 'locals')
+    self.handle_page(response)
 
   def handle_remotes(self, response):
-    new_remotes = {obj['id']: obj for obj in response['results']}
-    self.results.add_remotes(new_remotes)
+    # this is pretty simple, just hold a mapping from ids to objects
+    for obj in response['results']:
+      self.remotes[obj['id']] = obj
 
-    self.handle_page(response, 'remotes')
+    self.handle_page(response)
 
   def handle_matches(self, response):
-    def rename(o):
-      o['local_id'] = o.pop('from_instance')
-      o['remote_id'] = o.pop('to_instance')
-      return o
+    for match in response['results']:
+      from_instance = match['from_instance']
+      # TODO: local_id may be removed instead of renamed to save some space
+      # Some other bits of data may also be removed
+      match['local_id'] = match.pop('from_instance')
+      match['remote_id'] = match.pop('to_instance')
 
-    new_matches = map(rename, response['results'])
-    self.results.add_matches(new_matches)
+      # create an empty local item if matched local item was not processed yet
+      if from_instance not in self.locals:
+        self.locals[from_instance] = {'matches': []}
 
-    self.handle_page(response, 'matches')
+      # append match to locals
+      self.locals[from_instance]['matches'].append(match)
 
-  def handle_page(self, response, page_type):
-    if page_type not in self.seen:
-      self.seen.add(page_type)
-      self.ui.progress.setMaximum(self.ui.progress.maximum() +
-                                  response['count'])
-      self.ui.progress.setValue(self.ui.progress.value() + 1)
+    self.handle_page(response)
 
+  def handle_page(self, response):
     self.ui.progress.setValue(self.ui.progress.value() +
                               len(response['results']))
-    log('result').info("result download progress: {} / {} with {}"
+    log('result').info("result download progress: {} / {}"
                        "".format(self.ui.progress.value(),
-                                 self.ui.progress.maximum(), self.seen))
+                                 self.ui.progress.maximum()))
     if self.ui.progress.value() >= self.ui.progress.maximum():
       self.download_complete()
 
   def download_complete(self):
+    # TODO: perform the following while data comes in instead of after it
+    # arrived. Also, schedule execution using a timer to not hang
+    self.populate_tree()
+    self.set_checks()
+
     log('result').info("Result download completed successfully")
     self.ui.set_status("Result download complete")

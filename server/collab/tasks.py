@@ -34,15 +34,24 @@ def match(task_id):
 
     print("Running task {}, strategy {}".format(match.request.id, strategy))
     for step in steps:
-      match_by_step(task_id, step)
-      task.update(progress=F('progress') + 1)
+      local_count, remote_count, match_count = match_by_step(task_id, step)
+      task.update(progress=F('progress') + 1,
+                  local_count=F('local_count') + local_count,
+                  target_count=F('remote_count') + remote_count,
+                  match_count=F('match_count') + match_count)
+
+    # sanity checks
+    if not task.filter(progress=F('progress_max')).count():
+      raise RuntimeError("Task successfully finished without executing all "
+                         "steps")
+
+    match_count = Match.objects.filter(task_id=task_id).count()
+    if not task.filter(match_count=match_count).count():
+        raise RuntimeError("Collected counts of matches does not match final "
+                           "matches count")
   except Exception:
     task.update(status=Task.STATUS_FAILED, finished=now())
     raise
-
-  if not task.filter(progress=F('progress_max')).count():
-    raise RuntimeError("Task successfully finished without executing all "
-                       "steps")
 
   task.update(status=Task.STATUS_DONE, finished=now())
 
@@ -70,7 +79,7 @@ def match_by_step(task_id, step):
   if not source_count or not target_count:
     print("Skipped step {} with {} local vectors and {} remote vectors"
           "".format(step, source_count, target_count))
-    return
+    return source_count, target_count, 0
 
   print("Matching {} local vectors to {} remote vectors by {}"
         "".format(source_count, target_count, step))
@@ -84,6 +93,8 @@ def match_by_step(task_id, step):
     Match.objects.bulk_create(b)
   print("Took {} and resulted in {} match objects".format(now() - start,
                                                           match_count))
+
+  return source_count, target_count, match_count
 
 
 def gen_match_objs(task_id, step, source_vectors, target_vectors):

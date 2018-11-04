@@ -159,6 +159,10 @@ class Task(models.Model):
   progress = models.PositiveSmallIntegerField(default=0)
   progress_max = models.PositiveSmallIntegerField(null=True)
 
+  local_count = models.IntegerField(default=0)
+  remote_count = models.IntegerField(default=0)
+  match_count = models.IntegerField(default=0)
+
 
 class Match(models.Model):
   created = models.DateTimeField(auto_now_add=True)

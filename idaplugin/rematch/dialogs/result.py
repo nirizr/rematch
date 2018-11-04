@@ -100,30 +100,7 @@ class ResultDialog(gui.DockableDialog):
     self.tree.itemChanged.connect(self.item_changed)
     self.tree.itemSelectionChanged.connect(self.item_selection_changed)
 
-  def add_locals(self, local_objs):
-    self.locals.update(local_objs)
-
-  def add_remotes(self, remote_objs):
-    self.remotes.update(remote_objs)
-
-  def add_matches(self, match_objs):
-    self.matches.extend(match_objs)
-
-  def finalize_matches(self):
-    for obj in self.matches:
-      local_id = obj['local_id']
-      if 'matches' not in self.locals[local_id]:
-        self.locals[local_id]['matches'] = []
-      self.locals[local_id]['matches'].append(obj)
-
-    self.matches = []
-
   def show(self):
-    # TODO: perform the following while data comes in instead of after it
-    # arrived. Also, schedule execution using a timer to not hang
-    self.finalize_matches()
-    self.populate_tree()
-    self.set_checks()
     self.graph_dialog.Show()
     super(ResultDialog, self).show()
 

@@ -108,7 +108,6 @@ class MatchAction(base.BoundFileAction):
                            "working without any limitations.")
     self.pbar.setRange(0, int(r['progress_max']) if r['progress_max'] else 0)
     self.pbar.setValue(int(r['progress']))
-    self.pbar.accepted.connect(self.accept_task)
     self.pbar.show()
 
     self.timer.timeout.connect(self.perform_task)
@@ -120,25 +119,24 @@ class MatchAction(base.BoundFileAction):
                         json=True)
 
       progress_max = int(r['progress_max']) if r['progress_max'] else None
-      progress = int(r['progress'])
+      self.pbar.setValue(int(r['progress']))
       status = r['status']
       if status == 'failed':
         self.clean()
         log('match_action').error("Task failed!")
+      elif status == 'done':
+        self.pbar.accept()
+        self.accept_task(r)
       elif progress_max:
         self.pbar.setMaximum(progress_max)
-        if progress >= progress_max:
-          self.pbar.accept()
-        else:
-          self.pbar.setValue(progress)
     except Exception:
       self.clean()
       log('match_action').exception("perform update failed")
       raise
 
-  def accept_task(self):
+  def accept_task(self, task_data):
     log('match_action').info("Remote task completed successfully")
 
     self.clean()
 
-    ResultAction(self.task_id).activate()
+    ResultAction(task_data=task_data).activate()
