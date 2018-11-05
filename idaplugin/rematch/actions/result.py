@@ -18,12 +18,14 @@ class ResultAction(base.BoundFileAction):
     self.remotes = {}
     self.matches = []
 
+    self.compiled_filter = None
+
+    self.delayed_queries = []
+
     self.task_id = None
     self.local_count, self.local_count, self.local_count = 0, 0, 0
     if task_data:
       self.set_task_data(task_data)
-
-    self.delayed_queries = []
 
     self.timer = QtCore.QTimer()
 
@@ -32,6 +34,8 @@ class ResultAction(base.BoundFileAction):
     self.local_count = task_data['local_count']
     self.remote_count = task_data['remote_count']
     self.match_count = task_data['match_count']
+    log('result').info("Task counts: %s, %s, %s", self.local_count,
+                       self.remote_count, self.match_count)
 
   def activate(self, ctx=None):
     super(ResultAction, self).activate(ctx)
@@ -48,21 +52,23 @@ class ResultAction(base.BoundFileAction):
     self.ui.progress.setValue(0)
 
     log('result').info("Result download started")
-    locals_url = "collab/instances/?from_matches__task={}".format(self.task_id)
-    q = network.QueryWorker("GET", locals_url, json=True, paginated=True)
+    params = {'from_matches__task': self.task_id}
+    q = network.QueryWorker("GET", "collab/instances/", paginated=True,
+                            json=True, params=params)
+    self.delayed_queries.append(q)
     q.start(self.handle_locals)
-    self.delayed_queries.append(q)
 
-    remotes_url = ("collab/instances/?to_matches__task={}"
-                   "&annotation_count=true".format(self.task_id))
-    q = network.QueryWorker("GET", remotes_url, json=True, paginated=True)
+    params = {'to_matches__task': self.task_id,
+              'annotation_count': True}
+    q = network.QueryWorker("GET", "collab/instances/", paginated=True,
+                            json=True, params=params)
+    self.delayed_queries.append(q)
     q.start(self.handle_remotes)
-    self.delayed_queries.append(q)
 
-    matches_url = "collab/matches/?task={}".format(self.task_id)
-    q = network.QueryWorker("GET", matches_url, json=True, paginated=True)
-    q.start(self.handle_matches)
+    q = network.QueryWorker("GET", "collab/matches/", paginated=True,
+                            json=True, params={'task': self.task_id})
     self.delayed_queries.append(q)
+    q.start(self.handle_matches)
 
   def handle_locals(self, response):
     for obj in response['results']:
@@ -75,35 +81,39 @@ class ResultAction(base.BoundFileAction):
         self.locals[obj['id']] = obj
         self.locals['matches'] = []
 
-    self.handle_page(response)
+    log('result').info("locals new results %s", len(response['results']))
+    self.handle_page(len(response['results']))
 
   def handle_remotes(self, response):
     # this is pretty simple, just hold a mapping from ids to objects
     for obj in response['results']:
       self.remotes[obj['id']] = obj
 
-    self.handle_page(response)
+    log('result').info("remotes new results %s", len(response['results']))
+    self.handle_page(len(response['results']))
 
   def handle_matches(self, response):
     for match in response['results']:
-      from_instance = match['from_instance']
+      local_id = match['from_instance']
       # TODO: local_id may be removed instead of renamed to save some space
       # Some other bits of data may also be removed
       match['local_id'] = match.pop('from_instance')
       match['remote_id'] = match.pop('to_instance')
 
       # create an empty local item if matched local item was not processed yet
-      if from_instance not in self.locals:
-        self.locals[from_instance] = {'matches': []}
+      if local_id not in self.locals:
+        self.locals[local_id] = {}
+      if 'matches' not in self.locals[local_id]:
+        self.locals[local_id]['matches'] = []
 
       # append match to locals
-      self.locals[from_instance]['matches'].append(match)
+      self.locals[local_id]['matches'].append(match)
 
-    self.handle_page(response)
+    log('result').info("match new results %s", len(response['results']))
+    self.handle_page(len(response['results']))
 
-  def handle_page(self, response):
-    self.ui.progress.setValue(self.ui.progress.value() +
-                              len(response['results']))
+  def handle_page(self, results_count):
+    self.ui.progress.setValue(self.ui.progress.value() + results_count)
     log('result').info("result download progress: {} / {}"
                        "".format(self.ui.progress.value(),
                                  self.ui.progress.maximum()))
@@ -113,8 +123,66 @@ class ResultAction(base.BoundFileAction):
   def download_complete(self):
     # TODO: perform the following while data comes in instead of after it
     # arrived. Also, schedule execution using a timer to not hang
-    self.populate_tree()
-    self.set_checks()
+    self.ui.populate_tree()
+    self.ui.set_checks()
 
     log('result').info("Result download completed successfully")
     self.ui.set_status("Result download complete")
+
+  def build_context(self, local, match=None, remote=None):
+    context = {'Filter': False}
+
+    local = {'offset': local['offset'], 'name': local['name'],
+             'local': True}
+    context['local'] = local
+
+    if remote:
+      remote = {'offset': remote['offset'], 'name': remote['name'],
+                'score': match["score"], 'key': match["type"],
+                'local': remote['id'] in self.locals.keys()}
+    context['remote'] = remote
+
+    return context
+
+  def should_filter(self, context):
+    if not self.compiled_filter:
+      return False
+
+    try:
+      exec(self.compiled_filter, context)
+    except Exception as ex:
+      errors = context.get('Errors', 'stop')
+      if errors == 'stop':
+        self.compiled_filter = None
+        log('result').warning("Filter function encountered a runtime error: "
+                              "%s.\nDisabling filters.", ex)
+      elif errors == 'filter':
+        pass
+      elif errors == 'hide':
+        return True
+      elif 'errors' == 'show':
+        return False
+    return 'Filter' in context and context['Filter']
+
+  def populate_tree(self):
+    for local_obj in self.locals.values():
+      context = self.build_context(local_obj)
+      if self.should_filter(context):
+        continue
+
+      local_item = self.ui.populate_item(None, local_obj)
+      for match_obj in local_obj['matches']:
+        remote_obj = self.remotes[match_obj['remote_id']]
+
+        context = self.build_context(local_obj, match_obj, remote_obj)
+        if self.should_filter(context):
+          continue
+
+        self.ui.populate_item(local_item, remote_obj, match_obj)
+
+    # fake click on first child item so browser won't show a blank page
+    root = self.tree.invisibleRootItem()
+    if root.childCount():
+      if root.child(0).childCount():
+        item = root.child(0).child(0)
+        item.setSelected(True)

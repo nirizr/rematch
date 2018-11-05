@@ -22,6 +22,7 @@ from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
+from collab.filters import InstanceFilter
 
 
 class ViewSetOwnerMixin(object):
@@ -153,9 +154,8 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
-  filterset_fields = ('owner', 'file_version', 'type', 'from_matches__task',
-                      'to_matches__task')
   pagination_class = DefaultPagination
+  filterset_class = InstanceFilter
 
   def get_serializer_class(self):
     # use full instance serializer when receiving data

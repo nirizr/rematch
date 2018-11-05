@@ -32,13 +32,16 @@ def match(task_id):
     task.update(status=Task.STATUS_STARTED, task_id=match.request.id,
                 progress_max=len(steps), progress=0)
 
+    local_ids = set()
+    remote_ids = set()
     print("Running task {}, strategy {}".format(match.request.id, strategy))
+    # TODO: local and remote counts are wrong, they count all vectors used
+    # instead of number of vectors that actually matched
     for step in steps:
-      local_count, remote_count, match_count = match_by_step(task_id, step)
+      match_count = match_by_step(task_id, local_ids, remote_ids, step)
       task.update(progress=F('progress') + 1,
-                  local_count=F('local_count') + local_count,
-                  remote_count=F('remote_count') + remote_count,
-                  match_count=F('match_count') + match_count)
+                  match_count=F('match_count') + match_count,
+                  local_count=len(local_ids), remote_count=len(remote_ids))
 
     # sanity checks
     if not task.filter(progress=F('progress_max')).count():
@@ -69,7 +72,7 @@ def batch(iterable, size):
     return
 
 
-def match_by_step(task_id, step):
+def match_by_step(task_id, local_ids, remote_ids, step):
   start = now()
   source_vectors = Vector.objects.filter(step.get_source_filter())
   target_vectors = Vector.objects.filter(step.get_target_filter())
@@ -79,13 +82,14 @@ def match_by_step(task_id, step):
   if not local_count or not remote_count:
     print("Skipped step {} with {} local vectors and {} remote vectors"
           "".format(step, local_count, remote_count))
-    return local_count, remote_count, 0
+    return 0
 
   print("Matching {} local vectors to {} remote vectors by {}"
         "".format(local_count, remote_count, step))
 
   match_count = 0
-  match_objs = gen_match_objs(task_id, step, source_vectors, target_vectors)
+  match_objs = gen_match_objs(task_id, step, source_vectors, target_vectors,
+                              local_ids, remote_ids)
   for b in batch(match_objs, 10000):
     # bulk_create turns b into a list regardless, so lets make it useful
     b = list(b)
@@ -94,10 +98,11 @@ def match_by_step(task_id, step):
   print("Took {} and resulted in {} match objects".format(now() - start,
                                                           match_count))
 
-  return local_count, remote_count, match_count
+  return match_count
 
 
-def gen_match_objs(task_id, step, source_vectors, target_vectors):
+def gen_match_objs(task_id, step, source_vectors, target_vectors, local_ids,
+                   remote_ids):
   matches = step.gen_matches(source_vectors, target_vectors)
   for source_instance, target_instance, score in matches:
     if not np.isfinite(score):
@@ -109,4 +114,6 @@ def gen_match_objs(task_id, step, source_vectors, target_vectors):
     mat = Match(task_id=task_id, from_instance_id=source_instance,
                 to_instance_id=target_instance, score=score,
                 type=step.get_match_type())
+    local_ids.add(source_instance)
+    remote_ids.add(target_instance)
     yield mat

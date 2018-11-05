@@ -1,5 +1,4 @@
 import ida_kernwin
-import idc
 
 import json
 
@@ -29,9 +28,6 @@ class ResultDialog(gui.DockableDialog):
   def __init__(self, *args, **kwargs):
     super(ResultDialog, self).__init__(title="Match results", *args, **kwargs)
 
-    self.locals = {}
-    self.remotes = {}
-    self.matches = []
     self.apply_pbar = None
     self.matched_map = {}
     self.applied_annotations = set()
@@ -258,68 +254,10 @@ class ResultDialog(gui.DockableDialog):
         remote_item = local_item.child(0)
         remote_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Checked)
 
-  def build_context(self, local, match=None, remote=None):
-    context = {'Filter': False}
-
-    local = {'offset': local['offset'], 'name': local['name'],
-             'local': True}
-    context['local'] = local
-
-    if remote:
-      remote = {'offset': remote['offset'], 'name': remote['name'],
-                'score': match["score"], 'key': match["type"],
-                'local': remote['id'] in self.locals.keys()}
-    context['remote'] = remote
-
-    return context
-
-  def should_filter(self, context):
-    if not self.script_compile:
-      return False
-
-    try:
-      exec(self.script_compile, context)
-    except Exception as ex:
-      errors = context.get('Errors', 'stop')
-      if errors == 'stop':
-        self.script_compile = None
-        idc.Warning("Filter function encountered a runtime error: {}.\n"
-                    "Disabling filters.".format(ex))
-      elif errors == 'filter':
-        pass
-      elif errors == 'hide':
-        return True
-      elif 'errors' == 'show':
-        return False
-    return 'Filter' in context and context['Filter']
-
-  def populate_tree(self):
-    self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
-
-    for local_obj in self.locals.values():
-      context = self.build_context(local_obj)
-      if self.should_filter(context):
-        continue
-
-      local_item = self.populate_item(self.tree, local_obj)
-      for match_obj in local_obj['matches']:
-        remote_obj = self.remotes[match_obj['remote_id']]
-
-        context = self.build_context(local_obj, match_obj, remote_obj)
-        if self.should_filter(context):
-          continue
-
-        self.populate_item(local_item, remote_obj, match_obj)
-      self.tree.expandItem(local_item)
-
-    # fake click on first child item so browser won't show a blank page
-    root = self.tree.invisibleRootItem()
-    if root.childCount():
-      if root.child(0).childCount():
-        item = root.child(0).child(0)
-        item.setSelected(True)
-
   def populate_item(self, parent_item, item_obj, match_obj=None):
+    if parent_item is None:
+      parent_item = self.tree
+
     item_id = item_obj['id']
     item_name = item_obj['name']
 
@@ -331,7 +269,7 @@ class ResultDialog(gui.DockableDialog):
     tree_item.setFlags(item_flags)
     tree_item.setText(self.MATCH_NAME_COLUMN, item_name)
 
-    if item_id in self.locals:
+    if parent_item == self.tree:
       tree_item.setForeground(self.MATCH_NAME_COLUMN,
                                 self.LOCAL_ELEMENT_COLOR)
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
@@ -339,6 +277,7 @@ class ResultDialog(gui.DockableDialog):
     else:
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
                              self.REMOTE_ELEMENT_TOOLTIP)
+      self.tree.expandItem(parent_item)
 
     if match_obj:
       tree_item.setText(self.MATCH_SCORE_COLUMN,
