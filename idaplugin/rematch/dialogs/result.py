@@ -105,12 +105,6 @@ class ResultDialog(gui.DockableDialog):
     super(ResultDialog, self).show()
     self.tree.setFocus()
 
-  def get_obj(self, obj_id):
-    if obj_id in self.locals:
-      return self.locals[obj_id]
-    else:
-      return self.remotes[obj_id]
-
   def item_selection_changed(self):
     local_item = None
     remote_item = None
@@ -129,7 +123,7 @@ class ResultDialog(gui.DockableDialog):
       remote_item = item
 
     if local_item:
-      ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
+      ida_kernwin.jumpto(self.action.get_obj(local_item.api_id)['offset'])
       self.reset_focus()
 
     if remote_item:
@@ -196,7 +190,7 @@ class ResultDialog(gui.DockableDialog):
 
     for local_item, remote_item in self.enumerate_items():
       if remote_item.checkState(self.CHECKBOX_COLUMN):
-        local_offset = self.get_obj(local_item.api_id)['offset']
+        local_offset = self.action.get_obj(local_item.api_id)['offset']
         if remote_item.api_id in self.matched_map:
           self.matched_map[remote_item.api_id].append(local_offset)
         else:
@@ -278,6 +272,9 @@ class ResultDialog(gui.DockableDialog):
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
                              self.REMOTE_ELEMENT_TOOLTIP)
       self.tree.expandItem(parent_item)
+      # fake click on first child item so browser won't show a blank page
+      #if not self.tree.selectedItems():
+      #  tree_item.setSelected(True)
 
     if match_obj:
       tree_item.setText(self.MATCH_SCORE_COLUMN,

@@ -79,7 +79,7 @@ class ResultAction(base.BoundFileAction):
         self.locals[obj['id']].update(obj)
       else:
         self.locals[obj['id']] = obj
-        self.locals['matches'] = []
+        self.locals[obj['id']]['matches'] = []
 
     log('result').info("locals new results %s", len(response['results']))
     self.handle_page(len(response['results']))
@@ -123,13 +123,14 @@ class ResultAction(base.BoundFileAction):
   def download_complete(self):
     # TODO: perform the following while data comes in instead of after it
     # arrived. Also, schedule execution using a timer to not hang
-    self.ui.populate_tree()
+    self.populate_tree()
     self.ui.set_checks()
 
     log('result').info("Result download completed successfully")
     self.ui.set_status("Result download complete")
 
   def build_context(self, local, match=None, remote=None):
+    log('result').info("building context %s %s %s", local, match, remote)
     context = {'Filter': False}
 
     local = {'offset': local['offset'], 'name': local['name'],
@@ -180,9 +181,8 @@ class ResultAction(base.BoundFileAction):
 
         self.ui.populate_item(local_item, remote_obj, match_obj)
 
-    # fake click on first child item so browser won't show a blank page
-    root = self.tree.invisibleRootItem()
-    if root.childCount():
-      if root.child(0).childCount():
-        item = root.child(0).child(0)
-        item.setSelected(True)
+  def get_obj(self, obj_id):
+    if obj_id in self.locals:
+      return self.locals[obj_id]
+    else:
+      return self.remotes[obj_id]
