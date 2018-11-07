@@ -1,5 +1,4 @@
 import ida_kernwin
-import idc
 
 import json
 
@@ -11,11 +10,11 @@ from .. import exceptions
 
 from .. import collectors
 
-from . import filterscript
+from . import scriptfilter
 from . import serializedgraph
 
 
-class MatchResultDialog(gui.DockableDialog):
+class ResultDialog(gui.DockableDialog):
   MATCH_NAME_COLUMN = 0
   CHECKBOX_COLUMN = 0
   MATCH_SCORE_COLUMN = 1
@@ -26,45 +25,39 @@ class MatchResultDialog(gui.DockableDialog):
   LOCAL_ELEMENT_TOOLTIP = "Local function"
   REMOTE_ELEMENT_TOOLTIP = "Remote function"
 
-  def __init__(self, task_id, *args, **kwargs):
-    super(MatchResultDialog, self).__init__(*args, **kwargs)
+  def __init__(self, *args, **kwargs):
+    super(ResultDialog, self).__init__(title="Match results", *args, **kwargs)
 
-    self.task_id = task_id
-    self.locals = {}
-    self.remotes = {}
-    self.matches = []
     self.apply_pbar = None
     self.matched_map = {}
     self.applied_annotations = set()
 
-    self.script_code = None
-    self.script_compile = None
-    self.script_dialog = None
+    self.filter_dialog = None
     self.graph_dialog = serializedgraph.SerializedGraphDialog()
 
     # buttons
     self.btn_set = QtWidgets.QPushButton('&Select best')
     self.btn_clear = QtWidgets.QPushButton('&Clear')
-    self.btn_script = QtWidgets.QPushButton('Fi&lter')
+    self.btn_filter = QtWidgets.QPushButton('Fi&lter')
     self.btn_apply = QtWidgets.QPushButton('&Apply Matches')
 
     size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
                                         QtWidgets.QSizePolicy.Fixed)
     self.btn_set.setSizePolicy(size_policy)
     self.btn_clear.setSizePolicy(size_policy)
-    self.btn_script.setSizePolicy(size_policy)
+    self.btn_filter.setSizePolicy(size_policy)
     self.btn_apply.setSizePolicy(size_policy)
 
     # buttons layout
     self.hlayoutButtons = QtWidgets.QHBoxLayout()
     self.hlayoutButtons.addWidget(self.btn_set)
     self.hlayoutButtons.addWidget(self.btn_clear)
-    self.hlayoutButtons.addWidget(self.btn_script)
+    self.hlayoutButtons.addWidget(self.btn_filter)
     self.hlayoutButtons.addWidget(self.btn_apply)
 
     self.btn_set.clicked.connect(self.set_checks)
     self.btn_clear.clicked.connect(self.clear_checks)
-    self.btn_script.clicked.connect(self.show_script)
+    self.btn_filter.clicked.connect(self.show_filter)
     self.btn_apply.clicked.connect(self.apply_matches)
 
     # matches tree
@@ -86,52 +79,29 @@ class MatchResultDialog(gui.DockableDialog):
     self.tree.setSortingEnabled(True)
     self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
 
+    # prgoress bar
+    self.progress = QtWidgets.QProgressBar()
+    self.statusLbl = QtWidgets.QLabel()
+
     # base layout
     self.base_layout.addWidget(self.tree)
     self.base_layout.addWidget(self.search_box)
+    self.base_layout.addWidget(self.statusLbl)
+    self.base_layout.addWidget(self.progress)
     self.base_layout.addLayout(self.hlayoutButtons)
 
     # connect events to handle
     self.tree.itemChanged.connect(self.item_changed)
     self.tree.itemSelectionChanged.connect(self.item_selection_changed)
 
-  def add_locals(self, local_objs):
-    self.locals.update(local_objs)
-
-  def add_remotes(self, remote_objs):
-    self.remotes.update(remote_objs)
-
-  def add_matches(self, match_objs):
-    self.matches.extend(match_objs)
-
-  def finalize_matches(self):
-    for obj in self.matches:
-      local_id = obj['local_id']
-      if 'matches' not in self.locals[local_id]:
-        self.locals[local_id]['matches'] = []
-      self.locals[local_id]['matches'].append(obj)
-
-    self.matches = []
-
-  def show(self, *args, **kwargs):
-    # TODO: perform the following while data comes in instead of after it
-    # arrived. Also, schedule execution using a timer to not hang
-    self.finalize_matches()
-    self.populate_tree()
-    self.set_checks()
+  def show(self):
     self.graph_dialog.Show()
-    super(MatchResultDialog, self).show(*args, **kwargs)
+    super(ResultDialog, self).show()
 
   def reset_focus(self):
     # calling graph_dialog.show gave it focus. taking it back now
-    super(MatchResultDialog, self).show()
+    super(ResultDialog, self).show()
     self.tree.setFocus()
-
-  def get_obj(self, obj_id):
-    if obj_id in self.locals:
-      return self.locals[obj_id]
-    else:
-      return self.remotes[obj_id]
 
   def item_selection_changed(self):
     local_item = None
@@ -151,7 +121,7 @@ class MatchResultDialog(gui.DockableDialog):
       remote_item = item
 
     if local_item:
-      ida_kernwin.jumpto(self.get_obj(local_item.api_id)['offset'])
+      ida_kernwin.jumpto(self.action.get_obj(local_item.api_id)['offset'])
       self.reset_focus()
 
     if remote_item:
@@ -184,19 +154,15 @@ class MatchResultDialog(gui.DockableDialog):
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
     self.tree.blockSignals(False)
 
-  def show_script(self):
-    self.script_dialog = filterscript.FilterScriptDialog()
-    self.script_dialog.accepted.connect(self.update_script)
-    self.script_dialog.show()
+  def show_filter(self):
+    self.filter_dialog = scriptfilter.FilterDialog()
+    self.filter_dialog.accepted.connect(self.update_filter)
+    self.filter_dialog.show()
 
-  def update_script(self):
-    self.script_code = self.script_dialog.get_code()
-    self.script_dialog = None
-
-    self.script_compile = compile(self.script_code, '<input>', 'exec')
-
-    self.tree.clear()
-    self.populate_tree()
+  def update_filter(self):
+    filter_code = self.filter_dialog.get_code()
+    self.action.apply_filter(filter_code)
+    self.filter_dialog = None
 
   def enumerate_children(self, root=None):
     if not root:
@@ -218,7 +184,7 @@ class MatchResultDialog(gui.DockableDialog):
 
     for local_item, remote_item in self.enumerate_items():
       if remote_item.checkState(self.CHECKBOX_COLUMN):
-        local_offset = self.get_obj(local_item.api_id)['offset']
+        local_offset = self.action.get_obj(local_item.api_id)['offset']
         if remote_item.api_id in self.matched_map:
           self.matched_map[remote_item.api_id].append(local_offset)
         else:
@@ -230,6 +196,7 @@ class MatchResultDialog(gui.DockableDialog):
 
     self.apply_pbar = QtWidgets.QProgressDialog("", "&Cancel", 0, item_count)
 
+    # TODO: optimize this query
     q = network.QueryWorker("GET", "collab/annotations/full_hierarchy",
                             params={"instance": self.matched_map.keys()},
                             json=True, splittable="instance")
@@ -275,68 +242,10 @@ class MatchResultDialog(gui.DockableDialog):
         remote_item = local_item.child(0)
         remote_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Checked)
 
-  def build_context(self, local, match=None, remote=None):
-    context = {'Filter': False}
-
-    local = {'offset': local['offset'], 'name': local['name'],
-             'local': True}
-    context['local'] = local
-
-    if remote:
-      remote = {'offset': remote['offset'], 'name': remote['name'],
-                'score': match["score"], 'key': match["type"],
-                'local': remote['id'] in self.locals.keys()}
-    context['remote'] = remote
-
-    return context
-
-  def should_filter(self, context):
-    if not self.script_compile:
-      return False
-
-    try:
-      exec(self.script_compile, context)
-    except Exception as ex:
-      errors = context.get('Errors', 'stop')
-      if errors == 'stop':
-        self.script_compile = None
-        idc.Warning("Filter function encountered a runtime error: {}.\n"
-                    "Disabling filters.".format(ex))
-      elif errors == 'filter':
-        pass
-      elif errors == 'hide':
-        return True
-      elif 'errors' == 'show':
-        return False
-    return 'Filter' in context and context['Filter']
-
-  def populate_tree(self):
-    self.tree.sortItems(self.MATCH_SCORE_COLUMN, QtCore.Qt.DescendingOrder)
-
-    for local_obj in self.locals.values():
-      context = self.build_context(local_obj)
-      if self.should_filter(context):
-        continue
-
-      local_item = self.populate_item(self.tree, local_obj)
-      for match_obj in local_obj['matches']:
-        remote_obj = self.remotes[match_obj['remote_id']]
-
-        context = self.build_context(local_obj, match_obj, remote_obj)
-        if self.should_filter(context):
-          continue
-
-        self.populate_item(local_item, remote_obj, match_obj)
-      self.tree.expandItem(local_item)
-
-    # fake click on first child item so browser won't show a blank page
-    root = self.tree.invisibleRootItem()
-    if root.childCount():
-      if root.child(0).childCount():
-        item = root.child(0).child(0)
-        item.setSelected(True)
-
   def populate_item(self, parent_item, item_obj, match_obj=None):
+    if parent_item is None:
+      parent_item = self.tree
+
     item_id = item_obj['id']
     item_name = item_obj['name']
 
@@ -348,7 +257,7 @@ class MatchResultDialog(gui.DockableDialog):
     tree_item.setFlags(item_flags)
     tree_item.setText(self.MATCH_NAME_COLUMN, item_name)
 
-    if item_id in self.locals:
+    if parent_item == self.tree:
       tree_item.setForeground(self.MATCH_NAME_COLUMN,
                                 self.LOCAL_ELEMENT_COLOR)
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
@@ -356,12 +265,20 @@ class MatchResultDialog(gui.DockableDialog):
     else:
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
                              self.REMOTE_ELEMENT_TOOLTIP)
+      self.tree.expandItem(parent_item)
+
+      # fake click on first child item so browser won't show a blank page
+      # TODO: This doesn't work (probably because signal to actually perform
+      # the action is blocked), but if signals arent blocked IDA hangs
+      # probably because network query
+      # if not self.tree.selectedItems():
+      #   tree_item.setSelected(True)
 
     if match_obj:
       tree_item.setText(self.MATCH_SCORE_COLUMN,
                           str(round(match_obj['score'], 2)))
       tree_item.setText(self.ANNOTATION_COUNT_COLUMN,
-                          str(match_obj['annotation_count']))
+                          str(item_obj['annotation_count']))
       tree_item.setText(self.MATCH_KEY_COLUMN,
                           str(match_obj['type']))
       tree_item.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)

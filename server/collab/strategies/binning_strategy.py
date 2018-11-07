@@ -45,7 +45,6 @@ class BinningStrategy(Strategy):
     # object's size. This is esentially the upper bound bin size.
     max_size = max(max_size, 1)
     max_bin_base_power = 1 + int(ceil(log(max_size, self.BIN_BASE)))
-    print(max_bin_base_power)
 
     # build binning boundaries based
     boundaries = [self.BIN_BASE ** i for i in range(min_bin_base_power,

@@ -100,17 +100,15 @@ class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
       # TODO: multiline string matching
 
 
-class FilterScriptDialog(gui.GuiDialog):
+class FilterDialog(gui.GuiDialog):
   def __init__(self, *args, **kwargs):
-    super(FilterScriptDialog, self).__init__("Result filter script", *args,
-                                             **kwargs)
+    super(FilterDialog, self).__init__("Result filter script", *args, **kwargs)
 
     self.scripts_path = utils.get_plugin_path('scripts')
 
     self.script_txt = QtWidgets.QPlainTextEdit()
     self.highlighter = SyntaxHighlighter(self.script_txt.document())
-    self.status_lbl = QtWidgets.QLabel()
-    self.status_lbl.setStyleSheet("color: red;")
+    self.statusLbl = QtWidgets.QLabel()
     self.cb = QtWidgets.QComboBox()
 
     if not os.path.exists(self.scripts_path):
@@ -210,7 +208,7 @@ class FilterScriptDialog(gui.GuiDialog):
     self.base_layout.addWidget(self.help_lbl)
     self.base_layout.addLayout(self.combo_layout)
     self.base_layout.addWidget(self.script_txt)
-    self.base_layout.addWidget(self.status_lbl)
+    self.base_layout.addWidget(self.statusLbl)
     self.base_layout.addLayout(self.button_layout)
 
     self.cb.currentTextChanged.connect(self.combobox_change)
@@ -244,7 +242,7 @@ class FilterScriptDialog(gui.GuiDialog):
         data = myfile.read()
     else:
       data = ""
-    self.script_txt.setText(data)
+    self.script_txt.setPlainText(data)
 
   def get_code(self):
     return self.script_txt.toPlainText()
@@ -252,7 +250,11 @@ class FilterScriptDialog(gui.GuiDialog):
   def validate(self):
     try:
       compile(self.get_code(), '<input>', 'exec')
+      # TODO: get code to actually run on data before accept()ing so validation
+      # will be more percise
     except Exception as ex:
-      self.status_lbl.setText(str(ex))
+      import traceback
+      self.exception_base(ex, traceback.format_exc())
     else:
+      self.set_status("")
       self.accept()

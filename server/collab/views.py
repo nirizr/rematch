@@ -1,7 +1,8 @@
 from logging import getLogger
 import functools
 
-from rest_framework import (viewsets, permissions, decorators, response)
+from rest_framework import (viewsets, permissions, decorators, response,
+                            pagination, status)
 
 from django.db import models
 from django.http import Http404
@@ -16,11 +17,12 @@ from collab.serializers import (ProjectSerializer, FileSerializer,
                                 VectorSerializer, MatchSerializer,
                                 SlimInstanceSerializer, AnnotationSerializer,
                                 MatcherSerializer, StrategySerializer,
-                                DependencySerializer)
+                                DependencySerializer, CountInstanceSerializer)
 from collab.permissions import IsOwnerOrReadOnly
 from collab import tasks
 from collab.matchers import matchers_list
 from collab.strategies import strategies_list
+from collab.filters import InstanceFilter
 
 
 class ViewSetOwnerMixin(object):
@@ -39,6 +41,11 @@ class ViewSetManyAllowedMixin(object):
         kwargs["many"] = True
 
     return super(ViewSetManyAllowedMixin, self).get_serializer(*args, **kwargs)
+
+
+class DefaultPagination(pagination.CursorPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
 
 
 def paginatable(serializer_cls):
@@ -117,46 +124,13 @@ class TaskViewSet(ViewSetOwnerMixin, viewsets.ModelViewSet):
       serializer_class = TaskEditSerializer
     return serializer_class
 
-  @decorators.action(detail=True, url_path="locals")
-  @paginatable(SlimInstanceSerializer)
-  def locals(self, request, pk):
-    del request
-    del pk
-
-    task = self.get_object()
-
-    # include local matches (created for specified file_version and are a
-    # 'from_instance' match). for those, include the match objects themselves
-    return Instance.objects.filter(from_matches__task=task).distinct()
-
-  @decorators.action(detail=True, url_path="remotes")
-  @paginatable(SlimInstanceSerializer)
-  def remotes(self, request, pk):
-    del request
-    del pk
-
-    task = self.get_object()
-
-    # include remote matches (are a 'to_instance' match), those are referenced
-    # by match records of local instances
-    return Instance.objects.filter(to_matches__task=task).distinct()
-
-  @decorators.action(detail=True, url_path="matches")
-  @paginatable(MatchSerializer)
-  def matches(self, request, pk):
-    del request
-    del pk
-
-    task = self.get_object()
-
-    return Match.objects.filter(task=task)
-
 
 class MatchViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = Match.objects.all()
   serializer_class = MatchSerializer
   permission_classes = (permissions.IsAuthenticated,)
   filterset_fields = ('task', 'type', 'score')
+  pagination_class = DefaultPagination
 
   @staticmethod
   @decorators.action(detail=False)
@@ -180,8 +154,27 @@ class MatchViewSet(viewsets.ReadOnlyModelViewSet):
 class InstanceViewSet(ViewSetManyAllowedMixin, ViewSetOwnerMixin,
                       viewsets.ModelViewSet):
   queryset = Instance.objects.all()
-  serializer_class = InstanceVectorSerializer
-  filterset_fields = ('owner', 'file_version', 'type')
+  pagination_class = DefaultPagination
+  filterset_class = InstanceFilter
+
+  def get_serializer_class(self):
+    # use full instance serializer when receiving data
+    if self.request.GET.get('annotation_count', False):
+      return CountInstanceSerializer
+    elif (self.request.method in ('PATCH', 'PUT', 'POST') or
+          self.request.GET.get('full', False)):
+      return InstanceVectorSerializer
+    return SlimInstanceSerializer
+
+  def create(self, request, *args, **kwargs):
+    # Create as we're supposed to, but avoid triggering a serializer.data
+    # access, as those require pulling a lot of data from the db as well as
+    # serializing and sending a lot of data
+    del args, kwargs
+    serializer = self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    self.perform_create(serializer)
+    return response.Response({}, status=status.HTTP_201_CREATED)
 
 
 class VectorViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):

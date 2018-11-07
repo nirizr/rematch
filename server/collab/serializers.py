@@ -39,13 +39,17 @@ class TaskSerializer(serializers.ModelSerializer):
   status = serializers.ReadOnlyField()
   progress = serializers.ReadOnlyField()
   progress_max = serializers.ReadOnlyField()
+  local_count = serializers.ReadOnlyField()
+  remote_count = serializers.ReadOnlyField()
+  match_count = serializers.ReadOnlyField()
 
   class Meta(object):
     model = Task
     fields = ('id', 'task_id', 'created', 'finished', 'owner', 'status',
               'target_project', 'target_file', 'source_file',
               'source_file_version', 'source_start', 'source_end', 'matchers',
-              'progress', 'progress_max', 'strategy')
+              'progress', 'progress_max', 'strategy', 'local_count',
+              'remote_count', 'match_count')
 
 
 class TaskEditSerializer(TaskSerializer):
@@ -77,6 +81,17 @@ class SlimInstanceSerializer(serializers.ModelSerializer):
       return name
     except Annotation.DoesNotExist:
       return "sub_{:X}".format(instance.offset)
+
+
+class CountInstanceSerializer(SlimInstanceSerializer):
+  annotation_count = serializers.SerializerMethodField()
+
+  class Meta(SlimInstanceSerializer.Meta):
+    fields = SlimInstanceSerializer.Meta.fields + ('annotation_count',)
+
+  @staticmethod
+  def get_annotation_count(instance):
+    return instance.annotations.count()
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
@@ -134,16 +149,9 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
-  annotation_count = serializers.SerializerMethodField()
-
   class Meta(object):
     model = Match
-    fields = ('from_instance', 'to_instance', 'task', 'type', 'score',
-              'annotation_count')
-
-  @staticmethod
-  def get_annotation_count(match):
-    return Annotation.objects.filter(instance=match.to_instance).count()
+    fields = ('from_instance', 'to_instance', 'task', 'type', 'score')
 
 
 class MatcherSerializer(serializers.Serializer):

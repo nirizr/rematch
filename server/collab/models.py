@@ -69,6 +69,7 @@ class Instance(models.Model):
                   (TYPE_FUNCTION, "Function"),
                   (TYPE_UNIVERSAL, "Universal"))
 
+  created = models.DateTimeField(auto_now_add=True)
   owner = models.ForeignKey(User, models.CASCADE, db_index=True)
   file_version = models.ForeignKey(FileVersion, models.CASCADE,
                                    related_name='instances')
@@ -158,8 +159,13 @@ class Task(models.Model):
   progress = models.PositiveSmallIntegerField(default=0)
   progress_max = models.PositiveSmallIntegerField(null=True)
 
+  local_count = models.IntegerField(default=0)
+  remote_count = models.IntegerField(default=0)
+  match_count = models.IntegerField(default=0)
+
 
 class Match(models.Model):
+  created = models.DateTimeField(auto_now_add=True)
   from_instance = models.ForeignKey(Instance, models.CASCADE,
                                     related_name='from_matches')
   to_instance = models.ForeignKey(Instance, models.CASCADE,

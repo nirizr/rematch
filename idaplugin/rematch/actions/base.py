@@ -119,7 +119,7 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
     else:
       return ida_kernwin.AST_DISABLE
 
-  def activate(self, ctx):
+  def activate(self, ctx=None):
     del ctx
     if self.running():
       return

@@ -64,13 +64,8 @@ class InputErrorException(QueryException):
              "input and retry again. Please report a reproducable bug if "
              "this issue persists.")
 
-  def __init__(self, response, code, **kwargs):
-    super(InputErrorException, self).__init__(**kwargs)
-    self._response = response
-    self._code = code
-
   def errors(self):
-    return self._response.items()
+    return self._kwargs['response'].items()
 
 
 def factory(ex):
