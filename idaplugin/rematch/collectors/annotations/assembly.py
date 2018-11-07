@@ -22,9 +22,8 @@ class AssemblyAnnotation(annotation.Annotation):
       Otherwise, IDA of different offset lengths will truncate incorrect number
       of bytes"""
       hex_chars = int(log(ida_idaapi.BADADDR + 1, 2) / 4)
-      pattern = (r"\x01(.{1})\x01\([0-9a-zA-Z]{%s}([\w\s!@$?_]*?)\x02\1\x02\)"
-                  "" % hex_chars)
-      replace = r"\x01\g<1>\g<2>\x02\g<1>"
+      pattern = "\x01\\([0-9a-zA-Z]{%s}(.*?)\x02\\)" % hex_chars
+      replace = r"\g<1>"
       return re.sub(pattern, replace, asm)
 
     # make sure only nodes inside the function are accounted for
