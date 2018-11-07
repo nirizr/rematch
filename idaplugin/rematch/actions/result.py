@@ -137,7 +137,7 @@ class ResultAction(base.BoundFileAction):
              'local': True}
     context['local'] = local
 
-    if remote:
+    if match:
       remote = {'offset': remote['offset'], 'name': remote['name'],
                 'score': match["score"], 'key': match["type"],
                 'local': remote['id'] in self.locals.keys()}
@@ -145,9 +145,11 @@ class ResultAction(base.BoundFileAction):
 
     return context
 
-  def should_filter(self, context):
+  def should_filter(self, local, match=None, remote=None):
     if not self.compiled_filter:
       return False
+
+    context = self.build_context(local, match, remote)
 
     try:
       exec(self.compiled_filter, context)
@@ -166,17 +168,18 @@ class ResultAction(base.BoundFileAction):
     return 'Filter' in context and context['Filter']
 
   def populate_tree(self):
+    # clear tree before populating it
+    self.ui.tree.clear()
+
     for local_obj in self.locals.values():
-      context = self.build_context(local_obj)
-      if self.should_filter(context):
+      if self.should_filter(local_obj):
         continue
 
       local_item = self.ui.populate_item(None, local_obj)
       for match_obj in local_obj['matches']:
         remote_obj = self.remotes[match_obj['remote_id']]
 
-        context = self.build_context(local_obj, match_obj, remote_obj)
-        if self.should_filter(context):
+        if self.should_filter(local_obj, match_obj, remote_obj):
           continue
 
         self.ui.populate_item(local_item, remote_obj, match_obj)
@@ -186,3 +189,8 @@ class ResultAction(base.BoundFileAction):
       return self.locals[obj_id]
     else:
       return self.remotes[obj_id]
+
+  def apply_filter(self, filter_code):
+    self.compiled_filter = compile(filter_code, '<input>', 'exec')
+
+    self.populate_tree()

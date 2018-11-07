@@ -10,7 +10,7 @@ from .. import exceptions
 
 from .. import collectors
 
-from . import filterscript
+from . import scriptfilter
 from . import serializedgraph
 
 
@@ -32,34 +32,32 @@ class ResultDialog(gui.DockableDialog):
     self.matched_map = {}
     self.applied_annotations = set()
 
-    self.script_code = None
-    self.script_compile = None
-    self.script_dialog = None
+    self.filter_dialog = None
     self.graph_dialog = serializedgraph.SerializedGraphDialog()
 
     # buttons
     self.btn_set = QtWidgets.QPushButton('&Select best')
     self.btn_clear = QtWidgets.QPushButton('&Clear')
-    self.btn_script = QtWidgets.QPushButton('Fi&lter')
+    self.btn_filter = QtWidgets.QPushButton('Fi&lter')
     self.btn_apply = QtWidgets.QPushButton('&Apply Matches')
 
     size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,
                                         QtWidgets.QSizePolicy.Fixed)
     self.btn_set.setSizePolicy(size_policy)
     self.btn_clear.setSizePolicy(size_policy)
-    self.btn_script.setSizePolicy(size_policy)
+    self.btn_filter.setSizePolicy(size_policy)
     self.btn_apply.setSizePolicy(size_policy)
 
     # buttons layout
     self.hlayoutButtons = QtWidgets.QHBoxLayout()
     self.hlayoutButtons.addWidget(self.btn_set)
     self.hlayoutButtons.addWidget(self.btn_clear)
-    self.hlayoutButtons.addWidget(self.btn_script)
+    self.hlayoutButtons.addWidget(self.btn_filter)
     self.hlayoutButtons.addWidget(self.btn_apply)
 
     self.btn_set.clicked.connect(self.set_checks)
     self.btn_clear.clicked.connect(self.clear_checks)
-    self.btn_script.clicked.connect(self.show_script)
+    self.btn_filter.clicked.connect(self.show_filter)
     self.btn_apply.clicked.connect(self.apply_matches)
 
     # matches tree
@@ -156,19 +154,15 @@ class ResultDialog(gui.DockableDialog):
         curr_child.setCheckState(self.CHECKBOX_COLUMN, QtCore.Qt.Unchecked)
     self.tree.blockSignals(False)
 
-  def show_script(self):
-    self.script_dialog = filterscript.FilterScriptDialog()
-    self.script_dialog.accepted.connect(self.update_script)
-    self.script_dialog.show()
+  def show_filter(self):
+    self.filter_dialog = scriptfilter.FilterDialog()
+    self.filter_dialog.accepted.connect(self.update_filter)
+    self.filter_dialog.show()
 
-  def update_script(self):
-    self.script_code = self.script_dialog.get_code()
-    self.script_dialog = None
-
-    self.script_compile = compile(self.script_code, '<input>', 'exec')
-
-    self.tree.clear()
-    self.populate_tree()
+  def update_filter(self):
+    filter_code = self.filter_dialog.get_code()
+    self.action.apply_filter(filter_code)
+    self.filter_dialog = None
 
   def enumerate_children(self, root=None):
     if not root:
@@ -272,9 +266,13 @@ class ResultDialog(gui.DockableDialog):
       tree_item.setToolTip(self.MATCH_NAME_COLUMN,
                              self.REMOTE_ELEMENT_TOOLTIP)
       self.tree.expandItem(parent_item)
+
       # fake click on first child item so browser won't show a blank page
-      #if not self.tree.selectedItems():
-      #  tree_item.setSelected(True)
+      # TODO: This doesn't work (probably because signal to actually perform
+      # the action is blocked), but if signals arent blocked IDA hangs
+      # probably because network query
+      # if not self.tree.selectedItems():
+      #   tree_item.setSelected(True)
 
     if match_obj:
       tree_item.setText(self.MATCH_SCORE_COLUMN,
