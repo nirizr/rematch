@@ -176,13 +176,15 @@ class ResultAction(base.BoundFileAction):
         continue
 
       local_item = self.ui.populate_item(None, local_obj)
+      local_item.instance_id = local_obj['id']
       for match_obj in local_obj['matches']:
         remote_obj = self.remotes[match_obj['remote_id']]
 
         if self.should_filter(local_obj, match_obj, remote_obj):
           continue
 
-        self.ui.populate_item(local_item, remote_obj, match_obj)
+        remote_item = self.ui.populate_item(local_item, remote_obj, match_obj)
+        remote_item.instance_id = remote_obj['id']
 
   def get_obj(self, obj_id):
     if obj_id in self.locals:

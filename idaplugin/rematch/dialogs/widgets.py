@@ -262,10 +262,6 @@ class QFunctionRangeSelect(QtWidgets.QWidget):
 
 
 class MatchTreeWidgetItem(QtWidgets.QTreeWidgetItem):
-  def __init__(self, api_id, *args, **kwargs):
-    super(MatchTreeWidgetItem, self).__init__(*args, **kwargs)
-    self.api_id = api_id
-
   def __lt__(self, other):
     column = self.treeWidget().sortColumn()
     if self.childCount() == 0 and other.childCount() == 0:

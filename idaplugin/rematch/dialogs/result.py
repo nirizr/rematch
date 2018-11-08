@@ -121,14 +121,14 @@ class ResultDialog(gui.DockableDialog):
       remote_item = item
 
     if local_item:
-      ida_kernwin.jumpto(self.action.get_obj(local_item.api_id)['offset'])
+      ida_kernwin.jumpto(self.action.get_obj(local_item.instance_id)['offset'])
       self.reset_focus()
 
     if remote_item:
       # TODO: change graph to a "loading..." message
       q = network.QueryWorker("GET", "collab/annotations/", json=True,
                               params={"type": "assembly",
-                                      "instance": remote_item.api_id})
+                                      "instance": remote_item.instance_id})
       q.start(self.handle_display_change)
 
   def handle_display_change(self, response):
@@ -184,11 +184,11 @@ class ResultDialog(gui.DockableDialog):
 
     for local_item, remote_item in self.enumerate_items():
       if remote_item.checkState(self.CHECKBOX_COLUMN):
-        local_offset = self.action.get_obj(local_item.api_id)['offset']
-        if remote_item.api_id in self.matched_map:
-          self.matched_map[remote_item.api_id].append(local_offset)
+        local_offset = self.action.get_obj(local_item.instance_id)['offset']
+        if remote_item.instance_id in self.matched_map:
+          self.matched_map[remote_item.instance_id].append(local_offset)
         else:
-          self.matched_map[remote_item.api_id] = [local_offset]
+          self.matched_map[remote_item.instance_id] = [local_offset]
 
     item_count = sum(len(m) for m in self.matched_map.values())
     if not item_count:
@@ -199,18 +199,13 @@ class ResultDialog(gui.DockableDialog):
     # TODO: optimize this query
     q = network.QueryWorker("GET", "collab/annotations/full_hierarchy",
                             params={"instance": self.matched_map.keys()},
-                            json=True, splittable="instance")
+                            json=True)
     q.start(self.handle_apply_matches, write=True)
 
   def handle_apply_matches(self, response):
     for annotation in response:
       remote_id = annotation['instance']
       local_offsets = self.matched_map[remote_id]
-
-      # TODO: move dependency handling/applying loops and logic to the
-      # annotation apply code
-      for dependency in annotation['dependencies']:
-        self.apply_annotations(dependency, None)
 
       self.apply_annotation(annotation, *local_offsets)
       self.apply_pbar.setValue(self.apply_pbar.value() + len(local_offsets))
@@ -246,10 +241,9 @@ class ResultDialog(gui.DockableDialog):
     if parent_item is None:
       parent_item = self.tree
 
-    item_id = item_obj['id']
     item_name = item_obj['name']
 
-    tree_item = widgets.MatchTreeWidgetItem(item_id, parent_item)
+    tree_item = widgets.MatchTreeWidgetItem(parent_item)
     item_flags = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
     if match_obj:
       item_flags |= QtCore.Qt.ItemIsUserCheckable

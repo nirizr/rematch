@@ -27,13 +27,13 @@ def apply(offset, annotation):
       continue
 
     annotation_data = json.loads(annotation['data'])
-
-    if annotation_cls(offset).data() == annotation_data:
+    annotation_obj = annotation_cls(offset)
+    if annotation_obj.data() == annotation_data:
       log('annotation_apply').info("Setting annotation %s skipped at %s with "
                                    "%s because value is already set",
                                    annotation_cls, offset, annotation_data)
     else:
-      annotation_cls.apply(offset, annotation_data)
+      annotation_obj.apply(annotation_data)
 
 
 __all__ = ["collect", "apply", "vectors", "annotations"]
