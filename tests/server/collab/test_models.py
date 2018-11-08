@@ -83,8 +83,9 @@ def test_full_hierarchy(admin_api_client, admin_user):
   dependency = create_model('dependencies', admin_user)
   dependency.save()
 
+  dependant_instance_id = dependency.dependent.instance.id
   response = admin_api_client.get('/collab/annotations/full_hierarchy/',
-                                  data={'ids': dependency.dependent.id},
+                                  data={'instance': dependant_instance_id},
                                   HTTP_ACCEPT='application/json')
 
   expected_response = [dependency.dependency, dependency.dependent]

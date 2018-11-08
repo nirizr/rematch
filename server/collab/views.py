@@ -200,14 +200,14 @@ class AnnotationViewSet(viewsets.ModelViewSet):
   def full_hierarchy(self, request):
     del self
 
-    annotation_ids = request.query_params.getlist('ids')
+    instance_ids = request.query_params.getlist('instance')
 
     # TODO: perhaps only provide needed IDs here and fetch them using a
     # second query?
     def make_cte_subquery(cte):
       value0 = models.expressions.Value(0, output_field=models.IntegerField())
       value1 = models.expressions.Value(1, output_field=models.IntegerField())
-      return (Annotation.objects.filter(id__in=annotation_ids)
+      return (Annotation.objects.filter(instance__in=instance_ids)
               # .values("uuid", "instance", "type", "data",
               .values("id", "uuid", depth=value0)
               .union(cte.join(Annotation, dependents=cte.col.uuid)
