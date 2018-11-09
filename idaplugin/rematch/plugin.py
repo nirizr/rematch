@@ -79,7 +79,7 @@ class RematchPlugin(ida_idaapi.plugin_t):
     QtCore.QTimer.singleShot(1000, self.setup)
 
   def run(self, arg=0):
-    pass
+    actions.settings.SettingsAction().activate()
 
   def term(self):
     if self.statusbar_timer:
