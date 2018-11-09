@@ -29,12 +29,12 @@ class File(models.Model):
   created = models.DateTimeField(auto_now_add=True)
   owner = models.ForeignKey(User, models.CASCADE, db_index=True)
   project = models.ForeignKey(Project, models.CASCADE, null=True,
-                              related_name='files')
+                              blank=True, related_name='files')
   name = models.CharField(max_length=256)
   description = models.TextField()
   md5hash = models.CharField(max_length=32, db_index=True,
                              validators=[MinLengthValidator(32)])
-  file = files.FileField(upload_to="tasks", null=True,
+  file = files.FileField(upload_to="tasks", null=True, blank=True,
                          validators=[idb_validator])
 
   def __unicode__(self):
@@ -74,7 +74,7 @@ class Instance(models.Model):
   file_version = models.ForeignKey(FileVersion, models.CASCADE,
                                    related_name='instances')
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)
-  offset = models.BigIntegerField(null=True)
+  offset = models.BigIntegerField(null=True, blank=True)
   size = models.BigIntegerField()
   count = models.BigIntegerField()
 
@@ -138,7 +138,7 @@ class Task(models.Model):
 
   # store matched objects
   created = models.DateTimeField(auto_now_add=True)
-  finished = models.DateTimeField(null=True)
+  finished = models.DateTimeField(null=True, blank=True)
 
   owner = models.ForeignKey(User, models.CASCADE, db_index=True)
   status = models.CharField(default=STATUS_PENDING, max_length=64,
@@ -147,17 +147,18 @@ class Task(models.Model):
   source_file_version = models.ForeignKey(FileVersion, models.CASCADE,
                                           related_name='source_tasks')
   # TODO: make sure start > end
-  source_start = models.BigIntegerField(null=True)
-  source_end = models.BigIntegerField(null=True)
+  source_start = models.BigIntegerField(null=True, blank=True)
+  source_end = models.BigIntegerField(null=True, blank=True)
   # TODO: make sure only at least one of target_file/target_project is null
-  target_file = models.ForeignKey(File, models.CASCADE, null=True)
-  target_project = models.ForeignKey(Project, models.CASCADE, null=True)
+  target_file = models.ForeignKey(File, models.CASCADE, null=True, blank=True)
+  target_project = models.ForeignKey(Project, models.CASCADE, null=True,
+                                     blank=True)
   matchers = models.TextField(default='[]')
   strategy = models.CharField(choices=strategy_choices(), max_length=256,
                               default='all_strategy')
 
   progress = models.PositiveSmallIntegerField(default=0)
-  progress_max = models.PositiveSmallIntegerField(null=True)
+  progress_max = models.PositiveSmallIntegerField(null=True, blank=True)
 
   local_count = models.IntegerField(default=0)
   remote_count = models.IntegerField(default=0)
@@ -189,7 +190,7 @@ class Annotation(models.Model):
                   (TYPE_PROTOTYPE, "Prototype"),
                   (TYPE_STRUCTURE, "Structure"))
 
-  uuid = models.UUIDField(null=True, unique=True)
+  uuid = models.UUIDField(null=True, blank=True, unique=True)
   instance = models.ForeignKey(Instance, models.CASCADE,
                                related_name='annotations')
   type = models.CharField(max_length=64, choices=TYPE_CHOICES)
