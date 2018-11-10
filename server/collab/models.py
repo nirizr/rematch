@@ -98,13 +98,15 @@ class Vector(models.Model):
   TYPE_MNEMONIC_HASH = 'mnemonic_hash'
   TYPE_MNEMONIC_HIST = 'mnemonic_hist'
   TYPE_BASICBLOCKSIZE_HIST = 'basicblocksize_hist'
+  TYPE_BASICBLOCK_ADJACENCY = 'basicblock_adjacency'
   TYPE_CHOICES = [(TYPE_INSTRUCTION_HASH, "Instruction Hash"),
                   (TYPE_IDENTITY_HASH, "Identity Hash"),
                   (TYPE_NAME_HASH, "Name Hash"),
                   (TYPE_ASSEMBLY_HASH, "Assembly Hash"),
                   (TYPE_MNEMONIC_HASH, "Mnemonic Hash"),
                   (TYPE_MNEMONIC_HIST, "Mnemonic Hist"),
-                  (TYPE_BASICBLOCKSIZE_HIST, "Basic Block Size Hist")]
+                  (TYPE_BASICBLOCKSIZE_HIST, "Basic Block Size Hist"),
+                  (TYPE_BASICBLOCK_ADJACENCY, "Basic Block Adjacency")]
 
   instance = models.ForeignKey(Instance, models.CASCADE,
                                related_name='vectors')

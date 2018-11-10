@@ -4,6 +4,7 @@ Django ; python_version >= '3.0'            # install any version on python3
 numpy
 scipy
 scikit-learn
+networkx
 django-registration-redux
 djangorestframework
 django-rest-auth >=0.8.2
