@@ -6,19 +6,6 @@ import inspect
 import json
 
 
-def collect(collectors, items):
-  for collector_cls in collectors:
-    for item in items:
-      try:
-        r = collector_cls(item).serialize()
-        if r:
-          yield r
-      except UnicodeDecodeError:
-        log('annotation').error("Unicode decoding error during serializion of "
-                                "type %s with item %s", collector_cls.type,
-                                item)
-
-
 def apply(offset, annotation):
   for _, annotation_cls in inspect.getmembers(annotations):
     if not (inspect.isclass(annotation_cls) and
