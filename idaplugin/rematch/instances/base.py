@@ -1,4 +1,4 @@
-from .. import collectors
+from .. import collectors, log
 
 
 class BaseInstance(object):
@@ -18,9 +18,9 @@ class BaseInstance(object):
     return 0
 
   def serialize(self, include_annotations):
-    vectors = list(collectors.collect(self.vectors, self.items))
+    vectors = list(self.collect(self.vectors))
     if include_annotations:
-      annotations = list(collectors.collect(self.annotations, self.items))
+      annotations = list(self.collect(self.annotations))
     else:
       annotations = []
     size = self.size()
@@ -32,3 +32,15 @@ class BaseInstance(object):
 
   def version(self):
     return {vector.type: vector.type_version for vector in self.vectors}
+
+  def collect(self, collectors):
+    for collector_cls in collectors:
+      for item in self.items:
+        try:
+          r = collector_cls(item, instance=self).serialize()
+          if r:
+            yield r
+        except UnicodeDecodeError:
+          log('annotation').error("Unicode decoding error during serializion "
+                                  "of type %s with item %s",
+                                  collector_cls.type, item)
