@@ -37,7 +37,7 @@ class BaseInstance(object):
     for collector_cls in collectors:
       for item in self.items:
         try:
-          r = collector_cls(item, instance=self).serialize()
+          r = collector_cls(item).serialize()
           if r:
             yield r
         except UnicodeDecodeError:
