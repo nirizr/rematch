@@ -19,4 +19,7 @@ class BasicBlockAdjacencyVector(vector.Vector):
 
       adjacencies[node.id] = [succ.id for succ in node.succs()]
 
-    return adjacencies
+    if len(adjacencies) > 1:
+      return adjacencies
+    else:
+      return None

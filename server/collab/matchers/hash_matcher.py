@@ -21,11 +21,11 @@ class HashMatcher(matcher.Matcher):
         yield (source_instance_id, target_instance_id, 100)
 
   @classmethod
-  def apply_hash_func(self, values):
+  def apply_hash_func(cls, values):
     """allow easy hash generation from more structured data by applying a
     hash function on provided data."""
 
-    if not hasattr(self, 'hash_func'):
+    if not hasattr(cls, 'hash_func'):
       return values
 
-    return ((i_id, self.hash_func(data)) for i_id, data in values)
+    return ((i_id, cls.hash_func(data)) for i_id, data in values)
