@@ -9,11 +9,13 @@ from .name_hash import NameHashMatcher
 from .mnemonic_euclidean import MnemonicEuclideanMatcher
 from .dictionary_matcher import DictionaryMatcher
 from .basicblocksize_euclidean import BasicBlockSizeEuclideanMatcher
+from .basicblock_mdindex import BasicBlockMDIndexMatcher
 
 
 matchers_list = [InstructionHashMatcher, IdentityHashMatcher, NameHashMatcher,
                  AssemblyHashMatcher, MnemonicHashMatcher,
-                 MnemonicEuclideanMatcher, BasicBlockSizeEuclideanMatcher]
+                 MnemonicEuclideanMatcher, BasicBlockSizeEuclideanMatcher,
+                 BasicBlockMDIndexMatcher]
 
 
 def matcher_choices():
@@ -25,4 +27,5 @@ __all__ = ['Matcher', 'HashMatcher', 'EuclideanDictionaryMatcher',
            'InstructionHashMatcher', 'IdentityHashMatcher',
            'AssemblyHashMatcher', 'MnemonicHashMatcher', 'NameHashMatcher',
            'MnemonicEuclideanMatcher', 'DictionaryMatcher',
-           'BasicBlockSizeEuclideanMatcher', 'matchers_list']
+           'BasicBlockSizeEuclideanMatcher', 'BasicBlockMDIndexMatcher',
+           'matchers_list']
