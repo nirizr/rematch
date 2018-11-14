@@ -1,0 +1,23 @@
+# Temporary files
+**/.git
+**/.gitignore
+**/venv-*
+**/.*.un~
+**/*.pyc
+**/__pycache__
+
+# Other projects
+idaplugin
+docs
+README.rst
+LICENSE.md
+
+# Docker build files
+server/Dockerfile
+server/docker-compose.yml
+
+# Secrets, logs and raw data
+**/.rematch_secret.key
+**/.env
+server/logs
+server/postgres-data
