@@ -121,7 +121,7 @@ class UploadAction(base.BoundFileAction):
 
     # TODO: make these delayed queries?
     # Upload dependencies if there are any
-    dependencies = DependencyAnnotation.get_dependencies()
+    dependencies = list(DependencyAnnotation.get_dependencies())
     if dependencies:
       network.query("POST", "collab/dependencies/", json=True,
                     params=dependencies)

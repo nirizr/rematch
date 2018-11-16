@@ -9,9 +9,6 @@ class Annotation(collector.Collector):
     super(Annotation, self).__init__(*args, **kwargs)
     self.uuid = None
 
-  def dependency_name(self):
-    return super(Annotation, self).serialize()
-
   def serialize(self):
     s = super(Annotation, self).serialize()
     if s:
@@ -20,7 +17,7 @@ class Annotation(collector.Collector):
 
 
 class DependencyAnnotation(Annotation):
-  """This class implements utilities relatd to attribute dependency_uuids.
+  """This class implements utilities related to attribute dependency_uuids.
   Allowing attributes to define dependency relationships between them (such as
   a function prototype and a structure used in it for example).
   For that reason this class assigns and retrieves UUIDs according to class
@@ -48,10 +45,10 @@ class DependencyAnnotation(Annotation):
 
     dependency_id = (cls.__name__, dependency_name)
     dependency_uuid = cls.dependency_uuids[dependency_id]
-    cls.dependencies.add({'dependent': str(dependent.uuid),
-                          'dependency': str(dependency_uuid)})
+    cls.dependencies.add((str(dependent.uuid), str(dependency_uuid)))
     return dependency_uuid
 
   @classmethod
   def get_dependencies(cls):
-    return cls.dependencies
+    for dependent, dependency in cls.dependencies:
+      yield {'dependent': dependent, 'dependency': dependency}
