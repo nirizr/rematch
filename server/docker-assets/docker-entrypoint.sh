@@ -24,6 +24,6 @@ except user_model.DoesNotExist:
 
 celery -A rematch.celery worker -l info --detach --logfile /var/log/rematch/celery.log
 uwsgi --socket :8001 --module rematch.wsgi --env DJANGO_SETTINGS_MODULE=rematch.settings.docker --daemonize /var/log/rematch/uwsgi.log --master
-nginx -c /rematch_server/server/nginx.conf
+nginx -c docker-assets/nginx.conf
 
 # TODO: include health check for all three services, run all three as daemons

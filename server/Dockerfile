@@ -1,13 +1,10 @@
-FROM python:3.6
+FROM frolvlad/alpine-miniconda3
 ENV PYTHONUNBUFFERED 1
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
-          netcat-openbsd nginx postgresql-client
-RUN DEBIAN_FRONTEND=noninteractive apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
+RUN apk add --no-cache nginx postgresql-client uwsgi-python3
 
 # Create rematch user and setup environment
-RUN useradd --no-log-init -m -d /rematch_server rematch
+RUN mkdir /rematch_server/
+RUN addgroup rematch && adduser -S -D -H -h /rematch_server rematch -G rematch
 WORKDIR /rematch_server
 ADD --chown=rematch:rematch ./server/ ./server/
 ADD --chown=rematch:rematch ./tests/ ./tests/
@@ -18,9 +15,8 @@ RUN chown rematch:rematch -R /var/log/rematch/
 RUN chown rematch:rematch -R /var/lib/nginx/
 
 # Install python requirements
-RUN pip install --upgrade pip uwsgi
-RUN pip install -r /rematch_server/server/requirements.txt
+RUN pip install --no-cache-dir -r /rematch_server/server/requirements.txt
 
 # Downgrade to the rematch user and set server up
 # USER rematch
-CMD cd /rematch_server/server ; ./start_docker.sh
+CMD cd /rematch_server/server ; ./docker-assets/docker-entrypoint.sh
