@@ -27,7 +27,7 @@ services:
     hostname: web
     build:
       context: ..
-      dockerfile: server/docker-assets/Dockerfile
+      dockerfile: server/Dockerfile
     volumes:
       - ./logs:/var/log/rematch
     ports:
