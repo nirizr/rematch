@@ -2,8 +2,7 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 
 # Install needed packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq \
         nginx postgresql-client && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq && \
     rm -rf /var/lib/apt/lists/*
