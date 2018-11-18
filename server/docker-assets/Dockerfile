@@ -27,7 +27,7 @@ RUN pip install --disable-pip-version-check --no-cache-dir -r ./requirements.txt
 ADD --chown=rematch:rematch ./server/ ./server/
 
 # Add tests to the docker (TODO: this may be skipped)
-ADD --chown=rematch:rematch ./tests/server/ ./tests/
+ADD --chown=rematch:rematch ./tests/server/ ./server/tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server
