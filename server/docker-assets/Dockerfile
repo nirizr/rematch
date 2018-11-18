@@ -9,19 +9,24 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Create rematch user and setup environment
-RUN useradd --no-log-init -m -d /rematch_server rematch
+
+RUN mkdir /rematch_server/ && \
+    useradd --no-log-init -M -d /rematch_server rematch && \
+    chown rematch:rematch -R /rematch_server/
 WORKDIR /rematch_server
-ADD --chown=rematch:rematch ./server/ ./server/
-ADD --chown=rematch:rematch ./tests/server/ ./server/tests/
 
 RUN mkdir /var/log/rematch/
 RUN chown rematch:rematch -R /var/log/rematch/
-
 RUN chown rematch:rematch -R /var/lib/nginx/
 
 # Install python requirements
 RUN pip install --upgrade pip uwsgi
-RUN pip install -r /rematch_server/server/requirements.txt
+COPY ./server/requirements.txt ./requirements.txt
+RUN pip install -r ./requirements.txt
+
+# Add rematch project files as late as possible to use dockers cache
+ADD --chown=rematch:rematch ./server/ ./server/
+ADD --chown=rematch:rematch ./tests/server/ ./server/tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server/
