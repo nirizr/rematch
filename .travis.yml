@@ -87,7 +87,7 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source --statistics ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" == "docker" ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. DJANGO_LOG_FILE=/dev/null py.test -rapP ./ --verbose --cov-report= --cov=${PROJECT} ;" ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "PYTHONPATH=. DJANGO_LOG_FILE=/dev/null py.test -rapP ./ --verbose --cov-report= --cov=./ ;" ;
       elif [ "${PROJECT}" == "interop" ]; then
         PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} --verbose --cov-report= --cov=server --cov=idaplugin ;
       elif [ "${PROJECT}" == "server" ]; then
