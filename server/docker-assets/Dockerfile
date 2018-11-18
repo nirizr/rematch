@@ -1,10 +1,12 @@
 FROM python:3.6
 ENV PYTHONUNBUFFERED 1
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
-          netcat-openbsd nginx postgresql-client
-RUN DEBIAN_FRONTEND=noninteractive apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq
+
+# Install needed packages
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --fix-missing -yq \
+          nginx postgresql-client && \
+    DEBIAN_FRONTEND=noninteractive apt-get autoremove -yq && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create rematch user and setup environment
 RUN useradd --no-log-init -m -d /rematch_server rematch
