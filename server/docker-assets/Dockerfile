@@ -35,5 +35,5 @@ ADD --chown=rematch:rematch ./tests/server/ ./server/tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server/
-USER rematch
-CMD ./docker-assets/entrypoint.sh
+# USER rematch
+CMD cd /rematch_server/server ; ./docker-assets/entrypoint.sh
