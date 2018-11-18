@@ -4,11 +4,11 @@ echo "Waiting for database to start..."
 while ! pg_isready --host $POSTGRES_HOST --port $POSTGRES_PORT --timeout 10 ; do sleep 2; done
 
 echo "Migrating"
-python manage.py migrate
+python3 manage.py migrate
 
-python manage.py collectstatic --settings rematch.settings.docker --noinput
+python3 manage.py collectstatic --settings rematch.settings.docker --noinput
 
-python -c "import django; django.setup();
+python3 -c "import django; django.setup();
 from django.contrib.auth import get_user_model;
 user_model = get_user_model()
 try:
@@ -23,7 +23,7 @@ except user_model.DoesNotExist:
         password='${REMATCH_SU_PASSWORD}')"
 
 celery -A rematch.celery worker -l info --detach --logfile /var/log/rematch/celery.log
-uwsgi --socket :8001 --module rematch.wsgi --env DJANGO_SETTINGS_MODULE=rematch.settings.docker --daemonize /var/log/rematch/uwsgi.log --master
+uwsgi docker-assets/uwsgi.ini
 nginx -c docker-assets/nginx.conf
 
 # TODO: include health check for all three services, run all three as daemons
