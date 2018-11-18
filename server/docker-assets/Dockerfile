@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-slim
 ENV PYTHONUNBUFFERED 1
 
 # Install needed packages
