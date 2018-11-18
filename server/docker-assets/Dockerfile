@@ -15,9 +15,11 @@ RUN mkdir /rematch_server/ && \
     chown rematch:rematch -R /rematch_server/
 WORKDIR /rematch_server
 
-RUN mkdir /var/log/rematch/
-RUN chown rematch:rematch -R /var/log/rematch/
-RUN chown rematch:rematch -R /var/lib/nginx/
+# Set up logging directory
+# nginx directory is unused, bug nginx will refuse to run with write access
+RUN mkdir /var/log/rematch/ && \
+    chown rematch:rematch -R /var/log/rematch/ && \
+    chown rematch:rematch -R /var/lib/nginx/
 
 # Install python requirements
 RUN pip install --upgrade pip uwsgi
