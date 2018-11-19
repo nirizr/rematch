@@ -3,7 +3,8 @@ ENV PYTHONUNBUFFERED 1
 
 # Install needed packages
 RUN set -ex ; \
-    mkdir -p /usr/share/man/man{1,7} ; \
+    mkdir -p /usr/share/man/man1 ; \
+    mkdir -p /usr/share/man/man7 ; \
     apt-get update ; \
     apt-get install --fix-missing -yq --no-install-recommends \
         apt-utils nginx postgresql-client ; \
