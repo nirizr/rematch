@@ -47,8 +47,10 @@ install:
       service docker start ;
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web chown -R rematch:rematch /var/log/rematch ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ../tests/requirements.txt ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade coveralls pytest-cov ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml logs ;
       pip install --upgrade flake8 ;
     fi ;
   - if [ "${ENV}" == "conda" ]; then
@@ -87,7 +89,7 @@ script:
   - if [ -d ./tests/${PROJECT} ]; then flake8 ./tests/${PROJECT} --show-source --statistics ; fi ;
   - if [ -d ./tests/${PROJECT} ]; then
       if [ "${ENV}" == "docker" ]; then
-        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "cd ../ ; PYTHONPATH=. DJANGO_LOG_FILE=/dev/null py.test -rapP ./${PROJECT} ./tests/ --verbose --cov-report= --cov=${PROJECT} ;" ;
+        docker-compose -f ./${PROJECT}/docker-compose.yml exec web /bin/bash -c "cd ../ ; PYTHONPATH=. python -m pytest -rapP ./${PROJECT} ./tests/ --verbose --cov-report= --cov=${PROJECT} ;" ;
       elif [ "${PROJECT}" == "interop" ]; then
         PYTHONPATH=. py.test -rapP ./server ./idaplugin ./tests/${PROJECT} --verbose --cov-report= --cov=server --cov=idaplugin ;
       elif [ "${PROJECT}" == "server" ]; then
@@ -101,6 +103,9 @@ script:
   - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py server install ; fi ;
   - if [ "${PROJECT}" == "setup.py" ]; then python ./setup.py idaplugin install ; fi ;
   - if [ "${PROJECT}" == "docs" ]; then sphinx-build ./docs/ ./docs/_build -a -E -n -W ; fi ;
+  - if [ "${ENV}" == "docker" ]; then
+      curl -I http://127.0.0.1:8000/ ;
+    fi ;
 
 after_script:
   - if [ -d ./tests/${PROJECT} ] && [ "${ENV}" != "docker" ]; then

@@ -10,15 +10,17 @@ RUN set -ex ; \
     rm -rf /var/lib/apt/lists/*
 
 # Create rematch user and setup environment
-RUN mkdir /rematch_server/ && \
-    useradd --no-log-init -M -d /rematch_server rematch && \
+RUN set -ex ; \
+    mkdir /rematch_server/ ; \
+    useradd --no-log-init -M -d /rematch_server rematch ; \
     chown rematch:rematch -R /rematch_server/
 WORKDIR /rematch_server
 
 # Set up logging directory
 # nginx directory is unused, bug nginx will refuse to run with write access
-RUN mkdir /var/log/rematch/ && \
-    chown rematch:rematch -R /var/log/rematch/ && \
+RUN set -ex ; \
+    mkdir -p /var/log/rematch/ ; \
+    chown rematch:rematch -R /var/log/rematch ; \
     chown rematch:rematch -R /var/lib/nginx/
 
 # Install uwsgi as an additional step to better utilize docker cache
@@ -26,8 +28,9 @@ RUN pip install --disable-pip-version-check --no-cache-dir uwsgi
 
 # Install python requirements
 COPY ./server/requirements.txt ./requirements.txt
-RUN pip install --disable-pip-version-check --no-cache-dir \
-        -r ./requirements.txt && \
+RUN set -ex ; \
+    pip install --disable-pip-version-check --no-cache-dir \
+        -r ./requirements.txt ; \
     rm ./requirements.txt
 
 # Add rematch project files as late as possible to use dockers cache
@@ -36,5 +39,5 @@ ADD --chown=rematch:rematch ./tests/server/ ./tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server/
-# USER rematch # This screws up testing in docker
+USER rematch
 CMD ./docker-assets/entrypoint.sh
