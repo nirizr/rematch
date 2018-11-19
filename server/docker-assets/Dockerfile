@@ -8,7 +8,6 @@ RUN set -ex ; \
     apt-get update ; \
     apt-get install --fix-missing -yq --no-install-recommends \
         apt-utils nginx postgresql-client -yq ; \
-    apt-get remove --purge apt-utils -yq ; \
     apt-get autoremove -yq ; \
     rm -rf /var/lib/apt/lists/*
 
