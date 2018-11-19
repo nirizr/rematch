@@ -49,6 +49,7 @@ install:
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ../tests/requirements.txt ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade coveralls pytest-cov ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml logs ;
       pip install --upgrade flake8 ;
     fi ;
   - if [ "${ENV}" == "conda" ]; then
