@@ -23,7 +23,7 @@ except user_model.DoesNotExist:
         password='${REMATCH_SU_PASSWORD}')"
 
 celery -A rematch.celery worker -l info --detach --logfile /var/log/rematch/celery.log
-uwsgi --socket :8001 --module rematch.wsgi --env DJANGO_SETTINGS_MODULE=rematch.settings.docker --daemonize /var/log/rematch/uwsgi.log --master
-nginx -c /rematch_server/server/nginx.conf
+uwsgi docker-assets/uwsgi.ini
+nginx -c /rematch_server/server/docker-assets/nginx.conf
 
 # TODO: include health check for all three services, run all three as daemons

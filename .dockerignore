@@ -5,6 +5,7 @@
 **/.*.un~
 **/*.pyc
 **/__pycache__
+**/*.egg-info
 
 # Other projects
 idaplugin
@@ -13,7 +14,7 @@ README.rst
 LICENSE.md
 
 # Docker build files
-server/Dockerfile
+server/docker-assets/Dockerfile
 server/docker-compose.yml
 
 # Secrets, logs and raw data
