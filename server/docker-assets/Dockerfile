@@ -2,13 +2,14 @@ FROM python:3.6-slim
 ENV PYTHONUNBUFFERED 1
 
 # Install needed packages
-RUN mkdir -p /usr/share/man/man{1,7} && \
-    apt-get update && \
-    apt-get install --fix-missing -yq \
-        apt-utils nginx postgresql-client && \
-    AUTO_ADDED_PACKAGES=`apt-mark showauto` && \
-    apt-get remove --purge apt-utils $AUTO_ADDED_PACKAGES && \
-    apt-get autoremove -yq && \
+RUN set -ex ; \
+    mkdir -p /usr/share/man/man{1,7} ; \
+    apt-get update ; \
+    apt-get install --fix-missing -yq --no-install-recommends \
+        apt-utils nginx postgresql-client ; \
+    AUTO_ADDED_PACKAGES=`apt-mark showauto` ; \
+    apt-get remove --purge apt-utils $AUTO_ADDED_PACKAGES ; \
+    apt-get autoremove -yq ; \
     rm -rf /var/lib/apt/lists/*
 
 # Create rematch user and setup environment
