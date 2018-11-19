@@ -5,7 +5,9 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir -p /usr/share/man/man{1,7} && \
     apt-get update && \
     apt-get install --fix-missing -yq \
-        nginx postgresql-client && \
+        apt-utils nginx postgresql-client && \
+    AUTO_ADDED_PACKAGES=`apt-mark showauto` && \
+    apt-get remove --purge apt-utils $AUTO_ADDED_PACKAGES && \
     apt-get autoremove -yq && \
     rm -rf /var/lib/apt/lists/*
 
