@@ -47,6 +47,7 @@ install:
       service docker start ;
       docker-compose -f ./${PROJECT}/docker-compose.yml build ;
       docker-compose -f ./${PROJECT}/docker-compose.yml up -d ;
+      docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web chown -R rematch:rematch /var/log/rematch ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade -r ../tests/requirements.txt ;
       docker-compose -f ./${PROJECT}/docker-compose.yml exec --user root web pip install --upgrade coveralls pytest-cov ;
       docker-compose -f ./${PROJECT}/docker-compose.yml logs ;
