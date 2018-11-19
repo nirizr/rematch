@@ -8,8 +8,7 @@ RUN set -ex ; \
     apt-get update ; \
     apt-get install --fix-missing -yq --no-install-recommends \
         apt-utils nginx postgresql-client ; \
-    AUTO_ADDED_PACKAGES=`apt-mark showauto` ; \
-    apt-get remove --purge apt-utils $AUTO_ADDED_PACKAGES ; \
+    apt-get remove --purge apt-utils ; \
     apt-get autoremove -yq ; \
     rm -rf /var/lib/apt/lists/*
 
