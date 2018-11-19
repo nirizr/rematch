@@ -32,7 +32,7 @@ RUN pip install --disable-pip-version-check --no-cache-dir \
 
 # Add rematch project files as late as possible to use dockers cache
 ADD --chown=rematch:rematch ./server/ ./server/
-ADD --chown=rematch:rematch ./tests/server/ ./server/tests/
+ADD --chown=rematch:rematch ./tests/server/ ./tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server/
