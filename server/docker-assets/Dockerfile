@@ -2,10 +2,11 @@ FROM python:3.6
 ENV PYTHONUNBUFFERED 1
 
 # Install needed packages
-RUN apt-get update && \
-    apt-get install --fix-missing -yq \
-        nginx postgresql-client && \
-    apt-get autoremove -yq && \
+RUN set -ex ; \
+    apt-get update ; \
+    apt-get install --fix-missing -yq --no-install-recommends \
+        nginx postgresql-client ; \
+    apt-get autoremove -yq ; \
     rm -rf /var/lib/apt/lists/*
 
 # Create rematch user and setup environment
