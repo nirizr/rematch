@@ -36,5 +36,5 @@ ADD --chown=rematch:rematch ./tests/server/ ./tests/
 
 # Downgrade to the rematch user and set server up
 WORKDIR /rematch_server/server/
-# USER rematch # This screws up testing in docker
+USER rematch
 CMD ./docker-assets/entrypoint.sh
