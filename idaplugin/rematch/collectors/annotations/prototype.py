@@ -46,7 +46,7 @@ class PrototypeAnnotation(annotation.DependencyAnnotation):
       if not arg.is_struct():
           continue
 
-      StructureAnnotation.depend(self, str(arg))
+      self.depend_on(StructureAnnotation, str(arg))
 
     return d
 

@@ -117,7 +117,7 @@ class InstanceVectorSerializer(SlimInstanceSerializer):
       model = Vector
       fields = ('id', 'type', 'type_version', 'data')
 
-  class NestedAnnotationSerializer(AnnotationSerializer):
+  class NestedAnnotationSerializer(serializers.ModelSerializer):
     class Meta(object):
       model = Annotation
       fields = ('id', 'uuid', 'type', 'data')
