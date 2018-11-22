@@ -2,15 +2,15 @@ from .. import log
 from .base import BaseDialog
 
 
-class SilentDialog(BaseDialog):
+class AutoDialog(BaseDialog):
   def __init__(self, calls):
     # initialize super without any callbacks to avoid code review warnings
-    super(SilentDialog, self).__init__()
+    super(AutoDialog, self).__init__()
     self.data_value = None
     self.calls = calls
 
   def __call__(self, **kwargs):
-    super(SilentDialog, self).__init__(**kwargs)
+    super(AutoDialog, self).__init__(**kwargs)
     return self
 
   def show(self):

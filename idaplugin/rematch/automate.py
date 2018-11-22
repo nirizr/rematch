@@ -1,11 +1,7 @@
 import idaapi
 
-try:
-  import rematch.actions as actions
-  import rematch.dialogs as dialogs
-except ImportError:
-  from . import actions
-  from . import dialogs
+from . import actions
+from . import dialogs
 
 
 def main():
