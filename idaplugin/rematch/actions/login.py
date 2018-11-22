@@ -9,7 +9,7 @@ from ..dialogs.login import LoginDialog
 class LoginAction(base.UnauthAction):
   name = "&Login"
   group = "User"
-  dialog = LoginDialog
+  dialog_cls = LoginDialog
 
   def __init__(self, *args, **kwargs):
     super(LoginAction, self).__init__(*args, **kwargs)
@@ -34,7 +34,7 @@ class LoginAction(base.UnauthAction):
   def handle_login(self, response):
     del response
 
-    self.ui.set_status("Connected!", color="green")
+    self.dialog_obj.set_status("Connected!", color="green")
 
     config['login']['username'] = self.username
     config['login']['server'] = self.server
@@ -44,17 +44,17 @@ class LoginAction(base.UnauthAction):
       config['login']['password'] = ""
     config.save()
 
-    self.ui.accept()
+    self.dialog_obj.accept()
 
   def handle_exception(self, exception, traceback):
     del traceback
 
     if isinstance(exception, (exceptions.ConnectionException,
                               exceptions.ServerException)):
-      self.ui.set_status("Connection to server failed.", color="blue")
+      self.dialog_obj.set_status("Connection to server failed.", color="blue")
     elif isinstance(exception, (exceptions.QueryException,
                                 exceptions.AuthenticationException)):
-      self.ui.set_status("Invalid user name or password.", color="red")
+      self.dialog_obj.set_status("Invalid user name or password.", color="red")
 
 
 class LogoutAction(base.AuthAction):

@@ -13,7 +13,7 @@ import json
 
 class MatchAction(base.BoundFileAction):
   name = "&Match"
-  dialog = MatchDialog
+  dialog_cls = MatchDialog
 
   def __init__(self, *args, **kwargs):
     super(MatchAction, self).__init__(*args, **kwargs)
