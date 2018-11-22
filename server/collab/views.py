@@ -224,7 +224,7 @@ class AnnotationViewSet(viewsets.ModelViewSet):
     return annotations
 
 
-class DependencyViewSet(viewsets.ModelViewSet):
+class DependencyViewSet(ViewSetManyAllowedMixin, viewsets.ModelViewSet):
   queryset = Dependency.objects.all()
   serializer_class = DependencySerializer
   permission_classes = (permissions.IsAuthenticated,)

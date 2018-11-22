@@ -44,12 +44,10 @@ class StructureAnnotation(annotation.DependencyAnnotation):
 
     d['members'] = {}
     member_idx = 0
-    while member_idx != idaapi.BADADDR:
+    while member_idx not in (-1, idaapi.BADADDR):
         member = struct.get_member(member_idx)
         d['members'][member_idx] = self.member_data(member)
         member_idx = ida_struct.get_next_member_idx(struct, member.soff)
-        # TODO: FIX issue with looping over members
-        member_idx = idaapi.BADADDR
 
     return d
 
@@ -78,7 +76,7 @@ class StructureAnnotation(annotation.DependencyAnnotation):
     if sptr:
       struct_name = ida_struct.get_struc_name(sptr.id)
       d['struct_name'] = struct_name
-      d['struct_uuid'] = StructureAnnotation.depend(self, struct_name)
+      d['struct_uuid'] = self.depend_on(StructureAnnotation, struct_name)
     return d
 
   @classmethod
