@@ -8,7 +8,7 @@ from ..dialogs.settings import SettingsDialog
 
 class SettingsAction(base.IDAAction):
   name = "&Settings"
-  dialog = SettingsDialog
+  dialog_cls = SettingsDialog
 
   @staticmethod
   def submit_handler(autocheck, autoupdate, autologin, autologout, debug,
