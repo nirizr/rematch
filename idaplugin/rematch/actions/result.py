@@ -8,7 +8,7 @@ from . import base
 
 class ResultAction(base.BoundFileAction):
   name = "&Result"
-  dialog = ResultDialog
+  dialog_cls = ResultDialog
 
   def __init__(self, task_data=None, *args, **kwargs):
     super(ResultAction, self).__init__(*args, **kwargs)
@@ -46,10 +46,10 @@ class ResultAction(base.BoundFileAction):
       self.start_results()
 
   def start_results(self):
-    self.ui.set_status("Receiving match results...")
-    self.ui.progress.setRange(0, (self.local_count + self.remote_count +
-                                  self.match_count))
-    self.ui.progress.setValue(0)
+    self.dialog_obj.set_status("Receiving match results...")
+    total_count = (self.local_count + self.remote_count + self.match_count)
+    self.dialog_obj.progress.setRange(0, total_count)
+    self.dialog_obj.progress.setValue(0)
 
     log('result').info("Result download started")
     params = {'from_matches__task': self.task_id}
@@ -113,21 +113,22 @@ class ResultAction(base.BoundFileAction):
     self.handle_page(len(response['results']))
 
   def handle_page(self, results_count):
-    self.ui.progress.setValue(self.ui.progress.value() + results_count)
+    self.dialog_obj.progress.setValue(self.dialog_obj.progress.value() +
+                                      results_count)
     log('result').info("result download progress: {} / {}"
-                       "".format(self.ui.progress.value(),
-                                 self.ui.progress.maximum()))
-    if self.ui.progress.value() >= self.ui.progress.maximum():
+                       "".format(self.dialog_obj.progress.value(),
+                                 self.dialog_obj.progress.maximum()))
+    if self.dialog_obj.progress.value() >= self.dialog_obj.progress.maximum():
       self.download_complete()
 
   def download_complete(self):
     # TODO: perform the following while data comes in instead of after it
     # arrived. Also, schedule execution using a timer to not hang
     self.populate_tree()
-    self.ui.set_checks()
+    self.dialog_obj.set_checks()
 
     log('result').info("Result download completed successfully")
-    self.ui.set_status("Result download complete")
+    self.dialog_obj.set_status("Result download complete")
 
   def build_context(self, local, match=None, remote=None):
     log('result').info("building context %s %s %s", local, match, remote)
@@ -169,13 +170,13 @@ class ResultAction(base.BoundFileAction):
 
   def populate_tree(self):
     # clear tree before populating it
-    self.ui.tree.clear()
+    self.dialog_obj.tree.clear()
 
     for local_obj in self.locals.values():
       if self.should_filter(local_obj):
         continue
 
-      local_item = self.ui.populate_item(None, local_obj)
+      local_item = self.dialog_obj.populate_item(None, local_obj)
       local_item.instance_id = local_obj['id']
       for match_obj in local_obj['matches']:
         remote_obj = self.remotes[match_obj['remote_id']]
@@ -183,7 +184,8 @@ class ResultAction(base.BoundFileAction):
         if self.should_filter(local_obj, match_obj, remote_obj):
           continue
 
-        remote_item = self.ui.populate_item(local_item, remote_obj, match_obj)
+        remote_item = self.dialog_obj.populate_item(local_item, remote_obj,
+                                                    match_obj)
         remote_item.instance_id = remote_obj['id']
 
   def get_obj(self, obj_id):

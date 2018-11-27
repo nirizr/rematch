@@ -5,7 +5,7 @@ import idc
 
 
 class Action(object):
-  dialog = None
+  dialog_cls = None
   reject_handler = None
   accept_handler = None
   finish_handler = None
@@ -13,15 +13,15 @@ class Action(object):
   response_handler = None
   exception_handler = None
 
-  def __init__(self, ui_class=None):
+  def __init__(self, dialog_cls=None):
     super(Action, self).__init__()
-    if ui_class:
-      self.dialog = ui_class
-    self.ui = None
+    if dialog_cls:
+      self.dialog_cls = dialog_cls
+    self.dialog_obj = None
     self._running = False
 
   def __repr__(self):
-    return "<{}: {}>".format(self.__class__.__name__, self.dialog)
+    return "<{}: {}>".format(self.__class__.__name__, self.dialog_cls)
 
   def running(self):
     return self._running
@@ -125,17 +125,17 @@ class IDAAction(Action, ida_kernwin.action_handler_t):
       return
     self._running = True
 
-    if callable(self.dialog):
+    if callable(self.dialog_cls):
       try:
-        self.ui = self.dialog(action=self)
-        self.ui.show()
+        self.dialog_obj = self.dialog_cls(action=self)
+        self.dialog_obj.show()
       except Exception:
         log('actions').exception("Exception thrown while showing dialog")
         self._running = False
-        self.ui = None
+        self.dialog_obj = None
     else:
       raise NotImplementedError("Activation called on an action class with no "
-                                "dialog defined")
+                                "dialog_cls defined")
 
   def finish_handler(self, status):
     del status

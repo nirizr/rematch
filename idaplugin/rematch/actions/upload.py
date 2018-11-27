@@ -13,7 +13,7 @@ import hashlib
 
 class UploadAction(base.BoundFileAction):
   name = "&Upload"
-  dialog = UploadDialog
+  dialog_cls = UploadDialog
 
   def __init__(self, *args, **kwargs):
     super(UploadAction, self).__init__(*args, **kwargs)
@@ -62,7 +62,7 @@ class UploadAction(base.BoundFileAction):
   def submit_handler(self, force_update, upload_annotations):
     self.upload_annotations = upload_annotations
 
-    self.ui.set_status("Uploading...")
+    self.dialog_obj.set_status("Uploading...")
 
     endpoint = "collab/file_versions/"
     if force_update:
@@ -85,7 +85,7 @@ class UploadAction(base.BoundFileAction):
     self.instances = set((FunctionInstance, f) for f in idautils.Functions())
     self.instances.add((UniversalInstance, (s[0] for s in idautils.Structs())))
 
-    self.ui.increase_maximum(len(self.instances))
+    self.dialog_obj.increase_maximum(len(self.instances))
 
     self.timer.timeout.connect(self.perform_upload)
     self.timer.start(0)
@@ -109,12 +109,12 @@ class UploadAction(base.BoundFileAction):
       self.delayed_queries.append(q)
 
       self.instance_objs = []
-      self.ui.increase_maximum()
+      self.dialog_obj.increase_maximum()
     self.progress_advance()
 
   def progress_advance(self, result=None):
     del result
-    self.ui.advance()
+    self.dialog_obj.advance()
 
   def accept_handler(self):
     self.clean()
