@@ -2,7 +2,7 @@ from .idasix import QtCore, QtWidgets
 
 import ida_idaapi
 
-from . import config, user
+from . import config
 from . import actions
 from . import update
 
@@ -24,7 +24,6 @@ class RematchPlugin(ida_idaapi.plugin_t):
 
     self.update_checker = update.UpdateChecker()
     self.statusbar_label = None
-    self.statusbar_timer = None
 
   def init(self):
     self.setup()
@@ -61,19 +60,7 @@ class RematchPlugin(ida_idaapi.plugin_t):
     self.statusbar_label = QtWidgets.QLabel("Rematch loaded")
     self.get_mainwindow().statusBar().addPermanentWidget(self.statusbar_label)
 
-    # start status bar periodic update
-    self.statusbar_timer = QtCore.QTimer()
-    self.statusbar_timer.setInterval(1000)
-    self.statusbar_timer.timeout.connect(self.update_statusbar)
-    self.statusbar_timer.start()
-
     self.update_checker.check_update()
-
-  def update_statusbar(self):
-    if 'is_authenticated' in user and user['is_authenticated']:
-      self.statusbar_label.setText("Connected as {}".format(user['username']))
-    else:
-      self.statusbar_label.setText("Rematch loaded")
 
   def delay_setup(self):
     QtCore.QTimer.singleShot(1000, self.setup)
@@ -82,10 +69,6 @@ class RematchPlugin(ida_idaapi.plugin_t):
     actions.settings.SettingsAction().activate()
 
   def term(self):
-    if self.statusbar_timer:
-      self.statusbar_timer.stop()
-      self.statusbar_timer = None
-
     if ('token' in config['login'] and
         config['settings']['login']['autologout']):
       del config['login']['token']
